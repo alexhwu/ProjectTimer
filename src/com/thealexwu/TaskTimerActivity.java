@@ -9,10 +9,14 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -38,6 +42,7 @@ public class TaskTimerActivity extends Activity {
 	TableRow tr;
 	LinearLayout ll;
 
+	int viewIdCounter = 0;
 	Timer timer = new Timer();
 	final Handler handler = new Handler();
 
@@ -93,6 +98,8 @@ public class TaskTimerActivity extends Activity {
 
 				mainTl = new TableLayout(TaskTimerActivity.this);
 				mainTl.setLayoutParams(mtlParams);
+				mainTl.setId(viewIdCounter); // set the layout id for reference
+												// later
 
 				ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
 				final float scale = getResources().getDisplayMetrics().density;
@@ -130,7 +137,7 @@ public class TaskTimerActivity extends Activity {
 													+ ":"
 													+ (sec < 10 ? "0" + sec : sec);
 											timeText.setText(counterStr);
-											
+
 										}
 									});
 								}
@@ -164,6 +171,9 @@ public class TaskTimerActivity extends Activity {
 				// add timer and task label to inner table
 				ll.addView(mainTl);
 
+				// set long press event
+				// startStopBtn.setFocusable(false);
+				registerForContextMenu(mainTl);
 			}
 
 			public void onClick(View v) {
@@ -179,6 +189,7 @@ public class TaskTimerActivity extends Activity {
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
+								viewIdCounter++;
 								createTaskTimer(input.getText().toString());
 							}
 						});
@@ -198,4 +209,23 @@ public class TaskTimerActivity extends Activity {
 
 	}
 
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		menu.setHeaderTitle("Select Option");
+		menu.add(0, v.getId(), 0, "Delete Timer");
+	}
+
+	public boolean onContextItemSelected(MenuItem item) {
+
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		String menuItemTitle = (String) item.getTitle();
+
+		if (menuItemTitle == "Delete Timer") {
+
+			// get the innerTl view
+			TableLayout tv = (TableLayout) findViewById(item.getItemId());
+
+			ll.removeView(tv);
+		}
+		return true;
+	}
 }
