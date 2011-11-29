@@ -1,5 +1,6 @@
 package com.thealexwu;
 
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -60,8 +61,12 @@ public class TaskTimerActivity extends Activity {
 		
 		for(int i=0; i<max_count; i++) {
 			int t = pref.getInt("Timer"+i, 0);
+		
 			String l = pref.getString("Label"+i, "");
-			addTimerFromStorage(l,t);
+			boolean isRunning = pref.getBoolean("IsRunning"+i, false);
+			long timestamp = pref.getLong("Timestamp"+i, 0);
+			
+			addTimerFromStorage(l,t,isRunning, timestamp);
 			viewIdCounter++;
 		}
 		
@@ -128,6 +133,7 @@ public class TaskTimerActivity extends Activity {
 				startStopBtn.setTextSize(12);
 				startStopBtn.setHeight(pixels);
 				startStopBtn.setWidth(pixels);
+				startStopBtn.setId(30000+viewIdCounter);
 
 				startStopBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -137,6 +143,11 @@ public class TaskTimerActivity extends Activity {
 					public void onClick(View v) {
 
 						if (startStopBtn.isChecked()) {
+							SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+					        SharedPreferences.Editor editor = settings.edit();
+					        Calendar cal = Calendar.getInstance();
+				        	editor.putLong("StartTimestamp"+viewIdCounter, cal.getTimeInMillis());
+				        	
 							startStopBtn.setText("Stop");
 							timerTask = new TimerTask() {
 
@@ -145,23 +156,25 @@ public class TaskTimerActivity extends Activity {
 
 										public void run() {
 											counter++; // seconds
-											int hour = (int) counter / 6000;
-											int min = (int) counter / 60;
+											int hour = (int) (counter / 6000);
+											int min = (int) (counter / 60);
 											int sec = counter % 60;
 
+											timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
+											/*
 											String counterStr = (hour < 10 ? "0" + hour : hour)
 													+ ":"
 													+ (min < 10 ? "0" + min : min)
 													+ ":"
 													+ (sec < 10 ? "0" + sec : sec);
 											timeText.setText(counterStr);
-
+											*/
 										}
 									});
 								}
 							};
 
-							timer.schedule(timerTask, 0, 1000);
+							timer.schedule(timerTask, 1000, 1000);
 
 						} else {
 							startStopBtn.setText("Start");
@@ -227,7 +240,7 @@ public class TaskTimerActivity extends Activity {
 
 	}
 
-	private void addTimerFromStorage(String label, final int seconds) {
+	private void addTimerFromStorage(String label, final int seconds, boolean isRunning, long timestamp) {
 		ll = (LinearLayout) findViewById(R.id.linearLayout);
 		//Button newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
 
@@ -258,6 +271,7 @@ public class TaskTimerActivity extends Activity {
 		timeText.setTextSize(28);
 		timeText.setId(10000 + viewIdCounter);
 
+		
 		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
 		_tr2.addView(timeText);
 		innerTl.addView(_tr2);
@@ -290,28 +304,43 @@ public class TaskTimerActivity extends Activity {
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
-
+		startStopBtn.setId(30000+viewIdCounter);
+		
+		int _seconds = seconds;
+		
+		if (isRunning) {
+			// calculate the seconds to add since the activity was destroyed
+			long now = Calendar.getInstance().getTimeInMillis();
+			long elapsed = now - timestamp;  // milliseconds
+			_seconds += ((int) (Math.round(elapsed/1000)));
+			
+		}
+		
+		final int finalSeconds = _seconds;
+		
 		// set the initial counter value
-		int hour = (int) seconds / 6000;
-		int min = (int) seconds / 60;
-		int sec = seconds % 60;
-
+		int hour = (int) (finalSeconds / 6000);
+		int min = (int) (finalSeconds / 60);
+		int sec = finalSeconds % 60;
+		
+		
+		timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
+		/*
 		String counterStr = (hour < 10 ? "0" + hour : hour)
 				+ ":"
 				+ (min < 10 ? "0" + min : min)
 				+ ":"
 				+ (sec < 10 ? "0" + sec : sec);
-		timeText.setText(counterStr);
 		
+		
+		timeText.setText(counterStr);
+		*/
 		
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
 			TimerTask timerTask = null;
-			int counter = seconds;
+			int counter = finalSeconds;
 
-			
-			
-			
 			public void onClick(View v) {
 
 				if (startStopBtn.isChecked()) {
@@ -323,23 +352,25 @@ public class TaskTimerActivity extends Activity {
 
 								public void run() {
 									counter++; // seconds
-									int hour = (int) counter / 6000;
-									int min = (int) counter / 60;
+									int hour = (int) (counter / 6000);
+									int min = (int) (counter / 60);
 									int sec = counter % 60;
 
+									/*
 									String counterStr = (hour < 10 ? "0" + hour : hour)
 											+ ":"
 											+ (min < 10 ? "0" + min : min)
 											+ ":"
 											+ (sec < 10 ? "0" + sec : sec);
 									timeText.setText(counterStr);
-
+									*/
+									timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
 								}
 							});
 						}
 					};
 
-					timer.schedule(timerTask, 0, 1000);
+					timer.schedule(timerTask, 1000, 1000);
 
 				} else {
 					startStopBtn.setText("Start");
@@ -352,6 +383,11 @@ public class TaskTimerActivity extends Activity {
 			}
 		});
 
+		// start the timer is isRunning == true
+		if (isRunning) {
+			startStopBtn.performClick();
+		}
+		
 		TableRow _tr = new TableRow(mainTl.getContext());
 		_tr.addView(startStopBtn);
 		_tr.addView(innerTl);
@@ -393,6 +429,7 @@ public class TaskTimerActivity extends Activity {
 			TableLayout tv = (TableLayout) findViewById(item.getItemId());
 
 			ll.removeView(tv);
+			
 		}
 		return true;
 	}
@@ -432,7 +469,15 @@ public class TaskTimerActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         
-        // save timer(s) to preferences
+        saveTimers();
+        
+        // The activity is about to be destroyed.
+        timer.cancel();
+        
+    }
+    
+    private void saveTimers() {
+    	// save timer(s) to preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         
@@ -444,7 +489,7 @@ public class TaskTimerActivity extends Activity {
         	TableLayout tv = (TableLayout) findViewById(i);
         	
         	if (tv == null) continue; // none found; continue to next iteration
-        	
+        
         	
         	
         	// table layout found, which means a timer also exists; save the time value
@@ -457,17 +502,19 @@ public class TaskTimerActivity extends Activity {
         	TextView labelValue = (TextView) findViewById(20000+i);
         	editor.putString("Label"+max_count, labelValue.getText().toString());
         	
+        	// save the state of the timer; running or not
+        	ToggleButton btn = (ToggleButton) findViewById(30000+i);
+        	editor.putBoolean("IsRunning"+max_count, btn.isChecked());
+        	
+        	// save the timestamp; used for timers that are active when activity is destroyed
+        	Calendar cal = Calendar.getInstance();
+        	editor.putLong("Timestamp"+max_count, cal.getTimeInMillis());
         	
         	max_count++;
         }
         
-        editor.putInt("max_count", viewIdCounter);
+        editor.putInt("max_count", max_count);
         editor.commit();
-        
-        // The activity is about to be destroyed.
-        timer.cancel();
-        
-        
     }
     
     private int convertToSeconds(String t) {
@@ -488,7 +535,7 @@ public class TaskTimerActivity extends Activity {
     		sec+= m;
     	}
     	
-    	if (timeStr[1] != "00") {
+    	if (timeStr[2] != "00") {
     		// convert minutes into seconds
     		int s = Integer.parseInt(timeStr[2]);
     		sec+= s;
