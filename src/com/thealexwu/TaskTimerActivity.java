@@ -156,9 +156,12 @@ public class TaskTimerActivity extends Activity {
 
 										public void run() {
 											counter++; // seconds
-											int hour = (int) (counter / 6000);
-											int min = (int) (counter / 60);
-											int sec = counter % 60;
+											int hour = counter / 3600;
+											int rem = counter % 3600;
+											int min = rem / 60;
+											int sec = rem % 60;
+											
+											
 
 											timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
 											/*
@@ -174,7 +177,7 @@ public class TaskTimerActivity extends Activity {
 								}
 							};
 
-							timer.schedule(timerTask, 1000, 1000);
+							timer.scheduleAtFixedRate(timerTask, 1000, 1000);
 
 						} else {
 							startStopBtn.setText("Start");
@@ -319,22 +322,14 @@ public class TaskTimerActivity extends Activity {
 		final int finalSeconds = _seconds;
 		
 		// set the initial counter value
-		int hour = (int) (finalSeconds / 6000);
-		int min = (int) (finalSeconds / 60);
-		int sec = finalSeconds % 60;
+		int hour = finalSeconds / 3600;
+		int rem = finalSeconds % 3600;
+		int min = rem / 60;
+		int sec = rem % 60;
 		
 		
 		timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
-		/*
-		String counterStr = (hour < 10 ? "0" + hour : hour)
-				+ ":"
-				+ (min < 10 ? "0" + min : min)
-				+ ":"
-				+ (sec < 10 ? "0" + sec : sec);
 		
-		
-		timeText.setText(counterStr);
-		*/
 		
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -352,25 +347,18 @@ public class TaskTimerActivity extends Activity {
 
 								public void run() {
 									counter++; // seconds
-									int hour = (int) (counter / 6000);
-									int min = (int) (counter / 60);
-									int sec = counter % 60;
-
-									/*
-									String counterStr = (hour < 10 ? "0" + hour : hour)
-											+ ":"
-											+ (min < 10 ? "0" + min : min)
-											+ ":"
-											+ (sec < 10 ? "0" + sec : sec);
-									timeText.setText(counterStr);
-									*/
+									int hour = counter / 3600;
+									int rem = counter % 3600;
+									int min = rem / 60;
+									int sec = rem % 60;
+									
 									timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
 								}
 							});
 						}
 					};
 
-					timer.schedule(timerTask, 1000, 1000);
+					timer.scheduleAtFixedRate(timerTask, 1000, 1000);
 
 				} else {
 					startStopBtn.setText("Start");
@@ -460,7 +448,8 @@ public class TaskTimerActivity extends Activity {
     protected void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
-        
+        //Log.d("stop", "stop");
+        saveTimers();
     }
     
     private SharedPreferences sharedPref;
