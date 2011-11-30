@@ -83,124 +83,8 @@ public class TaskTimerActivity extends Activity {
 		itlParams = ((TableLayout) findViewById(R.id.tableLayout2)).getLayoutParams();
 
 		newTimerBtn.setOnClickListener(new View.OnClickListener() {
-
-			private void createTaskTimer(String label) {
-				innerTl = new TableLayout(TaskTimerActivity.this);
-				innerTl.setLayoutParams(itlParams);
-
-				final TextView taskLabel = new TextView(innerTl.getContext());
-				taskLabel.setText(label);
-				taskLabel.setLayoutParams(taskLabelParams);
-				taskLabel.setTextSize(18);
-				taskLabel.setId(20000 + viewIdCounter);
-				
-
-				final TextView timeText = new TextView(TaskTimerActivity.this);
-				timeText.setText("00:00:00");
-				timeText.setLayoutParams(timeTextParams);
-				timeText.setTextSize(28);
-				timeText.setId(10000 + viewIdCounter);
-
-				TableRow _tr2 = new TableRow(TaskTimerActivity.this);
-				_tr2.addView(timeText);
-				innerTl.addView(_tr2);
-
-				TableRow _tr3 = new TableRow(TaskTimerActivity.this);
-				_tr3.addView(taskLabel);
-				innerTl.addView(_tr3);
-
-				// add horizontal line
-				ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1);
-
-				View hrView = new View(TaskTimerActivity.this);
-				hrView.setLayoutParams(p);
-				hrView.setBackgroundColor(Color.GRAY);
-				hrView.getBackground().setAlpha(120);
-
-				innerTl.addView(hrView);
-
-				mainTl = new TableLayout(TaskTimerActivity.this);
-				mainTl.setLayoutParams(mtlParams);
-				mainTl.setId(viewIdCounter); // set the layout id for reference
-											 // later
-
-				//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
-				final float scale = getResources().getDisplayMetrics().density;
-				int pixels = (int) (65 * scale + 0.5f);
-
-				final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
-				startStopBtn.setText("Start");
-				startStopBtn.setTextSize(12);
-				startStopBtn.setHeight(pixels);
-				startStopBtn.setWidth(pixels);
-				startStopBtn.setId(30000+viewIdCounter);
-
-				startStopBtn.setOnClickListener(new View.OnClickListener() {
-
-					TimerTask timerTask = null;
-					int counter = 0;
-
-					public void onClick(View v) {
-
-						if (startStopBtn.isChecked()) {
-							SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-					        SharedPreferences.Editor editor = settings.edit();
-					        Calendar cal = Calendar.getInstance();
-				        	editor.putLong("StartTimestamp"+viewIdCounter, cal.getTimeInMillis());
-				        	
-							startStopBtn.setText("Stop");
-							timerTask = new TimerTask() {
-
-								public void run() {
-									handler.post(new Runnable() {
-
-										public void run() {
-											counter++; // seconds
-											int hour = counter / 3600;
-											int rem = counter % 3600;
-											int min = rem / 60;
-											int sec = rem % 60;
-											
-											timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
-											
-										}
-									});
-								}
-							};
-
-							timer.scheduleAtFixedRate(timerTask, 1000, 1000);
-
-						} else {
-							startStopBtn.setText("Start");
-							handler.removeCallbacks(timerTask);
-
-							if (timerTask != null) {
-								timerTask.cancel();
-							}
-						}
-					}
-				});
-
-				TableRow _tr = new TableRow(mainTl.getContext());
-				_tr.addView(startStopBtn);
-				_tr.addView(innerTl);
-
-				TableLayout.LayoutParams tableRowParams = new TableLayout.LayoutParams(
-						TableLayout.LayoutParams.FILL_PARENT,
-						TableLayout.LayoutParams.FILL_PARENT);
-				tableRowParams.setMargins(0, 2, 0, 2);
-				_tr.setLayoutParams(tableRowParams);
-
-				mainTl.addView(_tr);
-
-				// add timer and task label to inner table
-				ll.addView(mainTl);
-
-				// set long press event
-				// startStopBtn.setFocusable(false);
-				registerForContextMenu(mainTl);
-			}
-
+			
+			
 			public void onClick(View v) {
 
 				AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
@@ -234,6 +118,124 @@ public class TaskTimerActivity extends Activity {
 
 	}
 
+	private void createTaskTimer(String label) {
+		innerTl = new TableLayout(TaskTimerActivity.this);
+		innerTl.setLayoutParams(itlParams);
+
+		final TextView taskLabel = new TextView(innerTl.getContext());
+		taskLabel.setText(label);
+		taskLabel.setLayoutParams(taskLabelParams);
+		taskLabel.setTextSize(18);
+		taskLabel.setId(20000 + viewIdCounter);
+		
+
+		final TextView timeText = new TextView(TaskTimerActivity.this);
+		timeText.setText("00:00:00");
+		timeText.setLayoutParams(timeTextParams);
+		timeText.setTextSize(28);
+		timeText.setId(10000 + viewIdCounter);
+
+		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
+		_tr2.addView(timeText);
+		innerTl.addView(_tr2);
+
+		TableRow _tr3 = new TableRow(TaskTimerActivity.this);
+		_tr3.addView(taskLabel);
+		innerTl.addView(_tr3);
+
+		// add horizontal line
+		ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1);
+
+		View hrView = new View(TaskTimerActivity.this);
+		hrView.setLayoutParams(p);
+		hrView.setBackgroundColor(Color.GRAY);
+		hrView.getBackground().setAlpha(120);
+
+		innerTl.addView(hrView);
+
+		mainTl = new TableLayout(TaskTimerActivity.this);
+		mainTl.setLayoutParams(mtlParams);
+		mainTl.setId(viewIdCounter); // set the layout id for reference
+									 // later
+
+		//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
+		final float scale = getResources().getDisplayMetrics().density;
+		int pixels = (int) (65 * scale + 0.5f);
+
+		final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
+		startStopBtn.setText("Start");
+		startStopBtn.setTextSize(12);
+		startStopBtn.setHeight(pixels);
+		startStopBtn.setWidth(pixels);
+		startStopBtn.setId(30000+viewIdCounter);
+
+		startStopBtn.setOnClickListener(new View.OnClickListener() {
+
+			TimerTask timerTask = null;
+			int counter = 0;
+
+			public void onClick(View v) {
+
+				if (startStopBtn.isChecked()) {
+					SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+			        SharedPreferences.Editor editor = settings.edit();
+			        Calendar cal = Calendar.getInstance();
+		        	editor.putLong("StartTimestamp"+viewIdCounter, cal.getTimeInMillis());
+		        	
+					startStopBtn.setText("Stop");
+					timerTask = new TimerTask() {
+
+						public void run() {
+							handler.post(new Runnable() {
+
+								public void run() {
+									counter++; // seconds
+									int hour = counter / 3600;
+									int rem = counter % 3600;
+									int min = rem / 60;
+									int sec = rem % 60;
+									
+									timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
+									
+								}
+							});
+						}
+					};
+
+					timer.scheduleAtFixedRate(timerTask, 1000, 1000);
+
+				} else {
+					startStopBtn.setText("Start");
+					handler.removeCallbacks(timerTask);
+
+					if (timerTask != null) {
+						timerTask.cancel();
+					}
+				}
+			}
+		});
+
+		TableRow _tr = new TableRow(mainTl.getContext());
+		_tr.addView(startStopBtn);
+		_tr.addView(innerTl);
+
+		TableLayout.LayoutParams tableRowParams = new TableLayout.LayoutParams(
+				TableLayout.LayoutParams.FILL_PARENT,
+				TableLayout.LayoutParams.FILL_PARENT);
+		tableRowParams.setMargins(0, 2, 0, 2);
+		_tr.setLayoutParams(tableRowParams);
+
+		mainTl.addView(_tr);
+
+		// add timer and task label to inner table
+		ll.addView(mainTl);
+
+		// set long press event
+		// startStopBtn.setFocusable(false);
+		registerForContextMenu(mainTl);
+	}
+
+	
 	private void addTimerFromStorage(String label, final int seconds, boolean isRunning, long timestamp) {
 		ll = (LinearLayout) findViewById(R.id.linearLayout);
 		//Button newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
@@ -391,7 +393,7 @@ public class TaskTimerActivity extends Activity {
 	
 	}
 	
-	
+	// long press context menu
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Select Option");
 		menu.add(0, v.getId(), 0, "Delete Timer");
