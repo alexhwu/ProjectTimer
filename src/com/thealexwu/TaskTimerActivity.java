@@ -161,17 +161,8 @@ public class TaskTimerActivity extends Activity {
 											int min = rem / 60;
 											int sec = rem % 60;
 											
-											
-
 											timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
-											/*
-											String counterStr = (hour < 10 ? "0" + hour : hour)
-													+ ":"
-													+ (min < 10 ? "0" + min : min)
-													+ ":"
-													+ (sec < 10 ? "0" + sec : sec);
-											timeText.setText(counterStr);
-											*/
+											
 										}
 									});
 								}
@@ -404,6 +395,7 @@ public class TaskTimerActivity extends Activity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Select Option");
 		menu.add(0, v.getId(), 0, "Delete Timer");
+		menu.add(0, (20000 + v.getId()), 1, "Edit Task Name");
 	}
 
 	public boolean onContextItemSelected(MenuItem item) {
@@ -415,9 +407,33 @@ public class TaskTimerActivity extends Activity {
 
 			// get the innerTl view
 			TableLayout tv = (TableLayout) findViewById(item.getItemId());
-
 			ll.removeView(tv);
+		} else if (menuItemTitle == "Edit Task Name") {
+			final TextView textView = (TextView) findViewById(item.getItemId());
 			
+			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert.setTitle("Task Name");
+			alert.setMessage("Enter Task Name");
+
+			final EditText input = new EditText(TaskTimerActivity.this);
+			input.setSingleLine(); // one line tall
+			alert.setView(input);
+			alert.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							textView.setText(input.getText().toString());
+						}
+					});
+
+			alert.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,int which) {
+							// TODO Auto-generated method stub
+							return;
+						}
+					});
+			alert.show();
 		}
 		return true;
 	}
