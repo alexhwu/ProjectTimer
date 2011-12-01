@@ -203,6 +203,7 @@ public class TaskTimerActivity extends Activity {
 									
 									if (isTimeEdited) {
 										counter = convertToSeconds(timeText.getText().toString());
+										isTimeEdited = false;
 									}
 									
 									int hour = counter / 3600;
