@@ -6,6 +6,8 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -14,6 +16,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +31,15 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class TaskTimerActivity extends Activity {
-	// ToggleButton startStopBtn;
-	// TextView timeText;
-	// TextView taskLabel;
+	final int TIME_ID_PREFIX = 10000;
+	final int TASK_LABEL_ID_PREFIX = 20000;
+	final int START_STOP_ID_PREFIX = 30000;
 
+	boolean isTimeEdited = false; // indicates if the user has edited the time
+	String editedHour;
+	String editedMinute;
+	String editedSecond;
+	
 	LayoutParams startStopBtnLayoutParams;
 	LayoutParams mtlParams;
 	LayoutParams itlParams;
@@ -126,14 +134,14 @@ public class TaskTimerActivity extends Activity {
 		taskLabel.setText(label);
 		taskLabel.setLayoutParams(taskLabelParams);
 		taskLabel.setTextSize(18);
-		taskLabel.setId(20000 + viewIdCounter);
+		taskLabel.setId(TASK_LABEL_ID_PREFIX + viewIdCounter);
 		
 
 		final TextView timeText = new TextView(TaskTimerActivity.this);
 		timeText.setText("00:00:00");
 		timeText.setLayoutParams(timeTextParams);
 		timeText.setTextSize(28);
-		timeText.setId(10000 + viewIdCounter);
+		timeText.setId(TIME_ID_PREFIX + viewIdCounter);
 
 		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
 		_tr2.addView(timeText);
@@ -167,7 +175,7 @@ public class TaskTimerActivity extends Activity {
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
-		startStopBtn.setId(30000+viewIdCounter);
+		startStopBtn.setId(START_STOP_ID_PREFIX + viewIdCounter);
 
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -181,8 +189,10 @@ public class TaskTimerActivity extends Activity {
 			        SharedPreferences.Editor editor = settings.edit();
 			        Calendar cal = Calendar.getInstance();
 		        	editor.putLong("StartTimestamp"+viewIdCounter, cal.getTimeInMillis());
+		        	startStopBtn.setText("Stop");
+					
 		        	
-					startStopBtn.setText("Stop");
+					
 					timerTask = new TimerTask() {
 
 						public void run() {
@@ -190,12 +200,18 @@ public class TaskTimerActivity extends Activity {
 
 								public void run() {
 									counter++; // seconds
+									
+									if (isTimeEdited) {
+										counter = convertToSeconds(timeText.getText().toString());
+									}
+									
 									int hour = counter / 3600;
 									int rem = counter % 3600;
 									int min = rem / 60;
 									int sec = rem % 60;
 									
 									timeText.setText(String.format("%02d:%02d:%02d", hour, min, sec));
+									
 									
 								}
 							});
@@ -340,6 +356,12 @@ public class TaskTimerActivity extends Activity {
 
 								public void run() {
 									counter++; // seconds
+									
+									if (isTimeEdited) {
+										counter = convertToSeconds(timeText.getText().toString());
+										isTimeEdited = false;
+									}
+									
 									int hour = counter / 3600;
 									int rem = counter % 3600;
 									int min = rem / 60;
@@ -397,7 +419,8 @@ public class TaskTimerActivity extends Activity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Select Option");
 		menu.add(0, v.getId(), 0, "Delete Timer");
-		menu.add(0, (20000 + v.getId()), 1, "Edit Task Name");
+		menu.add(0, (v.getId()), 1, "Edit Task Name");
+		menu.add(0, (v.getId()), 2, "Edit Time");
 	}
 
 	public boolean onContextItemSelected(MenuItem item) {
@@ -410,8 +433,9 @@ public class TaskTimerActivity extends Activity {
 			// get the innerTl view
 			TableLayout tv = (TableLayout) findViewById(item.getItemId());
 			ll.removeView(tv);
+			
 		} else if (menuItemTitle == "Edit Task Name") {
-			final TextView textView = (TextView) findViewById(item.getItemId());
+			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
 			alert.setTitle("Task Name");
@@ -436,6 +460,152 @@ public class TaskTimerActivity extends Activity {
 						}
 					});
 			alert.show();
+		} else if (menuItemTitle == "Edit Time") {
+			
+			TableLayout tl = (TableLayout) findViewById(R.id.editTimeLayout);
+			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
+			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
+			String t = taskLabel.getText().toString();
+			
+			String[] timeArray = timeText.getText().toString().split(":");
+			
+			
+			final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			final View editTimeView = inflater.inflate(R.layout.edit_time, null);
+			
+			final TextView hourText = (TextView) editTimeView.findViewById(R.id.editHourText);
+			final String hour = timeArray[0];
+			hourText.setText(hour);
+			
+			TextView minuteText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+			String minute = timeArray[1];
+			minuteText.setText(minute);
+			
+			TextView secondText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+			String second = timeArray[2];
+			secondText.setText(second);
+			
+			
+			// set the edited time default values
+			/*
+			final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+			int h = Integer.parseInt(hText.getText().toString());
+			editedHour = formatDoubleDigit(++h);
+			
+			final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+			int m = Integer.parseInt(mText.getText().toString());
+			editedMinute = formatDoubleDigit(++m);
+			
+			final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+			int s = Integer.parseInt(sText.getText().toString());
+			editedSecond = formatDoubleDigit(++s);
+			*/
+			
+			
+			
+			
+			final Dialog dialog = new Dialog(this);
+			dialog.setTitle("Edit Time for " + taskLabel.getText().toString());
+			dialog.setContentView(editTimeView);
+			dialog.show();
+			
+			
+			
+			
+			//------------------------------------------------------------------------
+			// set the click function for the increment buttons
+			Button hourUpBtn = (Button) editTimeView.findViewById(R.id.editHourUpBtn);
+			hourUpBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+					int h = Integer.parseInt(hText.getText().toString());
+					//editedHour = formatDoubleDigit(++h);
+					hText.setText(formatDoubleDigit(incrementHour(h)));
+				}
+			});
+			
+			Button minuteUpBtn = (Button) editTimeView.findViewById(R.id.editMinuteUpBtn);
+			minuteUpBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+					int m = Integer.parseInt(mText.getText().toString());
+					//editedMinute = formatDoubleDigit(++m);
+					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
+				}
+			});
+			
+			Button secondUpBtn = (Button) editTimeView.findViewById(R.id.editSecondUpBtn);
+			secondUpBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+					int s = Integer.parseInt(sText.getText().toString());
+					//editedSecond = formatDoubleDigit(++s);
+					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
+				}
+			});
+			
+			
+			//------------------------------------------------------------------------
+			// set the click function for the decrement buttons
+			Button hourDownBtn = (Button) editTimeView.findViewById(R.id.editHourDownBtn);
+			hourDownBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+					int h = Integer.parseInt(hText.getText().toString());
+					//editedHour = formatDoubleDigit(++h);
+					hText.setText(formatDoubleDigit(decrementHour(h)));
+				}
+			});
+			
+			Button minuteDownBtn = (Button) editTimeView.findViewById(R.id.editMinuteDownBtn);
+			minuteDownBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+					int m = Integer.parseInt(mText.getText().toString());
+					//editedMinute = formatDoubleDigit(++m);
+					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
+				}
+			});
+			
+			Button secondDownBtn = (Button) editTimeView.findViewById(R.id.editSecondDownBtn);
+			secondDownBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+					int s = Integer.parseInt(sText.getText().toString());
+					//editedSecond = formatDoubleDigit(++s);
+					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
+				}
+			});
+			
+			
+			
+			Button editTimeOkBtn = (Button) editTimeView.findViewById(R.id.editTimeOkBtn);
+			editTimeOkBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					isTimeEdited = true;
+					
+					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+					int h = Integer.parseInt(hText.getText().toString());
+					
+					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+					int m = Integer.parseInt(mText.getText().toString());
+					
+					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+					int s = Integer.parseInt(sText.getText().toString());
+					
+					timeText.setText(formatDoubleDigit(h) + ":" + formatDoubleDigit(m) + ":" + formatDoubleDigit(s));
+					dialog.hide();
+				}
+			});
+			
+			Button editTimeCancelBtn = (Button) editTimeView.findViewById(R.id.editTimeCancelBtn);
+			editTimeCancelBtn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					isTimeEdited = false;
+					dialog.hide();
+				}
+			});
+			
 		}
 		return true;
 	}
@@ -484,6 +654,8 @@ public class TaskTimerActivity extends Activity {
     }
     
     private void saveTimers() {
+    	// TODO: Clear out existing data
+    	
     	// save timer(s) to preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
@@ -550,5 +722,46 @@ public class TaskTimerActivity extends Activity {
     	
     	 
     	return sec;
+    }
+    
+    private String formatDoubleDigit(int num) {
+    	if (num < 10)
+    		return "0"+num;
+    	
+    	return num+"";
+    }
+    
+    private String formatDoubleDigit(String num) {
+    	int n = Integer.parseInt(num);
+    	
+    	return formatDoubleDigit(n);
+    }
+    
+    private int incrementHour(int num) {
+    	if (num + 1 > 99)
+    		return 0;
+    	
+    	return ++num;
+    }
+    
+    private int incrementMinuteSecond(int num) {
+    	if (num + 1 > 59)
+    		return 0;
+    	
+    	return ++num;
+    }
+    
+    private int decrementHour(int num) {
+    	if (num - 1 < 0)
+    		return 99;
+    	
+    	return --num;
+    }
+    
+    private int decrementMinuteSecond(int num) {
+    	if (num - 1 < 0)
+    		return 59;
+    	
+    	return --num;
     }
 }
