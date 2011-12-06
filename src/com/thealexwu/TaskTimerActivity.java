@@ -631,14 +631,14 @@ public class TaskTimerActivity extends Activity {
     protected void onPause() {
         super.onPause();
         // Another activity is taking focus (this activity is about to be "paused").
-        
+        saveTimers();
     }
     @Override
     protected void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
         //Log.d("stop", "stop");
-        saveTimers();
+        //saveTimers();
     }
     
     private SharedPreferences sharedPref;
