@@ -10,14 +10,15 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -28,13 +29,15 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class TaskTimerActivity extends Activity {
 	final int TIME_ID_PREFIX = 10000;
 	final int TASK_LABEL_ID_PREFIX = 20000;
 	final int START_STOP_ID_PREFIX = 30000;
-
+	
+	
 	boolean isTimeEdited = false; // indicates if the user has edited the time
 	String editedHour;
 	String editedMinute;
@@ -135,14 +138,15 @@ public class TaskTimerActivity extends Activity {
 		taskLabel.setLayoutParams(taskLabelParams);
 		taskLabel.setTextSize(18);
 		taskLabel.setId(TASK_LABEL_ID_PREFIX + viewIdCounter);
-		
+		taskLabel.setTextColor(Color.LTGRAY);
 
 		final TextView timeText = new TextView(TaskTimerActivity.this);
 		timeText.setText("00:00:00");
 		timeText.setLayoutParams(timeTextParams);
 		timeText.setTextSize(28);
 		timeText.setId(TIME_ID_PREFIX + viewIdCounter);
-
+		timeText.setTextColor(Color.LTGRAY);
+		
 		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
 		_tr2.addView(timeText);
 		innerTl.addView(_tr2);
@@ -161,6 +165,37 @@ public class TaskTimerActivity extends Activity {
 
 		innerTl.addView(hrView);
 
+		
+				
+		innerTl.setOnTouchListener(new View.OnTouchListener() {
+			
+			public boolean onTouch(View v,MotionEvent evt) {
+				
+				switch(evt.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						v.setBackgroundColor(Color.WHITE);
+						taskLabel.setTextColor(Color.DKGRAY);
+						timeText.setTextColor(Color.DKGRAY);
+						break;
+					
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						taskLabel.setTextColor(Color.LTGRAY);
+						timeText.setTextColor(Color.LTGRAY);
+						break;
+				}
+				
+				return false;
+			}
+		});
+		
+		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				openContextMenu(mainTl);
+				return true;
+			}
+		});
+		
 		mainTl = new TableLayout(TaskTimerActivity.this);
 		mainTl.setLayoutParams(mtlParams);
 		mainTl.setId(viewIdCounter); // set the layout id for reference
@@ -250,6 +285,7 @@ public class TaskTimerActivity extends Activity {
 		// set long press event
 		// startStopBtn.setFocusable(false);
 		registerForContextMenu(mainTl);
+		
 	}
 
 	
@@ -276,19 +312,22 @@ public class TaskTimerActivity extends Activity {
 		taskLabel.setLayoutParams(taskLabelParams);
 		taskLabel.setTextSize(18);
 		taskLabel.setId(20000 + viewIdCounter);
-		
+		taskLabel.setTextColor(Color.LTGRAY);
 
 		final TextView timeText = new TextView(TaskTimerActivity.this);
 		timeText.setText("00:00:00");
 		timeText.setLayoutParams(timeTextParams);
 		timeText.setTextSize(28);
 		timeText.setId(10000 + viewIdCounter);
-
+		timeText.setTextColor(Color.LTGRAY);
+		
 		
 		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
 		_tr2.addView(timeText);
 		innerTl.addView(_tr2);
 
+		
+		
 		TableRow _tr3 = new TableRow(TaskTimerActivity.this);
 		_tr3.addView(taskLabel);
 		innerTl.addView(_tr3);
@@ -407,6 +446,36 @@ public class TaskTimerActivity extends Activity {
 		// add timer and task label to inner table
 		ll.addView(mainTl);
 
+		
+		innerTl.setOnTouchListener(new View.OnTouchListener() {
+			
+			public boolean onTouch(View v,MotionEvent evt) {
+				
+				switch(evt.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						v.setBackgroundColor(Color.WHITE);
+						taskLabel.setTextColor(Color.DKGRAY);
+						timeText.setTextColor(Color.DKGRAY);
+						break;
+					
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						taskLabel.setTextColor(Color.LTGRAY);
+						timeText.setTextColor(Color.LTGRAY);
+						break;
+				}
+				
+				return false;
+			}
+		});
+		
+		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				openContextMenu(mainTl);
+				return true;
+			}
+		});
+		
 		// set long press event
 		// startStopBtn.setFocusable(false);
 		registerForContextMenu(mainTl);

@@ -1,0 +1,112 @@
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/editTimeLayout"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="15dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <Button
+                android:id="@+id/editHourUpBtn"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:text="+" />
+            <TextView/>
+            <Button
+                android:id="@+id/editMinuteUpBtn"
+                android:layout_width="55dp"
+                android:paddingLeft="15dp"
+                android:layout_height="wrap_content"
+                android:text="+" />
+            <TextView/>
+            <Button
+                android:id="@+id/editSecondUpBtn"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:text="+" />
+		        
+        </TableRow>
+        
+        <TableRow>
+            <TextView
+                android:id="@+id/editHourText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="46dp"
+                android:text="00"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="46dp"
+                android:text=":"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+            <TextView
+                android:id="@+id/editMinuteText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="46dp"
+                android:text="00"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="46dp"
+                android:text=":"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+            <TextView
+                android:id="@+id/editSecondText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="46dp"
+                android:text="00"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </TableRow>
+        
+        <TableRow>
+            
+            <Button
+                android:id="@+id/editHourDownBtn"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:text="-" />
+            <TextView/>
+            <Button
+                android:id="@+id/editMinuteDownBtn"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:text="-" />
+            <TextView/>
+            <Button
+                android:id="@+id/editSecondDownBtn"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:text="-" />
+        
+        </TableRow>
+        
+        <LinearLayout
+        android:paddingTop="25dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal">
+                    <Button
+		                android:id="@+id/editTimeOkBtn"
+		                android:layout_width="110dp"
+		                android:layout_height="wrap_content"
+		                android:text="OK" />
+                    
+	                <Button
+	                    android:id="@+id/editTimeCancelBtn"
+	                    android:layout_width="80dp"
+	                    android:layout_height="wrap_content"
+	                    android:text="Cancel" />    
+          </LinearLayout>      
+    </TableLayout>
