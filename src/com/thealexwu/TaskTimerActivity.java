@@ -549,7 +549,7 @@ public class TaskTimerActivity extends Activity {
 		menu.setHeaderTitle("Select Option");
 		menu.add(0, (v.getId()), 0, "Edit Time");
 		
-		menu.add(0, (v.getId()), 1, "Edit Task Name");
+		menu.add(0, (v.getId()), 1, "Edit Label");
 		menu.add(0, v.getId(), 2, "Delete Timer");
 	}
 
@@ -585,11 +585,11 @@ public class TaskTimerActivity extends Activity {
 			alert.show();
 			
 			
-		} else if (menuItemTitle == "Edit Task Name") {
+		} else if (menuItemTitle == "Edit Label") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
-			alert.setTitle("Edit Task Name");
+			alert.setTitle("Edit Label");
 			//alert.setMessage("Enter New Task Name");
 
 			final EditText input = new EditText(TaskTimerActivity.this);
