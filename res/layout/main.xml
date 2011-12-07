@@ -8,8 +8,21 @@
         android:id="@+id/newTimerBtn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Add New Task Timer" />
+        android:text="Add New Task Timer"
+        android:gravity="center"
+        android:paddingRight="120dp"
+        android:background="#000000"
+        android:textColor="#CCCCCC"
+        android:height="55dp"
+        android:drawableLeft="@drawable/add"
+       />
+       
     
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#383838" />
+        
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"

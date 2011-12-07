@@ -10,7 +10,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class TaskTimerActivity extends Activity {
@@ -84,7 +82,26 @@ public class TaskTimerActivity extends Activity {
 
 		ll = (LinearLayout) findViewById(R.id.linearLayout);
 		Button newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
+		
+		newTimerBtn.setOnTouchListener(new View.OnTouchListener() {
+			
+			public boolean onTouch(View v,MotionEvent evt) {
+				
+				switch(evt.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						v.setBackgroundColor(Color.WHITE);
+						break;
+					
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						break;
+				}
+				
+				return false;
+			}
+		});
 
+		
 		startStopBtnLayoutParams = ((Button) findViewById(R.id.button1)).getLayoutParams();
 		timeTextParams = ((TextView) findViewById(R.id.timeText)).getLayoutParams();
 
@@ -162,44 +179,14 @@ public class TaskTimerActivity extends Activity {
 		hrView.setLayoutParams(p);
 		hrView.setBackgroundColor(Color.GRAY);
 		hrView.getBackground().setAlpha(120);
-
 		innerTl.addView(hrView);
-
 		
-				
-		innerTl.setOnTouchListener(new View.OnTouchListener() {
-			
-			public boolean onTouch(View v,MotionEvent evt) {
-				
-				switch(evt.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						taskLabel.setTextColor(Color.DKGRAY);
-						timeText.setTextColor(Color.DKGRAY);
-						break;
-					
-					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						taskLabel.setTextColor(Color.LTGRAY);
-						timeText.setTextColor(Color.LTGRAY);
-						break;
-				}
-				
-				return false;
-			}
-		});
-		
-		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
-			public boolean onLongClick(View v) {
-				openContextMenu(mainTl);
-				return true;
-			}
-		});
 		
 		mainTl = new TableLayout(TaskTimerActivity.this);
 		mainTl.setLayoutParams(mtlParams);
 		mainTl.setId(viewIdCounter); // set the layout id for reference
 									 // later
+		mainTl.setPadding(0, 10, 0, 0);
 
 		//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
 		final float scale = getResources().getDisplayMetrics().density;
@@ -211,7 +198,11 @@ public class TaskTimerActivity extends Activity {
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
 		startStopBtn.setId(START_STOP_ID_PREFIX + viewIdCounter);
-
+		startStopBtn.setBackgroundColor(Color.BLACK);
+		startStopBtn.setTextColor(Color.LTGRAY);
+		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
+		
+		
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
 			TimerTask timerTask = null;
@@ -225,8 +216,8 @@ public class TaskTimerActivity extends Activity {
 			        Calendar cal = Calendar.getInstance();
 		        	editor.putLong("StartTimestamp"+viewIdCounter, cal.getTimeInMillis());
 		        	startStopBtn.setText("Stop");
-					
-		        	
+		        	startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_on));
+		        
 					
 					timerTask = new TimerTask() {
 
@@ -258,6 +249,7 @@ public class TaskTimerActivity extends Activity {
 
 				} else {
 					startStopBtn.setText("Start");
+					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 					handler.removeCallbacks(timerTask);
 
 					if (timerTask != null) {
@@ -270,6 +262,7 @@ public class TaskTimerActivity extends Activity {
 		TableRow _tr = new TableRow(mainTl.getContext());
 		_tr.addView(startStopBtn);
 		_tr.addView(innerTl);
+		
 
 		TableLayout.LayoutParams tableRowParams = new TableLayout.LayoutParams(
 				TableLayout.LayoutParams.FILL_PARENT,
@@ -282,6 +275,58 @@ public class TaskTimerActivity extends Activity {
 		// add timer and task label to inner table
 		ll.addView(mainTl);
 
+		/*
+		innerTl.setOnTouchListener(new View.OnTouchListener() {
+			
+			public boolean onTouch(View v,MotionEvent evt) {
+				int action = evt.getAction() & MotionEvent.ACTION_MASK;
+				
+				switch(action) {
+					
+						
+					case MotionEvent.ACTION_DOWN:
+						v.setBackgroundColor(Color.WHITE);
+						taskLabel.setTextColor(Color.DKGRAY);
+						timeText.setTextColor(Color.DKGRAY);
+						return true;
+						//break;
+					
+					
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						taskLabel.setTextColor(Color.LTGRAY);
+						timeText.setTextColor(Color.LTGRAY);
+						return true;
+						//break;
+						
+					case MotionEvent.ACTION_POINTER_UP:
+						v.setBackgroundColor(Color.BLACK);
+						taskLabel.setTextColor(Color.LTGRAY);
+						timeText.setTextColor(Color.LTGRAY);
+						return true;
+						//break;
+						
+					case MotionEvent.ACTION_CANCEL:
+						v.setBackgroundColor(Color.BLACK);
+						taskLabel.setTextColor(Color.LTGRAY);
+						timeText.setTextColor(Color.LTGRAY);
+						return true;
+						//break;
+				}
+				
+				
+				return false;
+			}
+		});
+
+		
+		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				openContextMenu(mainTl);
+				return true;
+			}
+		});
+		*/
 		// set long press event
 		// startStopBtn.setFocusable(false);
 		registerForContextMenu(mainTl);
@@ -300,7 +345,7 @@ public class TaskTimerActivity extends Activity {
 		llParams = ((LinearLayout) findViewById(R.id.linearLayout)).getLayoutParams();
 		mtlParams = ((TableLayout) findViewById(R.id.tableLayout)).getLayoutParams();
 		itlParams = ((TableLayout) findViewById(R.id.tableLayout2)).getLayoutParams();
-
+		
 		
 
 	
@@ -334,6 +379,7 @@ public class TaskTimerActivity extends Activity {
 
 		// add horizontal line
 		ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1);
+		
 
 		View hrView = new View(TaskTimerActivity.this);
 		hrView.setLayoutParams(p);
@@ -346,17 +392,21 @@ public class TaskTimerActivity extends Activity {
 		mainTl.setLayoutParams(mtlParams);
 		mainTl.setId(viewIdCounter); // set the layout id for reference
 									 // later
-
+		mainTl.setPadding(0, 10, 0, 0);
+		
 		//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
 		final float scale = getResources().getDisplayMetrics().density;
 		int pixels = (int) (65 * scale + 0.5f);
-
 		final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
 		startStopBtn.setText("Start");
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
 		startStopBtn.setId(30000+viewIdCounter);
+		startStopBtn.setId(START_STOP_ID_PREFIX + viewIdCounter);
+		startStopBtn.setBackgroundColor(Color.BLACK);
+		startStopBtn.setTextColor(Color.LTGRAY);
+		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 		
 		int _seconds = seconds;
 		
@@ -389,6 +439,7 @@ public class TaskTimerActivity extends Activity {
 
 				if (startStopBtn.isChecked()) {
 					startStopBtn.setText("Stop");
+					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_on));
 					timerTask = new TimerTask() {
 
 						public void run() {
@@ -417,6 +468,7 @@ public class TaskTimerActivity extends Activity {
 
 				} else {
 					startStopBtn.setText("Start");
+					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 					handler.removeCallbacks(timerTask);
 
 					if (timerTask != null) {
@@ -446,7 +498,7 @@ public class TaskTimerActivity extends Activity {
 		// add timer and task label to inner table
 		ll.addView(mainTl);
 
-		
+		/*
 		innerTl.setOnTouchListener(new View.OnTouchListener() {
 			
 			public boolean onTouch(View v,MotionEvent evt) {
@@ -463,11 +515,18 @@ public class TaskTimerActivity extends Activity {
 						taskLabel.setTextColor(Color.LTGRAY);
 						timeText.setTextColor(Color.LTGRAY);
 						break;
+						
+					case MotionEvent.ACTION_OUTSIDE:
+						v.setBackgroundColor(Color.BLACK);
+						taskLabel.setTextColor(Color.LTGRAY);
+						timeText.setTextColor(Color.LTGRAY);
+						break;
 				}
 				
-				return false;
+				return true;
 			}
 		});
+		
 		
 		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
@@ -475,7 +534,7 @@ public class TaskTimerActivity extends Activity {
 				return true;
 			}
 		});
-		
+		*/
 		// set long press event
 		// startStopBtn.setFocusable(false);
 		registerForContextMenu(mainTl);
@@ -488,32 +547,57 @@ public class TaskTimerActivity extends Activity {
 	// long press context menu
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		menu.setHeaderTitle("Select Option");
-		menu.add(0, v.getId(), 0, "Delete Timer");
+		menu.add(0, (v.getId()), 0, "Edit Time");
+		
 		menu.add(0, (v.getId()), 1, "Edit Task Name");
-		menu.add(0, (v.getId()), 2, "Edit Time");
+		menu.add(0, v.getId(), 2, "Delete Timer");
 	}
 
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(final MenuItem item) {
 
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 		String menuItemTitle = (String) item.getTitle();
 
 		if (menuItemTitle == "Delete Timer") {
+			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
+			
+			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert.setTitle("Delete " + textView.getText().toString() + "?");
+		 	
+			
+			alert.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							// get the innerTl view
+							TableLayout tv = (TableLayout) findViewById(item.getItemId());
+							ll.removeView(tv);
+						}
+					});
 
-			// get the innerTl view
-			TableLayout tv = (TableLayout) findViewById(item.getItemId());
-			ll.removeView(tv);
+			alert.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,int which) {
+							// TODO Auto-generated method stub
+							return;
+						}
+					});
+			alert.show();
+			
 			
 		} else if (menuItemTitle == "Edit Task Name") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
-			alert.setTitle("Task Name");
-			alert.setMessage("Enter Task Name");
+			alert.setTitle("Edit Task Name");
+			//alert.setMessage("Enter New Task Name");
 
 			final EditText input = new EditText(TaskTimerActivity.this);
 			input.setSingleLine(); // one line tall
+			input.setText(textView.getText().toString());
+			input.setSelection(input.getText().length());
 			alert.setView(input);
+			
 			alert.setPositiveButton("Ok",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
@@ -556,30 +640,10 @@ public class TaskTimerActivity extends Activity {
 			secondText.setText(second);
 			
 			
-			// set the edited time default values
-			/*
-			final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
-			int h = Integer.parseInt(hText.getText().toString());
-			editedHour = formatDoubleDigit(++h);
-			
-			final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-			int m = Integer.parseInt(mText.getText().toString());
-			editedMinute = formatDoubleDigit(++m);
-			
-			final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-			int s = Integer.parseInt(sText.getText().toString());
-			editedSecond = formatDoubleDigit(++s);
-			*/
-			
-			
-			
-			
 			final Dialog dialog = new Dialog(this);
 			dialog.setTitle("Edit Time for " + taskLabel.getText().toString());
 			dialog.setContentView(editTimeView);
 			dialog.show();
-			
-			
 			
 			
 			//------------------------------------------------------------------------
