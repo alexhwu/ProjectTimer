@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Add New Timer"
         android:gravity="center"
-        android:paddingRight="120dp"
+        android:paddingRight="105dp"
         android:background="#000000"
         android:textColor="#CCCCCC"
         android:height="55dp"
