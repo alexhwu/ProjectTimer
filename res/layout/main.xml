@@ -22,63 +22,76 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:background="#383838" />
+    
+    
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+	    
         
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-        
-        <LinearLayout
-        android:id="@+id/linearLayout"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:orientation="vertical">
-            <TableLayout
-            android:id="@+id/tableLayout"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="vertical"
-		    android:visibility="gone"
-		    >
-		    
-	            <TableRow>
-	            					
-					<ToggleButton
-	                    android:id="@+id/button1"
-	                    android:layout_width="65dp"
-	                    android:layout_height="65dp"
-	                    android:textSize="12dp"
-	                    android:text="Start" />
-					
-						<TableLayout
-			            android:id="@+id/tableLayout2"
-					    android:layout_width="fill_parent"
-					    android:layout_height="wrap_content"
-					    android:orientation="vertical">
-					    
-							<TableRow>
-								<TextView
-				                    android:id="@+id/timeText"
-				                    android:layout_width="fill_parent"
-				                    android:layout_height="wrap_content"
-				                    android:textSize="28dp"
-				                    android:layout_marginLeft="15dp"
-				                    android:text="00:00:00" />
-							</TableRow>
-							<TableRow>
-				                <TextView
-				                    android:id="@+id/taskLabel"
-				                    android:layout_width="230dp"
-				                    android:layout_height="wrap_content"
-				                    android:layout_marginLeft="15dp"
-				                    android:textSize="18dp"
-				                    android:text="ETP Project ETP Project" />
-							</TableRow>
-						</TableLayout>
-	            
-	         </TableRow>
-         </TableLayout>
-         </LinearLayout>
-         
-    </ScrollView>
+	    <LinearLayout 
+	        android:layout_width="fill_parent" 
+	        android:layout_height="fill_parent" >
+		    <ScrollView
+		        android:id="@+id/scrollView1"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content" >
+		        
+		        <LinearLayout
+		        android:id="@+id/linearLayout"
+			    android:layout_width="fill_parent"
+			    android:layout_height="fill_parent"
+			    android:orientation="vertical">
+		            <TableLayout
+		            android:id="@+id/tableLayout"
+				    android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="vertical"
+				    android:visibility="gone"
+				    >
+				    
+			            <TableRow>
+			            					
+							<ToggleButton
+			                    android:id="@+id/button1"
+			                    android:layout_width="65dp"
+			                    android:layout_height="65dp"
+			                    android:textSize="12dp"
+			                    android:text="Start" />
+							
+								<TableLayout
+					            android:id="@+id/tableLayout2"
+							    android:layout_width="fill_parent"
+							    android:layout_height="wrap_content"
+							    android:orientation="vertical">
+							    
+									<TableRow>
+										<TextView
+						                    android:id="@+id/timeText"
+						                    android:layout_width="fill_parent"
+						                    android:layout_height="wrap_content"
+						                    android:textSize="28dp"
+						                    android:layout_marginLeft="15dp"
+						                    android:text="00:00:00" />
+									</TableRow>
+									<TableRow>
+						                <TextView
+						                    android:id="@+id/taskLabel"
+						                    android:layout_width="230dp"
+						                    android:layout_height="wrap_content"
+						                    android:layout_marginLeft="15dp"
+						                    android:textSize="18dp"
+						                    android:text="ETP Project ETP Project" />
+									</TableRow>
+								</TableLayout>
+			            
+			         </TableRow>
+		         </TableLayout>
+		         </LinearLayout>
+		         
+		    </ScrollView>
+		</LinearLayout>    
+	    
+	</RelativeLayout>
 </LinearLayout>

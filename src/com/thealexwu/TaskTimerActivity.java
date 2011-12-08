@@ -90,10 +90,17 @@ public class TaskTimerActivity extends Activity {
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
 						v.setBackgroundColor(Color.WHITE);
+						((Button) v).setTextColor(Color.DKGRAY);
 						break;
 					
 					case MotionEvent.ACTION_UP:
 						v.setBackgroundColor(Color.BLACK);
+						((Button) v).setTextColor(Color.LTGRAY);
+						break;
+					
+					case MotionEvent.ACTION_CANCEL:
+						v.setBackgroundColor(Color.BLACK);
+						((Button) v).setTextColor(Color.LTGRAY);
 						break;
 				}
 				
@@ -275,43 +282,31 @@ public class TaskTimerActivity extends Activity {
 		// add timer and task label to inner table
 		ll.addView(mainTl);
 
-		/*
+		
 		innerTl.setOnTouchListener(new View.OnTouchListener() {
 			
 			public boolean onTouch(View v,MotionEvent evt) {
 				int action = evt.getAction() & MotionEvent.ACTION_MASK;
 				
 				switch(action) {
-					
 						
 					case MotionEvent.ACTION_DOWN:
 						v.setBackgroundColor(Color.WHITE);
 						taskLabel.setTextColor(Color.DKGRAY);
 						timeText.setTextColor(Color.DKGRAY);
-						return true;
-						//break;
-					
+						break;
 					
 					case MotionEvent.ACTION_UP:
 						v.setBackgroundColor(Color.BLACK);
 						taskLabel.setTextColor(Color.LTGRAY);
 						timeText.setTextColor(Color.LTGRAY);
-						return true;
-						//break;
-						
-					case MotionEvent.ACTION_POINTER_UP:
-						v.setBackgroundColor(Color.BLACK);
-						taskLabel.setTextColor(Color.LTGRAY);
-						timeText.setTextColor(Color.LTGRAY);
-						return true;
-						//break;
+						break;
 						
 					case MotionEvent.ACTION_CANCEL:
 						v.setBackgroundColor(Color.BLACK);
 						taskLabel.setTextColor(Color.LTGRAY);
 						timeText.setTextColor(Color.LTGRAY);
-						return true;
-						//break;
+						break;
 				}
 				
 				
@@ -322,13 +317,12 @@ public class TaskTimerActivity extends Activity {
 		
 		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
-				openContextMenu(mainTl);
+				openContextMenu(v);
 				return true;
 			}
 		});
-		*/
+		
 		// set long press event
-		// startStopBtn.setFocusable(false);
 		registerForContextMenu(mainTl);
 		
 	}
@@ -498,7 +492,7 @@ public class TaskTimerActivity extends Activity {
 		// add timer and task label to inner table
 		ll.addView(mainTl);
 
-		/*
+		
 		innerTl.setOnTouchListener(new View.OnTouchListener() {
 			
 			public boolean onTouch(View v,MotionEvent evt) {
@@ -516,29 +510,27 @@ public class TaskTimerActivity extends Activity {
 						timeText.setTextColor(Color.LTGRAY);
 						break;
 						
-					case MotionEvent.ACTION_OUTSIDE:
+					case MotionEvent.ACTION_CANCEL:
 						v.setBackgroundColor(Color.BLACK);
 						taskLabel.setTextColor(Color.LTGRAY);
 						timeText.setTextColor(Color.LTGRAY);
 						break;
 				}
 				
-				return true;
+				return false;
 			}
 		});
 		
 		
 		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
-				openContextMenu(mainTl);
+				openContextMenu(v);
 				return true;
 			}
 		});
-		*/
+		
 		// set long press event
-		// startStopBtn.setFocusable(false);
 		registerForContextMenu(mainTl);
-	
 
 		
 	
