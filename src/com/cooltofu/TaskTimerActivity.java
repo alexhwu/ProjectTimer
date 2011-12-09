@@ -254,6 +254,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		mainTl.setId(viewIdCounter); // set the layout id for reference
 									 // later
 		mainTl.setPadding(0, 10, 0, 0);
+		
+		
+        
 
 		//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
 		final float scale = getResources().getDisplayMetrics().density;
@@ -382,6 +385,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			}
 		});
 		
+		
 		// set long press event
 		registerForContextMenu(mainTl);
 		
@@ -421,6 +425,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		timeText.setTextColor(Color.LTGRAY);
 		
 		
+        
+        
 		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
 		_tr2.addView(timeText);
 		innerTl.addView(_tr2);
@@ -448,6 +454,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 									 // later
 		mainTl.setPadding(0, 10, 0, 0);
 		
+        
+        
 		//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
 		final float scale = getResources().getDisplayMetrics().density;
 		int pixels = (int) (65 * scale + 0.5f);
@@ -547,6 +555,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		tableRowParams.setMargins(0, 2, 0, 2);
 		_tr.setLayoutParams(tableRowParams);
 
+		
 		mainTl.addView(_tr);
 
 		// add timer and task label to inner table

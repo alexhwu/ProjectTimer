@@ -86,6 +86,7 @@
 					            android:id="@+id/tableLayout2"
 							    android:layout_width="fill_parent"
 							    android:layout_height="wrap_content"
+							    android:stretchColumns="0"
 							    android:orientation="vertical">
 							    
 									<TableRow>

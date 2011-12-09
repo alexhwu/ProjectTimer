@@ -66,13 +66,7 @@
 		        android:layout_height="280dp"
 		        android:layout_gravity="center_horizontal"
 		        android:src="@drawable/context_menu" />
-		    <TextView
-                android:id="@+id/moreScreenTextView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="15dp"
-                android:paddingTop="15dp"
-                android:text="TIP: Swipe left and right to move between screens." />
+		    
 		    <TextView
 		        android:id="@+id/moreScreenTextView1"
 		        android:layout_width="wrap_content"
@@ -92,7 +86,7 @@
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:padding="15dp"
-		        android:text="Graphics by Jonathan Britner" />
+		        android:text="Launcer icon by Jonathan Britner" />
 		    <View
 		        android:layout_width="fill_parent"
 		        android:layout_height="1dp"
