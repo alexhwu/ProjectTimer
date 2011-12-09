@@ -4,52 +4,110 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    <TextView
-        android:id="@+id/moreScreenTextView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="15dp"
-        android:text="TIP: Press and hold on the time for more options." />
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="280dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/context_menu" />
-    <TextView
-        android:id="@+id/moreScreenTextView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="15dp"
-        android:text="Created by CoolTofu." />
-    <TextView
-        android:id="@+id/moreScreenTextView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoLink="web"
-        android:paddingLeft="15dp"
-        android:text="http://cooltofu.com" />
-    <TextView
-        android:id="@+id/moreScreenTextView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Graphics by Jonathan Britner" />
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#383838" />
-    <Button
-        android:id="@+id/moreScreenOkBtn"
-        android:layout_width="fill_parent"
-        android:layout_height="55dp"
-        android:background="#000000"
-        android:textColor="#CCCCCC"
-        android:text="Back to Main Screen" />
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#383838" />
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+        <Button
+            android:id="@+id/timerBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="... Timer"
+            android:gravity="center"
+            android:paddingRight="15dp"
+            android:background="#000000"
+            android:textColor="#CCCCCC"
+            android:height="55dp"
+            android:paddingLeft="15dp" />
+        <View
+            android:id="@+id/verticalLine"
+            android:layout_width="1dp"
+            android:layout_height="55dp"
+            android:background="#383838"
+            android:layout_toRightOf="@+id/timerBtn" />
+        <Button
+            android:id="@+id/moreBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="More Info"
+            android:background="#000000"
+            android:textColor="#CCCCCC"
+            android:height="55dp"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/verticalLine" />
+    </RelativeLayout>
+    
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >   
+        
+        <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+		    <View
+		        android:layout_width="fill_parent"
+		        android:layout_height="1dp"
+		        android:background="#383838" />
+		    
+		    
+		    <TextView
+		        android:id="@+id/moreScreenTextView1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:paddingLeft="15dp"
+		        android:paddingTop="15dp"
+		        android:text="TIP: Press and hold the time/label for more options." />
+		    <ImageView
+		        android:id="@+id/imageView1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="280dp"
+		        android:layout_gravity="center_horizontal"
+		        android:src="@drawable/context_menu" />
+		    <TextView
+                android:id="@+id/moreScreenTextView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="15dp"
+                android:paddingTop="15dp"
+                android:text="TIP: Swipe left and right to move between screens." />
+		    <TextView
+		        android:id="@+id/moreScreenTextView1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:paddingLeft="15dp"
+		        android:paddingTop="15dp"
+		        android:text="Created by CoolTofu" />
+		    <TextView
+		        android:id="@+id/moreScreenTextView1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:autoLink="web"
+		        android:paddingLeft="15dp"
+		        android:text="http://cooltofu.com" />
+		    <TextView
+		        android:id="@+id/moreScreenTextView2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:padding="15dp"
+		        android:text="Graphics by Jonathan Britner" />
+		    <View
+		        android:layout_width="fill_parent"
+		        android:layout_height="1dp"
+		        android:background="#383838" />
+		    <Button
+		        android:id="@+id/moreScreenOkBtn"
+		        android:layout_width="fill_parent"
+		        android:layout_height="55dp"
+		        android:background="#000000"
+		        android:textColor="#CCCCCC"
+		        android:text="Back to Main Screen" />
+		    <View
+		        android:layout_width="fill_parent"
+		        android:layout_height="1dp"
+		        android:background="#383838" />
+		    </LinearLayout>
+	</ScrollView>
 </LinearLayout>

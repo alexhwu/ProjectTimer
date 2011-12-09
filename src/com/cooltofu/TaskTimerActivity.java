@@ -16,22 +16,26 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class TaskTimerActivity extends Activity {
+public class TaskTimerActivity extends Activity implements OnClickListener {
 	final int TIME_ID_PREFIX = 10000;
 	final int TASK_LABEL_ID_PREFIX = 20000;
 	final int START_STOP_ID_PREFIX = 30000;
@@ -54,6 +58,7 @@ public class TaskTimerActivity extends Activity {
 	TableRow tr;
 	LinearLayout ll;
 
+	
 	int viewIdCounter = 0;
 	Timer timer = new Timer();
 	final Handler handler = new Handler();
@@ -191,7 +196,19 @@ public class TaskTimerActivity extends Activity {
 		
 		});
 		
-	}
+		
+		// handle swipe gestures
+		gestureDetector = new GestureDetector(new MyGestureDetector());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        };
+        
+        RelativeLayout sv = (RelativeLayout) findViewById(R.id.relativeLayout);
+        sv.setOnClickListener(TaskTimerActivity.this);
+        sv.setOnTouchListener(gestureListener);
+	}//onCreate
 
 	
 	
@@ -924,4 +941,40 @@ public class TaskTimerActivity extends Activity {
     	
     	return --num;
     }
+    
+    
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private GestureDetector gestureDetector;
+    View.OnTouchListener gestureListener;
+    
+	class MyGestureDetector extends SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                // right to left swipe
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    //Toast.makeText(TaskTimerActivity.this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                	Intent i = new Intent();
+    				i.setClass(TaskTimerActivity.this, MoreScreen.class);
+    				startActivity(i);
+                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    //Toast.makeText(TaskTimerActivity.this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                	// do nothing
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+            return false;
+        }
+
+    }
+
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		
+	}
 }
