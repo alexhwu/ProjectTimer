@@ -1,4 +1,4 @@
-package com.thealexwu;
+package com.cooltofu;
 
 import java.util.Calendar;
 import java.util.Timer;
@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,7 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -62,6 +63,10 @@ public class TaskTimerActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		Eula.show(this);
+		
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		setContentView(R.layout.main);
 		
@@ -151,8 +156,32 @@ public class TaskTimerActivity extends Activity {
 			}
 		});
 
+		
+		
+		//-------------------------------
+		// More button actions
+		Button moreBtn = (Button) findViewById(R.id.moreBtn);
+		moreBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+			public boolean onTouch(View v,MotionEvent evt) {
+				
+				switch(evt.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						Intent i = new Intent();
+						i.setClass(TaskTimerActivity.this, MoreScreen.class);
+						startActivity(i);
+						break;
+				}
+				
+				return false;
+			}
+		}); // moreBtn.setOnTouchListener()
+		
 	}
 
+	
+	
+	
 	private void createTaskTimer(String label) {
 		innerTl = new TableLayout(TaskTimerActivity.this);
 		innerTl.setLayoutParams(itlParams);
@@ -547,7 +576,6 @@ public class TaskTimerActivity extends Activity {
 
 	public boolean onContextItemSelected(final MenuItem item) {
 
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 		String menuItemTitle = (String) item.getTitle();
 
 		if (menuItemTitle == "Delete Timer") {
@@ -608,10 +636,9 @@ public class TaskTimerActivity extends Activity {
 			alert.show();
 		} else if (menuItemTitle == "Edit Time") {
 			
-			TableLayout tl = (TableLayout) findViewById(R.id.editTimeLayout);
 			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
 			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
-			String t = taskLabel.getText().toString();
+	
 			
 			String[] timeArray = timeText.getText().toString().split(":");
 			
@@ -744,29 +771,27 @@ public class TaskTimerActivity extends Activity {
     protected void onStart() {
         super.onStart();
         // The activity is about to become visible.
-       
+        
     }
     @Override
     protected void onResume() {
         super.onResume();
         // The activity has become visible (it is now "resumed").
-       
+        
     }
     @Override
     protected void onPause() {
         super.onPause();
         // Another activity is taking focus (this activity is about to be "paused").
         saveTimers();
+      
     }
     @Override
     protected void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
-        //Log.d("stop", "stop");
-        //saveTimers();
+        
     }
-    
-    private SharedPreferences sharedPref;
     
     @Override
     protected void onDestroy() {
@@ -857,11 +882,6 @@ public class TaskTimerActivity extends Activity {
     	return num+"";
     }
     
-    private String formatDoubleDigit(String num) {
-    	int n = Integer.parseInt(num);
-    	
-    	return formatDoubleDigit(n);
-    }
     
     private int incrementHour(int num) {
     	if (num + 1 > 99)
