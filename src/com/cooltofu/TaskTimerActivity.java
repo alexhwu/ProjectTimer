@@ -128,8 +128,8 @@ public class TaskTimerActivity extends Activity {
 			public void onClick(View v) {
 
 				AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
-				alert.setTitle("Task Name");
-				alert.setMessage("Enter Task Name");
+				alert.setTitle("Timer Label");
+				alert.setMessage("Enter Timer Label");
 
 				final EditText input = new EditText(TaskTimerActivity.this);
 				input.setSingleLine(); // one line tall
@@ -160,22 +160,36 @@ public class TaskTimerActivity extends Activity {
 		
 		//-------------------------------
 		// More button actions
-		Button moreBtn = (Button) findViewById(R.id.moreBtn);
+		final Button moreBtn = (Button) findViewById(R.id.moreBtn);
 		moreBtn.setOnTouchListener(new View.OnTouchListener() {
 				
 			public boolean onTouch(View v,MotionEvent evt) {
 				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						Intent i = new Intent();
-						i.setClass(TaskTimerActivity.this, MoreScreen.class);
-						startActivity(i);
+						v.setBackgroundColor(Color.WHITE);
+						moreBtn.setTextColor(Color.DKGRAY);
+						break;
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						moreBtn.setTextColor(Color.LTGRAY);
 						break;
 				}
 				
 				return false;
 			}
 		}); // moreBtn.setOnTouchListener()
+		
+		moreBtn.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				Intent i = new Intent();
+				i.setClass(TaskTimerActivity.this, MoreScreen.class);
+				startActivity(i);
+				
+			}
+		
+		});
 		
 	}
 
@@ -610,7 +624,6 @@ public class TaskTimerActivity extends Activity {
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
 			alert.setTitle("Edit Label");
-			//alert.setMessage("Enter New Task Name");
 
 			final EditText input = new EditText(TaskTimerActivity.this);
 			input.setSingleLine(); // one line tall
@@ -676,6 +689,7 @@ public class TaskTimerActivity extends Activity {
 					hText.setText(formatDoubleDigit(incrementHour(h)));
 				}
 			});
+			
 			
 			Button minuteUpBtn = (Button) editTimeView.findViewById(R.id.editMinuteUpBtn);
 			minuteUpBtn.setOnClickListener(new View.OnClickListener() {

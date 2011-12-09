@@ -18,7 +18,9 @@
 	        android:background="#000000"
 	        android:textColor="#CCCCCC"
 	        android:height="55dp"
-	        android:drawableLeft="@drawable/add" />
+	        android:drawableLeft="@drawable/add"
+	        android:paddingLeft="19dp"
+            android:drawablePadding="15dp" />
 	    <View
 	        android:id="@+id/verticalLine"
 		    android:layout_width="1dp"
