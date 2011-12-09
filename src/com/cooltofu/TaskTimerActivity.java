@@ -243,7 +243,7 @@ public class TaskTimerActivity extends Activity {
 		int pixels = (int) (65 * scale + 0.5f);
 
 		final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
-		startStopBtn.setText("Start");
+		startStopBtn.setText("OFF");
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
@@ -265,7 +265,7 @@ public class TaskTimerActivity extends Activity {
 			        SharedPreferences.Editor editor = settings.edit();
 			        Calendar cal = Calendar.getInstance();
 		        	editor.putLong("StartTimestamp"+viewIdCounter, cal.getTimeInMillis());
-		        	startStopBtn.setText("Stop");
+		        	startStopBtn.setText("ON");
 		        	startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_on));
 		        
 					
@@ -298,7 +298,7 @@ public class TaskTimerActivity extends Activity {
 					timer.scheduleAtFixedRate(timerTask, 1000, 1000);
 
 				} else {
-					startStopBtn.setText("Start");
+					startStopBtn.setText("OFF");
 					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 					handler.removeCallbacks(timerTask);
 
@@ -435,7 +435,7 @@ public class TaskTimerActivity extends Activity {
 		final float scale = getResources().getDisplayMetrics().density;
 		int pixels = (int) (65 * scale + 0.5f);
 		final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
-		startStopBtn.setText("Start");
+		startStopBtn.setText("OFF");
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
@@ -475,7 +475,7 @@ public class TaskTimerActivity extends Activity {
 			public void onClick(View v) {
 
 				if (startStopBtn.isChecked()) {
-					startStopBtn.setText("Stop");
+					startStopBtn.setText("ON");
 					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_on));
 					timerTask = new TimerTask() {
 
@@ -504,7 +504,7 @@ public class TaskTimerActivity extends Activity {
 					timer.scheduleAtFixedRate(timerTask, 1000, 1000);
 
 				} else {
-					startStopBtn.setText("Start");
+					startStopBtn.setText("OFF");
 					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 					handler.removeCallbacks(timerTask);
 
