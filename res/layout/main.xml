@@ -84,7 +84,8 @@
 							
 								<TableLayout
 					            android:id="@+id/tableLayout2"
-							    android:layout_width="fill_parent"
+							    android:layout_width="0dp"
+							    android:layout_weight="1"
 							    android:layout_height="wrap_content"
 							    android:stretchColumns="0"
 							    android:orientation="vertical">
@@ -101,10 +102,12 @@
 									<TableRow>
 						                <TextView
 						                    android:id="@+id/taskLabel"
-						                    android:layout_width="230dp"
+						                    android:layout_width="wrap_content"
 						                    android:layout_height="wrap_content"
 						                    android:layout_marginLeft="15dp"
+						                    android:layout_marginRight="8dp"
 						                    android:textSize="18dp"
+						                    android:ellipsize="start"
 						                    android:text="ETP Project ETP Project" />
 									</TableRow>
 								</TableLayout>

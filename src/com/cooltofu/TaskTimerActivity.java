@@ -980,12 +980,14 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
             }
             return false;
         }
+        
 
     }
 
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		Toast t = Toast.makeText(v.getContext(), "gesture on Click", Toast.LENGTH_SHORT);
-		t.show();
+		//Toast t = Toast.makeText(v.getContext(), "gesture on Click", Toast.LENGTH_SHORT);
+		//t.show();
+		
 	}
 }
