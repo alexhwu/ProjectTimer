@@ -19,6 +19,30 @@ public class MoreScreen extends Activity implements OnClickListener {
 		
 		setContentView(R.layout.more);
 		
+		final Button moreBtn = (Button) findViewById(R.id.moreBtn);
+		moreBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+			public boolean onTouch(View v,MotionEvent evt) {
+				
+				switch(evt.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						v.setBackgroundColor(Color.WHITE);
+						moreBtn.setTextColor(Color.DKGRAY);
+						break;
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						moreBtn.setTextColor(Color.LTGRAY);
+						break;
+					case MotionEvent.ACTION_CANCEL:
+						v.setBackgroundColor(Color.BLACK);
+						((Button) v).setTextColor(Color.LTGRAY);
+						break;
+				}
+				
+				return false;
+			}
+		}); // moreBtn.setOnTouchListener()
+		
 		final Button btn = (Button) findViewById(R.id.moreScreenOkBtn);
 		btn.setOnClickListener(new View.OnClickListener() {
 
