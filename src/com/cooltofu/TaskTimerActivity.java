@@ -33,6 +33,7 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class TaskTimerActivity extends Activity implements OnClickListener {
@@ -133,7 +134,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			public void onClick(View v) {
 
 				AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
-				alert.setTitle("Timer Label");
+				alert.setTitle("Add New Timer");
 				alert.setMessage("Enter Timer Label");
 
 				final EditText input = new EditText(TaskTimerActivity.this);
@@ -984,6 +985,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		
+		Toast t = Toast.makeText(v.getContext(), "gesture on Click", Toast.LENGTH_SHORT);
+		t.show();
 	}
 }
