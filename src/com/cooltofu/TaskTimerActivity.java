@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.cooltofu.db.TimerDbAdapter;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class TaskTimerActivity extends Activity implements OnClickListener {
 	final int TIME_ID_PREFIX = 10000;
@@ -69,14 +70,19 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	private Cursor cursor;
 	
 	public static final String PREFS_NAME = "MyPrefsFile";
+	public GoogleAnalyticsTracker tracker;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		Eula.show(this);
 		
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		
+		tracker = GoogleAnalyticsTracker.getInstance();
+		tracker.startNewSession("UA-27584987-1", 10, this);
 		
 		setContentView(R.layout.main);
 		
@@ -98,6 +104,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		startManagingCursor(cursor);
 		
 		if (cursor != null) {
+			
 			
 			cursor.moveToFirst();
 			while (cursor.isAfterLast() == false) {
@@ -122,6 +129,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				cursor.moveToNext();
 			}
+			tracker.trackEvent("RestoreFromDb", "onCreate", "count", cursor.getCount());
 		}
 		
 
@@ -160,7 +168,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			
 			
 			public void onClick(View v) {
-
+				
+				
 				AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
 				alert.setTitle("Add New Timer");
 				alert.setMessage("Enter Timer Label");
@@ -198,6 +207,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							}
 						});
 				alert.show();
+				
+				tracker.trackEvent("NewTimerBtn", "setOnClickListener", "", -1);
 			}
 		});
 
@@ -326,8 +337,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		        
 					
 					timerTask = new TimerTask() {
-
+						
 						public void run() {
+							
 							handler.post(new Runnable() {
 
 								public void run() {
@@ -352,6 +364,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 									}*/
 								}
 							});
+							
 						}
 					};
 
@@ -449,7 +462,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	public boolean onContextItemSelected(final MenuItem item) {
 
 		String menuItemTitle = (String) item.getTitle();
-
+		
+		
 		if (menuItemTitle == "Delete Timer") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
@@ -632,9 +646,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					if (isOn)
 						startStopBtn.performClick();
 					
-					dialog.hide();
-					
-					
+					dialog.dismiss();
 				}
 			});
 			
@@ -647,11 +659,13 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					if (isOn)
 						startStopBtn.performClick();
 					
-					dialog.hide();
+					dialog.dismiss();
 				}
 			});
 			
 		}
+		
+		tracker.trackEvent("ContextMenu", "onContextItemSelected", menuItemTitle, -1);
 		return true;
 	}
 
@@ -667,6 +681,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     }
     @Override
     protected void onResume() {
+    	
         super.onResume();
         // The activity has become visible (it is now "resumed").
         
@@ -694,12 +709,20 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         // The activity is about to be destroyed.
         timer.cancel();
         
+        if (cursor != null)
+        	cursor.close();
+        
+        
         if (db != null)
         	db.close();
+        
+        // stop google analytics tracker
+        tracker.stopSession();
         
     }
     
     private void saveTimers() {
+    	
     	
         cursor = db.fetchAllTimers();
         startManagingCursor(cursor);

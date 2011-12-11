@@ -26,8 +26,10 @@ public class TimerDbAdapter {
 	}
 
 	public TimerDbAdapter open() throws SQLException {
+		
 		dbHelper = new TimerDbHelper(context);
 		db = dbHelper.getWritableDatabase();
+	
 		return this;
 	}
 
