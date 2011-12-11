@@ -41,6 +41,10 @@ public class MoreScreen extends Activity implements OnClickListener {
 						v.setBackgroundColor(Color.BLACK);
 						btn.setTextColor(Color.LTGRAY);
 						break;
+					case MotionEvent.ACTION_CANCEL:
+						v.setBackgroundColor(Color.BLACK);
+						((Button) v).setTextColor(Color.LTGRAY);
+						break;
 				}
 				
 				return false;
@@ -61,6 +65,10 @@ public class MoreScreen extends Activity implements OnClickListener {
 					case MotionEvent.ACTION_UP:
 						v.setBackgroundColor(Color.BLACK);
 						timerBtn.setTextColor(Color.LTGRAY);
+						break;
+					case MotionEvent.ACTION_CANCEL:
+						v.setBackgroundColor(Color.BLACK);
+						((Button) v).setTextColor(Color.LTGRAY);
 						break;
 				}
 				
