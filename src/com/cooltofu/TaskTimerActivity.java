@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
@@ -177,6 +178,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 				final EditText input = new EditText(TaskTimerActivity.this);
 				input.setSingleLine(); // one line tall
+				input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
 				alert.setView(input);
 				alert.setPositiveButton("Ok",
 						new DialogInterface.OnClickListener() {
@@ -994,8 +996,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     }
     
     private int incrementHour(int num) {
-    	if (num + 1 > 99)
-    		return 0;
     	
     	return ++num;
     }
@@ -1009,7 +1009,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     
     private int decrementHour(int num) {
     	if (num - 1 < 0)
-    		return 99;
+    		return 0;
     	
     	return --num;
     }
