@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
@@ -556,18 +557,104 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			dialog.setContentView(editTimeView);
 			dialog.show();
 			
+			final int repeatSpeed = 100; // how fast to repeat the action for increment/decrement time
 			
+			final Runnable onPressedIncrementHour = new Runnable() {
+				public void run() {
+					
+					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+					int h = Integer.parseInt(hText.getText().toString());
+					//editedHour = formatDoubleDigit(++h);
+					hText.setText(formatDoubleDigit(incrementHour(h)));
+					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
+				}
+			};
+			final Runnable onPressedDecrementHour = new Runnable() {
+				public void run() {
+					
+					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+					int h = Integer.parseInt(hText.getText().toString());
+					//editedHour = formatDoubleDigit(++h);
+					hText.setText(formatDoubleDigit(decrementHour(h)));
+					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
+				}
+			};
+			
+			
+			
+			final Runnable onPressedIncrementMinute = new Runnable() {
+				public void run() {
+					
+					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+					int m = Integer.parseInt(mText.getText().toString());
+					//editedMinute = formatDoubleDigit(++m);
+					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
+					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
+				}
+			};
+			final Runnable onPressedDecrementMinute = new Runnable() {
+				public void run() {
+					
+					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+					int m = Integer.parseInt(mText.getText().toString());
+					//editedMinute = formatDoubleDigit(++m);
+					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
+					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
+				}
+			};
+			
+			
+			final Runnable onPressedIncrementSecond = new Runnable() {
+				public void run() {
+					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+					int s = Integer.parseInt(sText.getText().toString());
+					//editedSecond = formatDoubleDigit(++s);
+					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
+					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
+				}
+			};
+			final Runnable onPressedDecrementSecond = new Runnable() {
+				public void run() {
+					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+					int s = Integer.parseInt(sText.getText().toString());
+					//editedSecond = formatDoubleDigit(++s);
+					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
+					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
+				}
+			};
 			//------------------------------------------------------------------------
 			// set the click function for the increment buttons
 			Button hourUpBtn = (Button) editTimeView.findViewById(R.id.editHourUpBtn);
 			hourUpBtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
+					
 					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
 					int h = Integer.parseInt(hText.getText().toString());
 					//editedHour = formatDoubleDigit(++h);
 					hText.setText(formatDoubleDigit(incrementHour(h)));
 				}
 			});
+			
+			hourUpBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+				public final boolean onTouch(View v, MotionEvent event) {
+					
+					int action = event.getAction();
+					
+					switch(action) {
+						case MotionEvent.ACTION_DOWN:
+							handler.removeCallbacks(onPressedIncrementHour);
+							handler.postAtTime(onPressedIncrementHour, SystemClock.uptimeMillis()+repeatSpeed);
+							break;
+						case MotionEvent.ACTION_UP:
+							handler.removeCallbacks(onPressedIncrementHour);
+							break;
+					}
+					return false;
+				}
+				
+			});
+			
 			
 			
 			Button minuteUpBtn = (Button) editTimeView.findViewById(R.id.editMinuteUpBtn);
@@ -579,6 +666,26 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
 				}
 			});
+			minuteUpBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+				public final boolean onTouch(View v, MotionEvent event) {
+					
+					int action = event.getAction();
+					
+					switch(action) {
+						case MotionEvent.ACTION_DOWN:
+							handler.removeCallbacks(onPressedIncrementMinute);
+							handler.postAtTime(onPressedIncrementMinute, SystemClock.uptimeMillis()+repeatSpeed);
+							break;
+						case MotionEvent.ACTION_UP:
+							handler.removeCallbacks(onPressedIncrementMinute);
+							break;
+					}
+					return false;
+				}
+				
+			});
+
 			
 			Button secondUpBtn = (Button) editTimeView.findViewById(R.id.editSecondUpBtn);
 			secondUpBtn.setOnClickListener(new View.OnClickListener() {
@@ -589,7 +696,25 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
 				}
 			});
-			
+			secondUpBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+				public final boolean onTouch(View v, MotionEvent event) {
+					
+					int action = event.getAction();
+					
+					switch(action) {
+						case MotionEvent.ACTION_DOWN:
+							handler.removeCallbacks(onPressedIncrementSecond);
+							handler.postAtTime(onPressedIncrementSecond, SystemClock.uptimeMillis()+repeatSpeed);
+							break;
+						case MotionEvent.ACTION_UP:
+							handler.removeCallbacks(onPressedIncrementSecond);
+							break;
+					}
+					return false;
+				}
+				
+			});
 			
 			//------------------------------------------------------------------------
 			// set the click function for the decrement buttons
@@ -602,7 +727,26 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					hText.setText(formatDoubleDigit(decrementHour(h)));
 				}
 			});
-			
+			hourDownBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+				public final boolean onTouch(View v, MotionEvent event) {
+					
+					int action = event.getAction();
+					
+					switch(action) {
+						case MotionEvent.ACTION_DOWN:
+							handler.removeCallbacks(onPressedDecrementHour);
+							handler.postAtTime(onPressedDecrementHour, SystemClock.uptimeMillis()+repeatSpeed);
+							break;
+						case MotionEvent.ACTION_UP:
+							handler.removeCallbacks(onPressedDecrementHour);
+							break;
+					}
+					return false;
+				}
+				
+			});
+
 			Button minuteDownBtn = (Button) editTimeView.findViewById(R.id.editMinuteDownBtn);
 			minuteDownBtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
@@ -612,7 +756,25 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
 				}
 			});
-			
+			minuteDownBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+				public final boolean onTouch(View v, MotionEvent event) {
+					
+					int action = event.getAction();
+					
+					switch(action) {
+						case MotionEvent.ACTION_DOWN:
+							handler.removeCallbacks(onPressedDecrementMinute);
+							handler.postAtTime(onPressedDecrementMinute, SystemClock.uptimeMillis()+repeatSpeed);
+							break;
+						case MotionEvent.ACTION_UP:
+							handler.removeCallbacks(onPressedDecrementMinute);
+							break;
+					}
+					return false;
+				}
+			});
+
 			Button secondDownBtn = (Button) editTimeView.findViewById(R.id.editSecondDownBtn);
 			secondDownBtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
@@ -622,7 +784,25 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
 				}
 			});
-			
+			secondDownBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+				public final boolean onTouch(View v, MotionEvent event) {
+					
+					int action = event.getAction();
+					
+					switch(action) {
+						case MotionEvent.ACTION_DOWN:
+							handler.removeCallbacks(onPressedDecrementSecond);
+							handler.postAtTime(onPressedDecrementSecond, SystemClock.uptimeMillis()+repeatSpeed);
+							break;
+						case MotionEvent.ACTION_UP:
+							handler.removeCallbacks(onPressedDecrementSecond);
+							break;
+					}
+					return false;
+				}
+				
+			});
 			
 			
 			Button editTimeOkBtn = (Button) editTimeView.findViewById(R.id.editTimeOkBtn);
