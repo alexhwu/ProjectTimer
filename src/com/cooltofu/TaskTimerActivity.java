@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -75,11 +74,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	public static final String PREFS_NAME = "MyPrefsFile";
 	public GoogleAnalyticsTracker tracker;
 	
-	private SensorManager sensorManager;
-	private long lastUpdate = System.currentTimeMillis();
+	//private SensorManager sensorManager;
+	//private long lastUpdate = System.currentTimeMillis();
 	
 	
-	private boolean isDialogShowing = false;
+	//private boolean isDialogShowing = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -190,7 +189,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 					public void onCancel(DialogInterface arg0) {
 						// TODO Auto-generated method stub
-						isDialogShowing = false;
+						//isDialogShowing = false;
 						return;
 					}
 					
@@ -213,7 +212,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 								cursor = db.fetchAllTimers();
 									
 								createTaskTimer((int) timerId, label, 0, false);
-								isDialogShowing = false;
+								//isDialogShowing = false;
 							}
 						});
 
@@ -222,12 +221,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 							public void onClick(DialogInterface dialog, int which) {
 								// TODO Auto-generated method stub
-								isDialogShowing = false;
+								//isDialogShowing = false;
 								return;
 							}
 						});
 				alert.show();
-				isDialogShowing = true;
+				//isDialogShowing = true;
 				
 				
 			}
@@ -367,7 +366,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				});
 			}
     	};
-    	timer.scheduleAtFixedRate(totalTimerTask, 1000, 1000);
+    	timer.scheduleAtFixedRate(totalTimerTask, 0, 1000);
 			
     	
     	
@@ -596,7 +595,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 				public void onCancel(DialogInterface arg0) {
 					// TODO Auto-generated method stub
-					isDialogShowing = false;
+					//isDialogShowing = false;
 					return;
 				}
 				
@@ -606,7 +605,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							deleteAllTimers();
 
-							isDialogShowing = false;
+							//isDialogShowing = false;
 							// TODO: find a way to close context menu
 							// reset to timer list activity to prevent a null pointer exception
 							// scenario: the contextmenu is opened, and the user deletes all timers
@@ -625,12 +624,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 						public void onClick(DialogInterface dialog,int which) {
 							// TODO Auto-generated method stub
-							isDialogShowing = false;
+							//isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
-			isDialogShowing = true;
+			//isDialogShowing = true;
 			
 		} else if (menuItemTitle == "Delete Timer") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -642,7 +641,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 				public void onCancel(DialogInterface arg0) {
 					// TODO Auto-generated method stub
-					isDialogShowing = false;
+					//isDialogShowing = false;
 					return;
 				}
 				
@@ -656,7 +655,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							
 							db.deleteTimer(item.getItemId());
 							cursor = db.fetchAllTimers();
-							isDialogShowing = false;
+							//isDialogShowing = false;
 						}
 					});
 
@@ -665,12 +664,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 						public void onClick(DialogInterface dialog,int which) {
 							// TODO Auto-generated method stub
-							isDialogShowing = false;
+							//isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
-			isDialogShowing = true;
+			//isDialogShowing = true;
 			
 		} else if (menuItemTitle == "Edit Label") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -688,7 +687,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 				public void onCancel(DialogInterface arg0) {
 					// TODO Auto-generated method stub
-					isDialogShowing = false;
+					//isDialogShowing = false;
 					return;
 				}
 				
@@ -698,7 +697,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							textView.setText(input.getText().toString());
-							isDialogShowing = false;
+							//isDialogShowing = false;
 						}
 					});
 
@@ -707,15 +706,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 						public void onClick(DialogInterface dialog,int which) {
 							// TODO Auto-generated method stub
-							isDialogShowing = false;
+							//isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
-			isDialogShowing = true;
+			//isDialogShowing = true;
 			
 		} else if (menuItemTitle == "Edit Time") {
-			isDialogShowing = true;
+			//isDialogShowing = true;
 			
 			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
 			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -1021,7 +1020,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					if (isOn)
 						startStopBtn.performClick();
 					
-					isDialogShowing = false;
+					//isDialogShowing = false;
 					
 					dialog.dismiss();
 					
@@ -1037,7 +1036,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					if (isOn)
 						startStopBtn.performClick();
 					
-					isDialogShowing = false;
+					//isDialogShowing = false;
 					dialog.dismiss();
 					
 				}
