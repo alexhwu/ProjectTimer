@@ -560,6 +560,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			dialog.show();
 			
 			final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
+			final int PRESS_DELAY = 200; // delay on press event for time editing
 			
 			final Runnable onPressedIncrementHour = new Runnable() {
 				public void run() {
@@ -646,7 +647,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					switch(action) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedIncrementHour);
-							handler.postAtTime(onPressedIncrementHour, SystemClock.uptimeMillis()+repeatSpeed);
+							handler.postAtTime(onPressedIncrementHour, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
 							break;
 						case MotionEvent.ACTION_UP:
 							handler.removeCallbacks(onPressedIncrementHour);
@@ -677,7 +678,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					switch(action) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedIncrementMinute);
-							handler.postAtTime(onPressedIncrementMinute, SystemClock.uptimeMillis()+repeatSpeed);
+							handler.postAtTime(onPressedIncrementMinute, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
 							break;
 						case MotionEvent.ACTION_UP:
 							handler.removeCallbacks(onPressedIncrementMinute);
@@ -707,7 +708,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					switch(action) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedIncrementSecond);
-							handler.postAtTime(onPressedIncrementSecond, SystemClock.uptimeMillis()+repeatSpeed);
+							handler.postAtTime(onPressedIncrementSecond, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
 							break;
 						case MotionEvent.ACTION_UP:
 							handler.removeCallbacks(onPressedIncrementSecond);
@@ -738,7 +739,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					switch(action) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedDecrementHour);
-							handler.postAtTime(onPressedDecrementHour, SystemClock.uptimeMillis()+repeatSpeed);
+							handler.postAtTime(onPressedDecrementHour, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
 							break;
 						case MotionEvent.ACTION_UP:
 							handler.removeCallbacks(onPressedDecrementHour);
@@ -767,7 +768,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					switch(action) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedDecrementMinute);
-							handler.postAtTime(onPressedDecrementMinute, SystemClock.uptimeMillis()+repeatSpeed);
+							handler.postAtTime(onPressedDecrementMinute, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
 							break;
 						case MotionEvent.ACTION_UP:
 							handler.removeCallbacks(onPressedDecrementMinute);
@@ -795,7 +796,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					switch(action) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedDecrementSecond);
-							handler.postAtTime(onPressedDecrementSecond, SystemClock.uptimeMillis()+repeatSpeed);
+							handler.postAtTime(onPressedDecrementSecond, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
 							break;
 						case MotionEvent.ACTION_UP:
 							handler.removeCallbacks(onPressedDecrementSecond);
