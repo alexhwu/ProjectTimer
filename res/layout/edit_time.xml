@@ -9,27 +9,27 @@
         <TableRow>
             <Button
                 android:id="@+id/editHourUpBtn"
-                android:layout_width="55dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="+" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="30dp"/>
             <TextView/>
             <Button
                 android:id="@+id/editMinuteUpBtn"
-                android:layout_width="55dp"
-               android:layout_height="wrap_content"
-                android:text="+" 
-                android:textColor="#333333"
-                android:textSize="25dp"/>
-            <TextView/>
-            <Button
-                android:id="@+id/editSecondUpBtn"
-                android:layout_width="55dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="+" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="30dp"/>
+            <TextView/>
+            <Button
+                android:id="@+id/editSecondUpBtn"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="+" 
+                android:textColor="#333333"
+                android:textSize="30dp"/>
 		        
         </TableRow>
         
@@ -79,27 +79,27 @@
             
             <Button
                 android:id="@+id/editHourDownBtn"
-                android:layout_width="55dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="-"
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="30dp"/>
             <TextView/>
             <Button
                 android:id="@+id/editMinuteDownBtn"
-                android:layout_width="55dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="-" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="30dp"/>
             <TextView/>
             <Button
                 android:id="@+id/editSecondDownBtn"
-                android:layout_width="55dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="-" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="30dp"/>
         
         </TableRow>
         
@@ -116,7 +116,7 @@
                     
 	                <Button
 	                    android:id="@+id/editTimeCancelBtn"
-	                    android:layout_width="80dp"
+	                    android:layout_width="93dp"
 	                    android:layout_height="wrap_content"
 	                    android:text="Cancel" />    
           </LinearLayout>      

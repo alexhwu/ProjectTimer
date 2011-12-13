@@ -559,7 +559,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			dialog.setContentView(editTimeView);
 			dialog.show();
 			
-			final int repeatSpeed = 100; // how fast to repeat the action for increment/decrement time
+			final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
 			
 			final Runnable onPressedIncrementHour = new Runnable() {
 				public void run() {
