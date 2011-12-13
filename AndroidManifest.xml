@@ -14,7 +14,8 @@
         android:label="@string/app_name" >
         <activity
             android:label="@string/app_name"
-            android:name="TaskTimerActivity">
+            android:name="TaskTimerActivity"
+            android:screenOrientation="portrait">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,7 +23,8 @@
         </activity>
         <activity 
             android:label="More"
-            android:name=".MoreScreen">
+            android:name=".MoreScreen"
+            android:screenOrientation="portrait">
             
         </activity>
     </application>

@@ -37,6 +37,9 @@ public class TimerDbAdapter {
 		dbHelper.close();
 	}
 
+	public boolean isOpen() {
+		return db.isOpen();
+	}
 	
 /**
 	 * Create a new timer If the timer is successfully created return the new

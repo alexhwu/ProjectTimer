@@ -108,7 +108,8 @@
 						                    android:layout_marginRight="8dp"
 						                    android:textSize="18dp"
 						                    android:ellipsize="start"
-						                    android:text="ETP Project ETP Project" />
+						                    android:autoText="true"
+						                    android:text="" />
 									</TableRow>
 								</TableLayout>
 			            

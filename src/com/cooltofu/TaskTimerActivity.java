@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -82,6 +83,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 	private long lastUpdate = System.currentTimeMillis();
 	
 	
+	private boolean isDialogShowing = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -189,10 +191,20 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 				input.setSingleLine(); // one line tall
 				input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
 				alert.setView(input);
+				
+				alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+					public void onCancel(DialogInterface arg0) {
+						// TODO Auto-generated method stub
+						isDialogShowing = false;
+						return;
+					}
+					
+				});
+				
 				alert.setPositiveButton("Ok",
 						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int whichButton) {
+							public void onClick(DialogInterface dialog, int whichButton) {
 								
 								String label = input.getText().toString();
 								// create db entry for new timer
@@ -206,19 +218,21 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 								
 									
 								createTaskTimer((int) timerId, label, 0, false);
+								isDialogShowing = false;
 							}
 						});
 
 				alert.setNegativeButton("Cancel",
 						new DialogInterface.OnClickListener() {
 
-							public void onClick(DialogInterface dialog,
-									int which) {
+							public void onClick(DialogInterface dialog, int which) {
 								// TODO Auto-generated method stub
+								isDialogShowing = false;
 								return;
 							}
 						});
 				alert.show();
+				isDialogShowing = true;
 				
 				tracker.trackEvent("NewTimerBtn", "setOnClickListener", "", -1);
 			}
@@ -468,6 +482,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 		// set long press event
 		registerForContextMenu(mainTl);
 		
+		
 	}
 	
 	
@@ -478,6 +493,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 		
 		menu.add(0, (v.getId()), 1, "Edit Label");
 		menu.add(0, v.getId(), 2, "Delete Timer");
+		
 	}
 
 	public boolean onContextItemSelected(final MenuItem item) {
@@ -491,7 +507,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
 			alert.setTitle("Delete " + textView.getText().toString() + "?");
 		 	
-			
+			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+				public void onCancel(DialogInterface arg0) {
+					// TODO Auto-generated method stub
+					isDialogShowing = false;
+					return;
+				}
+				
+			});
 			alert.setPositiveButton("Ok",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
@@ -500,6 +524,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 							ll.removeView(tv);
 							
 							db.deleteTimer(item.getItemId());
+							isDialogShowing = false;
 						}
 					});
 
@@ -508,11 +533,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 
 						public void onClick(DialogInterface dialog,int which) {
 							// TODO Auto-generated method stub
+							isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
-			
+			isDialogShowing = true;
 			
 		} else if (menuItemTitle == "Edit Label") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -526,10 +552,21 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 			input.setSelection(input.getText().length());
 			alert.setView(input);
 			
+			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+				public void onCancel(DialogInterface arg0) {
+					// TODO Auto-generated method stub
+					isDialogShowing = false;
+					return;
+				}
+				
+			});
+			
 			alert.setPositiveButton("Ok",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							textView.setText(input.getText().toString());
+							isDialogShowing = false;
 						}
 					});
 
@@ -538,11 +575,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 
 						public void onClick(DialogInterface dialog,int which) {
 							// TODO Auto-generated method stub
+							isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
+			isDialogShowing = true;
+			
 		} else if (menuItemTitle == "Edit Time") {
+			isDialogShowing = true;
 			
 			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
 			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -576,6 +617,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 			dialog.setTitle("Edit Time for " + taskLabel.getText().toString());
 			dialog.setContentView(editTimeView);
 			dialog.show();
+			
 			
 			final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
 			final int PRESS_DELAY = 200; // delay on press event for time editing
@@ -847,7 +889,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 					if (isOn)
 						startStopBtn.performClick();
 					
+					isDialogShowing = false;
+					
 					dialog.dismiss();
+					
 				}
 			});
 			
@@ -860,7 +905,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 					if (isOn)
 						startStopBtn.performClick();
 					
+					isDialogShowing = false;
 					dialog.dismiss();
+					
 				}
 			});
 			
@@ -888,6 +935,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
         sensorManager.registerListener(this,
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 				SensorManager.SENSOR_DELAY_NORMAL);
+        
+       
     }
     @Override
     protected void onPause() {
@@ -929,6 +978,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
     
     private void saveTimers() {
     	
+    	if (!db.isOpen())
+    		db.open();
     	
         cursor = db.fetchAllTimers();
         startManagingCursor(cursor);
@@ -1107,11 +1158,14 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 			long actualTime = System.currentTimeMillis();
 			if (accelationSquareRoot >= 5) //
 			{
-				if (isPromptForDelete == true || (actualTime - lastUpdate < 300)) {
+				if (isDialogShowing == true || (actualTime - lastUpdate < 300)) {
 					return;
 				}
 				
 				lastUpdate = actualTime;
+				
+				if (!db.isOpen())
+		    		db.open();
 				
 				// if there is at least one timer, prompt user to delete all timers
 				cursor = db.fetchAllTimers();
@@ -1122,7 +1176,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 				}
 				
 				
-				isPromptForDelete = true;
+				
 				AlertDialog.Builder deleteAllAlert = new AlertDialog.Builder(TaskTimerActivity.this);
 				deleteAllAlert.setTitle("Delete all timers?");
 				
@@ -1130,7 +1184,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 
 					public void onCancel(DialogInterface arg0) {
 						// TODO Auto-generated method stub
-						isPromptForDelete = false;
+						isDialogShowing = false;
 						return;
 					}
 					
@@ -1138,7 +1192,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 				deleteAllAlert.setPositiveButton("Ok",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								isPromptForDelete = false;
+								
+								if (!db.isOpen())
+						    		db.open();
 								
 								cursor = db.fetchAllTimers();
 								startManagingCursor(cursor);
@@ -1157,7 +1213,16 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 									}
 								}
 								
+								isDialogShowing = false;
 								
+								// TODO: find a way to close context menu
+								// reset to timer list activity to prevent a null pointer exception
+								// scenario: the contextmenu is opened, and the user deletes all timers
+								// the contextmenu is still opened which will cause null exception when an item is selected
+								Intent i = new Intent();
+			    				i.setClass(TaskTimerActivity.this, TaskTimerActivity.class);
+			    				startActivity(i);
+			    				
 								return;
 								
 							}
@@ -1168,11 +1233,13 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 
 							public void onClick(DialogInterface dialog,int which) {
 								// TODO Auto-generated method stub
-								isPromptForDelete = false;
+								
+								isDialogShowing = false;
 								return;
 							}
 						});
 				deleteAllAlert.show();
+				isDialogShowing = true;
 				
 			}
 
