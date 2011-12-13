@@ -12,6 +12,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -40,7 +44,7 @@ import android.widget.ToggleButton;
 import com.cooltofu.db.TimerDbAdapter;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
-public class TaskTimerActivity extends Activity implements OnClickListener {
+public class TaskTimerActivity extends Activity implements OnClickListener, SensorEventListener {
 	final int TIME_ID_PREFIX = 10000;
 	final int TASK_LABEL_ID_PREFIX = 20000;
 	final int START_STOP_ID_PREFIX = 30000;
@@ -73,6 +77,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	
 	public static final String PREFS_NAME = "MyPrefsFile";
 	public GoogleAnalyticsTracker tracker;
+	
+	private SensorManager sensorManager;
+	private long lastUpdate = System.currentTimeMillis();
+	
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -262,6 +271,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         RelativeLayout sv = (RelativeLayout) findViewById(R.id.relativeLayout);
         sv.setOnClickListener(TaskTimerActivity.this);
         sv.setOnTouchListener(gestureListener);
+        
+        
+        
+        // shake event
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+    	sensorManager.registerListener(this,
+    			sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+    			SensorManager.SENSOR_DELAY_NORMAL);
+    	lastUpdate = System.currentTimeMillis();
 	}//onCreate
 
 	
@@ -867,11 +885,16 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     	
         super.onResume();
         // The activity has become visible (it is now "resumed").
-        
+        sensorManager.registerListener(this,
+				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+				SensorManager.SENSOR_DELAY_NORMAL);
     }
     @Override
     protected void onPause() {
+    	sensorManager.unregisterListener(this);
+    	
         super.onPause();
+        
         // Another activity is taking focus (this activity is about to be "paused").
         saveTimers();
       
@@ -1059,5 +1082,101 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		//Toast t = Toast.makeText(v.getContext(), "gesture on Click", Toast.LENGTH_SHORT);
 		//t.show();
 		
+	}
+
+	
+	
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	
+	boolean isPromptForDelete = false;
+	public void onSensorChanged(SensorEvent event) {
+		// TODO Auto-generated method stub
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			float[] values = event.values;
+			// Movement
+			float x = values[0];
+			float y = values[1];
+			float z = values[2];
+
+			float accelationSquareRoot = (x * x + y * y + z * z)
+					/ (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH);
+			long actualTime = System.currentTimeMillis();
+			if (accelationSquareRoot >= 5) //
+			{
+				if (isPromptForDelete == true || (actualTime - lastUpdate < 300)) {
+					return;
+				}
+				
+				lastUpdate = actualTime;
+				
+				// if there is at least one timer, prompt user to delete all timers
+				cursor = db.fetchAllTimers();
+				startManagingCursor(cursor);
+				
+				if (cursor == null || cursor.getCount() == 0) {
+					return;
+				}
+				
+				
+				isPromptForDelete = true;
+				AlertDialog.Builder deleteAllAlert = new AlertDialog.Builder(TaskTimerActivity.this);
+				deleteAllAlert.setTitle("Delete all timers?");
+				
+				deleteAllAlert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+					public void onCancel(DialogInterface arg0) {
+						// TODO Auto-generated method stub
+						isPromptForDelete = false;
+						return;
+					}
+					
+				});
+				deleteAllAlert.setPositiveButton("Ok",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								isPromptForDelete = false;
+								
+								cursor = db.fetchAllTimers();
+								startManagingCursor(cursor);
+								
+								if (cursor != null) {
+									
+									cursor.moveToFirst();
+									while (cursor.isAfterLast() == false) {
+										// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+										int id = cursor.getInt(0);
+										TableLayout tv = (TableLayout) findViewById(id);
+										ll.removeView(tv);
+										
+										db.deleteTimer(id);
+										cursor.moveToNext();
+									}
+								}
+								
+								
+								return;
+								
+							}
+						});
+
+				deleteAllAlert.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+
+							public void onClick(DialogInterface dialog,int which) {
+								// TODO Auto-generated method stub
+								isPromptForDelete = false;
+								return;
+							}
+						});
+				deleteAllAlert.show();
+				
+			}
+
+		}
 	}
 }

@@ -70,6 +70,7 @@ public class TimerDbAdapter {
 	}
 
 	
+	
 /**
 	 * Return a Cursor over the list of all timer in the database
 	 * 
