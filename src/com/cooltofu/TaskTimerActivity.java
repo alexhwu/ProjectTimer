@@ -11,11 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,7 +41,7 @@ import android.widget.ToggleButton;
 import com.cooltofu.db.TimerDbAdapter;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
-public class TaskTimerActivity extends Activity implements OnClickListener, SensorEventListener {
+public class TaskTimerActivity extends Activity implements OnClickListener {
 	final int TIME_ID_PREFIX = 10000;
 	final int TASK_LABEL_ID_PREFIX = 20000;
 	final int START_STOP_ID_PREFIX = 30000;
@@ -94,8 +90,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 		
 		
 		
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.startNewSession("UA-27584987-1", 10, this);
 		
 		setContentView(R.layout.main);
 		
@@ -142,7 +136,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 				
 				cursor.moveToNext();
 			}
-			tracker.trackEvent("RestoreFromDb", "onCreate", "count", cursor.getCount());
+			
 		}
 		
 
@@ -213,9 +207,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 								if (timerId == -1) {
 									// db error
 									// TODO: handle error
-									
 								}
 								
+								// update cursor
+								cursor = db.fetchAllTimers();
 									
 								createTaskTimer((int) timerId, label, 0, false);
 								isDialogShowing = false;
@@ -234,7 +229,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 				alert.show();
 				isDialogShowing = true;
 				
-				tracker.trackEvent("NewTimerBtn", "setOnClickListener", "", -1);
+				
 			}
 		});
 
@@ -289,11 +284,97 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
         
         
         // shake event
+        /*
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     	sensorManager.registerListener(this,
     			sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
     			SensorManager.SENSOR_DELAY_NORMAL);
     	lastUpdate = System.currentTimeMillis();
+    	*/
+    	
+    	//-------------------------------
+		// Options button actions
+		final Button optionBtn = (Button) findViewById(R.id.optionBtn);
+		optionBtn.setOnTouchListener(new View.OnTouchListener() {
+				
+			public boolean onTouch(View v,MotionEvent evt) {
+				
+				switch(evt.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						v.setBackgroundColor(Color.WHITE);
+						optionBtn.setTextColor(Color.DKGRAY);
+						break;
+					case MotionEvent.ACTION_UP:
+						v.setBackgroundColor(Color.BLACK);
+						optionBtn.setTextColor(Color.LTGRAY);
+						break;
+				}
+				
+				return false;
+			}
+		}); // optionBtn.setOnTouchListener()
+		
+		optionBtn.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				openContextMenu(v);
+			}
+		
+		});
+		registerForContextMenu(optionBtn);
+		
+    	// calculate total if there are timers
+    	TimerTask totalTimerTask;
+    	final TextView totalTextView = (TextView) findViewById(R.id.sumText);
+    	
+    	totalTimerTask = new TimerTask() {
+			
+    		
+			public void run() {
+				
+				handler.post(new Runnable() {
+
+					public void run() {
+						int seconds = 0;
+						
+						if (cursor != null && cursor.getCount() > 0) {
+							startManagingCursor(cursor);
+					        
+					        
+							cursor.moveToFirst();
+							while (cursor.isAfterLast() == false) {
+								// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+								int id = cursor.getInt(0);
+								
+								TableLayout tv = (TableLayout) findViewById(id);
+					        	
+					        	if (tv == null) continue; // none found; continue to next iteration
+					        
+					        	
+					        	
+					        	// table layout found, which means a timer also exists; save the time value
+					        	TextView timeValue = (TextView) findViewById(10000+id);
+					        	seconds += convertToSeconds(timeValue.getText().toString());
+					        	
+					        	
+								cursor.moveToNext();
+							}
+						
+							
+						}
+						totalTextView.setText(formatTimeTextDisplay(seconds));
+					}
+				});
+			}
+    	};
+    	timer.scheduleAtFixedRate(totalTimerTask, 1000, 1000);
+			
+    	
+    	
+    	
+    	tracker = GoogleAnalyticsTracker.getInstance();
+		tracker.startNewSession("UA-27584987-1", this);
+		tracker.trackEvent("Startup", "onCreate", "", -1);
 	}//onCreate
 
 	
@@ -338,7 +419,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 		mainTl.setId(timerId); // set the layout id for reference
 									 // later
 		mainTl.setPadding(0, 10, 0, 0);
-		
+		mainTl.setTag("Timer");
 		
         
 
@@ -360,7 +441,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
 			TimerTask timerTask = null;
-			int counter = seconds;
+			int counter = 0;
 
 			
 			public void onClick(View v) {
@@ -382,6 +463,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 									timeText.setText(formatTimeTextDisplay(counter));
 									counter++;
 									timeText.setText(formatTimeTextDisplay(counter));
+									
+									
 									//isTimeEdited = false;
 									
 									/*
@@ -488,20 +571,68 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 	
 	// long press context menu
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		menu.setHeaderTitle("Select Option");
-		menu.add(0, (v.getId()), 0, "Edit Time");
-		
-		menu.add(0, (v.getId()), 1, "Edit Label");
-		menu.add(0, v.getId(), 2, "Delete Timer");
+		if (v.getTag() == "Timer") {
+			menu.setHeaderTitle("Select Option");
+			menu.add(0, (v.getId()), 0, "Edit Time");
+			menu.add(0, (v.getId()), 1, "Edit Label");
+			menu.add(0, v.getId(), 2, "Delete Timer");
+		} else {
+			// options button
+			menu.setHeaderTitle("Select Option");
+			menu.add(0, 1, 0, "Delete All Timers");
+		}
 		
 	}
-
+	
 	public boolean onContextItemSelected(final MenuItem item) {
 
 		String menuItemTitle = (String) item.getTitle();
 		
-		
-		if (menuItemTitle == "Delete Timer") {
+		if (menuItemTitle == "Delete All Timers") {
+			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert.setTitle("Delete all Timers?");
+		 	
+			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+				public void onCancel(DialogInterface arg0) {
+					// TODO Auto-generated method stub
+					isDialogShowing = false;
+					return;
+				}
+				
+			});
+			alert.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							deleteAllTimers();
+
+							isDialogShowing = false;
+							// TODO: find a way to close context menu
+							// reset to timer list activity to prevent a null pointer exception
+							// scenario: the contextmenu is opened, and the user deletes all timers
+							// the contextmenu is still opened which will cause null exception when an item is selected
+							Intent i = new Intent();
+		    				i.setClass(TaskTimerActivity.this, TaskTimerActivity.class);
+		    				startActivity(i);
+		    				
+		    				
+							//return;
+						}
+					});
+
+			alert.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,int which) {
+							// TODO Auto-generated method stub
+							isDialogShowing = false;
+							return;
+						}
+					});
+			alert.show();
+			isDialogShowing = true;
+			
+		} else if (menuItemTitle == "Delete Timer") {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
@@ -524,6 +655,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 							ll.removeView(tv);
 							
 							db.deleteTimer(item.getItemId());
+							cursor = db.fetchAllTimers();
 							isDialogShowing = false;
 						}
 					});
@@ -913,7 +1045,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 			
 		}
 		
-		tracker.trackEvent("ContextMenu", "onContextItemSelected", menuItemTitle, -1);
+		
 		return true;
 	}
 
@@ -932,15 +1064,16 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
     	
         super.onResume();
         // The activity has become visible (it is now "resumed").
+        /*
         sensorManager.registerListener(this,
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 				SensorManager.SENSOR_DELAY_NORMAL);
-        
+        */
        
     }
     @Override
     protected void onPause() {
-    	sensorManager.unregisterListener(this);
+    	//sensorManager.unregisterListener(this);
     	
         super.onPause();
         
@@ -970,9 +1103,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
         
         if (db != null)
         	db.close();
-        
-        // stop google analytics tracker
-        tracker.stopSession();
         
     }
     
@@ -1135,15 +1265,39 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 	}
 
 	
-	
+	/*
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 		
-	}
+	}*/
 
+	
+	private void deleteAllTimers() {
+		if (!db.isOpen())
+    		db.open();
+		
+		cursor = db.fetchAllTimers();
+		startManagingCursor(cursor);
+		
+		if (cursor != null) {
+			
+			cursor.moveToFirst();
+			while (cursor.isAfterLast() == false) {
+				// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+				int id = cursor.getInt(0);
+				TableLayout tv = (TableLayout) findViewById(id);
+				ll.removeView(tv);
+				
+				db.deleteTimer(id);
+				cursor.moveToNext();
+			}
+		}
+		
+	}
 	
 	
 	boolean isPromptForDelete = false;
+	/*
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -1193,25 +1347,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								
-								if (!db.isOpen())
-						    		db.open();
-								
-								cursor = db.fetchAllTimers();
-								startManagingCursor(cursor);
-								
-								if (cursor != null) {
-									
-									cursor.moveToFirst();
-									while (cursor.isAfterLast() == false) {
-										// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-										int id = cursor.getInt(0);
-										TableLayout tv = (TableLayout) findViewById(id);
-										ll.removeView(tv);
-										
-										db.deleteTimer(id);
-										cursor.moveToNext();
-									}
-								}
+								deleteAllTimers();
 								
 								isDialogShowing = false;
 								
@@ -1244,5 +1380,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 			}
 
 		}
-	}
+		
+		
+	}*/
+	
+	
+	
 }
