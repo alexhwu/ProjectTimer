@@ -1060,12 +1060,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
                     return false;
                 // right to left swipe
                 if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    //Toast.makeText(TaskTimerActivity.this, "Left Swipe", Toast.LENGTH_SHORT).show();
+                    
                 	Intent i = new Intent();
     				i.setClass(TaskTimerActivity.this, MoreScreen.class);
     				startActivity(i);
                 }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    //Toast.makeText(TaskTimerActivity.this, "Right Swipe", Toast.LENGTH_SHORT).show();
+                    
                 	// do nothing
                 }
             } catch (Exception e) {
@@ -1079,8 +1079,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener, Sens
 
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		//Toast t = Toast.makeText(v.getContext(), "gesture on Click", Toast.LENGTH_SHORT);
-		//t.show();
+		
 		
 	}
 
