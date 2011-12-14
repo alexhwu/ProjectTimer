@@ -583,6 +583,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 	}
 	
+	
 	public boolean onContextItemSelected(final MenuItem item) {
 
 		String menuItemTitle = (String) item.getTitle();
@@ -610,12 +611,13 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							// reset to timer list activity to prevent a null pointer exception
 							// scenario: the contextmenu is opened, and the user deletes all timers
 							// the contextmenu is still opened which will cause null exception when an item is selected
-							Intent i = new Intent();
-		    				i.setClass(TaskTimerActivity.this, TaskTimerActivity.class);
-		    				startActivity(i);
+							//Intent i = new Intent();
+		    				//i.setClass(TaskTimerActivity.this, TaskTimerActivity.class);
+		    				//startActivity(i);
 		    				
 		    				
-							//return;
+							return;
+							
 						}
 					});
 
@@ -1272,6 +1274,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 	
 	private void deleteAllTimers() {
+		
 		if (!db.isOpen())
     		db.open();
 		
@@ -1291,6 +1294,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				cursor.moveToNext();
 			}
 		}
+		cursor = db.fetchAllTimers();
 		
 	}
 	
