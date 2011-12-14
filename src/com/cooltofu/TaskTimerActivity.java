@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -49,15 +51,16 @@ import com.cooltofu.db.TimerDbAdapter;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class TaskTimerActivity extends Activity implements OnClickListener {
-	final int TIME_ID_PREFIX = 10000;
-	final int TASK_LABEL_ID_PREFIX = 20000;
-	final int START_STOP_ID_PREFIX = 30000;
+	final static int TIME_ID_PREFIX = 10000;
+	final static int TASK_LABEL_ID_PREFIX = 20000;
+	final static int START_STOP_ID_PREFIX = 30000;
+	
+	static List timerIds = new ArrayList();
 	
 	
-	//boolean isTimeEdited = false; // indicates if the user has changed the time
-	String editedHour;
-	String editedMinute;
-	String editedSecond;
+	static String editedHour;
+	static String editedMinute;
+	static String editedSecond;
 	
 	LayoutParams startStopBtnLayoutParams;
 	LayoutParams mtlParams;
@@ -119,6 +122,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 		if (cursor != null) {
 			
+			timerIds.clear();
 			
 			cursor.moveToFirst();
 			while (cursor.isAfterLast() == false) {
@@ -141,6 +145,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				createTaskTimer(id, label, seconds, isOn);
 				
+				
+				timerIds.add(id);
 				cursor.moveToNext();
 			}
 			
@@ -216,7 +222,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 									// TODO: handle error
 								}
 								
-									
+								timerIds.add(timerId);	
 								createTaskTimer((int) timerId, label, 0, false);
 								//isDialogShowing = false;
 							}
@@ -342,8 +348,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					public void run() {
 						int seconds = 0;
 						
-						if (!db.isOpen())
-							db.open();
 						
 						cursor = db.fetchAllTimers();
 						startManagingCursor(cursor);
@@ -610,18 +614,16 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			// create the csv file
 			StringBuffer headerBuf = new StringBuffer();
 			StringBuffer timeBuf = new StringBuffer();
-			
-			if (!db.isOpen())
-	    		db.open();
+			int len = timerIds.size();
 	    	
-	        cursor = db.fetchAllTimers();
-	        startManagingCursor(cursor);
 	        
-	        if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				while (cursor.isAfterLast() == false) {
+	        
+	        if (len > 0) {
+				int id = 0;
+				
+				for (int i = 0; i < len; i++) {
 					// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-					int id = cursor.getInt(0);
+					id = Integer.parseInt(timerIds.get(i).toString());
 					
 					TableLayout tv = (TableLayout) findViewById(id);
 		        	
@@ -635,7 +637,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		        	TextView labelValue = (TextView) findViewById(20000+id);
 		        	String label = labelValue.getText().toString();
 		        	
-		        	if (cursor.isLast()) {
+		        	if (i == (len -1)) {
 		        		headerBuf.append("\""+ escapeQuote(label) +"\"");
 		        		timeBuf.append("\""+ timeValue.getText().toString() + "\"");
 		        	}
@@ -644,8 +646,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		        		timeBuf.append("\"" + timeValue.getText().toString() + "\",");
 		        	}
 		        	
-		        	
-					cursor.moveToNext();
 				}
 			}
 	        
@@ -770,7 +770,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							ll.removeView(tv);
 							
 							db.deleteTimer(item.getItemId());
-						
+							timerIds.remove(item.getItemId());
 							//isDialogShowing = false;
 						}
 					});
@@ -1184,7 +1184,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 				SensorManager.SENSOR_DELAY_NORMAL);
         */
-       
+        if (!db.isOpen())
+			db.open();
+        
+		
+        
     }
     @Override
     protected void onPause() {
@@ -1204,12 +1208,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         // The activity is about to be destroyed.
        // timer.cancel();
         
-        if (cursor != null)
-        	cursor.close();
+        //if (cursor != null)
+        //	cursor.close();
         
         
-        if (db != null)
-        	db.close();
+        //if (db != null)
+        //	db.close();
     }
     
     @Override
@@ -1232,49 +1236,43 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     
     private void saveTimers() {
     	
-    	if (!db.isOpen())
-    		db.open();
-    	
-        cursor = db.fetchAllTimers();
-        startManagingCursor(cursor);
+        int len = timerIds.size();
         
-        if (cursor != null) {
-			cursor.moveToFirst();
-			while (cursor.isAfterLast() == false) {
-				// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-				int id = cursor.getInt(0);
-				
-				TableLayout tv = (TableLayout) findViewById(id);
-	        	
-	        	if (tv == null) continue; // none found; continue to next iteration
-	        
-	        	
-	        	
-	        	// table layout found, which means a timer also exists; save the time value
-	        	TextView timeValue = (TextView) findViewById(10000+id);
-	        	int seconds = convertToSeconds(timeValue.getText().toString());
-	        	
-	        	
-	        	// save the timer label
-	        	TextView labelValue = (TextView) findViewById(20000+id);
-	        	String label = labelValue.getText().toString();
-	        	
-	        	
-	        	// save the state of the timer; running or not
-	        	ToggleButton btn = (ToggleButton) findViewById(30000+id);
-	        	boolean isOn = btn.isChecked();
-	        	
-	        	
-	        	// save the timestamp; used for timers that are active when activity is destroyed
-	        	Calendar cal = Calendar.getInstance();
-	        	long timestamp = cal.getTimeInMillis();
-	        	
-	        	
-	        	db.updateTimer(id, label, seconds, timestamp, isOn);
-	        	
-				cursor.moveToNext();
-			}
+        
+		for (int i=0; i < len; i++) {
+			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+			int id = Integer.parseInt(timerIds.get(i).toString());
+			
+			TableLayout tv = (TableLayout) findViewById(id);
+        	
+        	if (tv == null) continue; // none found; continue to next iteration
+        
+        	
+        	
+        	// table layout found, which means a timer also exists; save the time value
+        	TextView timeValue = (TextView) findViewById(10000+id);
+        	int seconds = convertToSeconds(timeValue.getText().toString());
+        	
+        	
+        	// save the timer label
+        	TextView labelValue = (TextView) findViewById(20000+id);
+        	String label = labelValue.getText().toString();
+        	
+        	
+        	// save the state of the timer; running or not
+        	ToggleButton btn = (ToggleButton) findViewById(30000+id);
+        	boolean isOn = btn.isChecked();
+        	
+        	
+        	// save the timestamp; used for timers that are active when activity is destroyed
+        	Calendar cal = Calendar.getInstance();
+        	long timestamp = cal.getTimeInMillis();
+        	
+        	
+        	db.updateTimer(id, label, seconds, timestamp, isOn);
+        	
 		}
+	
         
         
         
@@ -1389,127 +1387,28 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	}
 
 	
-	/*
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-		
-	}*/
 
 	
 	private void deleteAllTimers() {
 		
-		if (!db.isOpen())
-    		db.open();
-		
-		cursor = db.fetchAllTimers();
-		startManagingCursor(cursor);
-		
-		if (cursor != null) {
+		int len = timerIds.size();
+	
+		for (int i = 0; i < len; i++) {
+			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+			int id = Integer.parseInt(timerIds.get(i).toString());
+			TableLayout tv = (TableLayout) findViewById(id);
+			ll.removeView(tv);
 			
-			cursor.moveToFirst();
-			while (cursor.isAfterLast() == false) {
-				// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-				int id = cursor.getInt(0);
-				TableLayout tv = (TableLayout) findViewById(id);
-				ll.removeView(tv);
-				
-				db.deleteTimer(id);
-				cursor.moveToNext();
-			}
-			
+			db.deleteTimer(id);
+			timerIds.clear();
 		}
+		
+	
 		
 		
 	}
 	
 	
-	boolean isPromptForDelete = false;
-	/*
-	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
-		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			float[] values = event.values;
-			// Movement
-			float x = values[0];
-			float y = values[1];
-			float z = values[2];
-
-			float accelationSquareRoot = (x * x + y * y + z * z)
-					/ (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH);
-			long actualTime = System.currentTimeMillis();
-			if (accelationSquareRoot >= 5) //
-			{
-				if (isDialogShowing == true || (actualTime - lastUpdate < 300)) {
-					return;
-				}
-				
-				lastUpdate = actualTime;
-				
-				if (!db.isOpen())
-		    		db.open();
-				
-				// if there is at least one timer, prompt user to delete all timers
-				cursor = db.fetchAllTimers();
-				startManagingCursor(cursor);
-				
-				if (cursor == null || cursor.getCount() == 0) {
-					return;
-				}
-				
-				
-				
-				AlertDialog.Builder deleteAllAlert = new AlertDialog.Builder(TaskTimerActivity.this);
-				deleteAllAlert.setTitle("Delete all timers?");
-				
-				deleteAllAlert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-					public void onCancel(DialogInterface arg0) {
-						// TODO Auto-generated method stub
-						isDialogShowing = false;
-						return;
-					}
-					
-				});
-				deleteAllAlert.setPositiveButton("Ok",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								
-								deleteAllTimers();
-								
-								isDialogShowing = false;
-								
-								// TODO: find a way to close context menu
-								// reset to timer list activity to prevent a null pointer exception
-								// scenario: the contextmenu is opened, and the user deletes all timers
-								// the contextmenu is still opened which will cause null exception when an item is selected
-								Intent i = new Intent();
-			    				i.setClass(TaskTimerActivity.this, TaskTimerActivity.class);
-			    				startActivity(i);
-			    				
-								return;
-								
-							}
-						});
-
-				deleteAllAlert.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-
-							public void onClick(DialogInterface dialog,int which) {
-								// TODO Auto-generated method stub
-								
-								isDialogShowing = false;
-								return;
-							}
-						});
-				deleteAllAlert.show();
-				isDialogShowing = true;
-				
-			}
-
-		}
-		
-		
-	}*/
 	
 	
 	
