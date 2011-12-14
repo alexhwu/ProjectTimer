@@ -208,8 +208,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 									// TODO: handle error
 								}
 								
-								// update cursor
-								cursor = db.fetchAllTimers();
 									
 								createTaskTimer((int) timerId, label, 0, false);
 								//isDialogShowing = false;
@@ -336,8 +334,14 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					public void run() {
 						int seconds = 0;
 						
+						if (!db.isOpen())
+							db.open();
+						
+						cursor = db.fetchAllTimers();
+						startManagingCursor(cursor);
 						if (cursor != null && cursor.getCount() > 0) {
-							startManagingCursor(cursor);
+							
+							
 					        
 					        
 							cursor.moveToFirst();
@@ -616,7 +620,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		    				//startActivity(i);
 		    				
 		    				
-							return;
+							//return;
 							
 						}
 					});
@@ -656,7 +660,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							ll.removeView(tv);
 							
 							db.deleteTimer(item.getItemId());
-							cursor = db.fetchAllTimers();
+						
 							//isDialogShowing = false;
 						}
 					});
@@ -1087,6 +1091,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
         
+        // The activity is about to be destroyed.
+        timer.cancel();
+        
+        if (cursor != null)
+        	cursor.close();
+        
+        
+        if (db != null)
+        	db.close();
     }
     
     @Override
@@ -1293,8 +1306,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				db.deleteTimer(id);
 				cursor.moveToNext();
 			}
+			
 		}
-		cursor = db.fetchAllTimers();
+		
 		
 	}
 	
