@@ -1,5 +1,9 @@
 package com.cooltofu;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,10 +16,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.InputType;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
@@ -35,6 +42,7 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cooltofu.db.TimerDbAdapter;
@@ -343,7 +351,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							
 							
 					        
-					        
 							cursor.moveToFirst();
 							while (cursor.isAfterLast() == false) {
 								// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
@@ -443,7 +450,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
-			TimerTask timerTask = null;
+			TimerTask timerTask;
 			int counter = 0;
 
 			
@@ -488,9 +495,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							
 						}
 					};
-
+					
+					
 					timer.scheduleAtFixedRate(timerTask, 1000, 1000);
-
+				
 				} else {
 					startStopBtn.setText("OFF");
 					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
@@ -582,17 +590,119 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		} else {
 			// options button
 			menu.setHeaderTitle("Select Option");
-			menu.add(0, 1, 0, "Delete All Timers");
+			menu.add(1, 1, 0, "Delete All Timers");
+			menu.add(1, 2, 1, "Email Timers");
 		}
 		
 	}
 	
+	private String escapeQuote(String s) {
+		return s.replaceAll("\"", "\"\"");
+	}
 	
 	public boolean onContextItemSelected(final MenuItem item) {
 
 		String menuItemTitle = (String) item.getTitle();
+		String nl = "\n";
 		
-		if (menuItemTitle == "Delete All Timers") {
+		if (menuItemTitle == "Email Timers") {
+			//
+			// create the csv file
+			StringBuffer headerBuf = new StringBuffer();
+			StringBuffer timeBuf = new StringBuffer();
+			
+			if (!db.isOpen())
+	    		db.open();
+	    	
+	        cursor = db.fetchAllTimers();
+	        startManagingCursor(cursor);
+	        
+	        if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				while (cursor.isAfterLast() == false) {
+					// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+					int id = cursor.getInt(0);
+					
+					TableLayout tv = (TableLayout) findViewById(id);
+		        	
+		        	if (tv == null) continue; // none found; continue to next iteration
+		        
+		        	
+		        	// table layout found, which means a timer also exists; save the time value
+		        	TextView timeValue = (TextView) findViewById(10000+id);
+		        	
+		        	// save the timer label
+		        	TextView labelValue = (TextView) findViewById(20000+id);
+		        	String label = labelValue.getText().toString();
+		        	
+		        	if (cursor.isLast()) {
+		        		headerBuf.append("\""+ escapeQuote(label) +"\"");
+		        		timeBuf.append("\""+ timeValue.getText().toString() + "\"");
+		        	}
+		        	else {
+		        		headerBuf.append("\""+ escapeQuote(label) +"\",");
+		        		timeBuf.append("\"" + timeValue.getText().toString() + "\",");
+		        	}
+		        	
+		        	
+					cursor.moveToNext();
+				}
+			}
+	        
+		
+			
+			File f = null;
+			File sdcard = null;
+			FileWriter writer = null;
+			try {
+				sdcard = new File(Environment.getExternalStorageDirectory() + "/data/com/cooltofu/tasktimer/");
+				sdcard.mkdirs();
+				
+				f = new File(sdcard, "timers.csv");
+				
+				
+				writer = new FileWriter(f);
+				writer.write(headerBuf.toString() + nl);
+				writer.write(timeBuf.toString() + nl);
+				writer.flush();
+				
+				
+				
+				
+			} catch (FileNotFoundException ex) {
+				Log.e("file not found", ex.getMessage());
+			} catch (IOException ioex) {
+				Log.e("io ex: ", ioex.getMessage());
+			} finally {
+				try {
+					if (writer != null)
+						writer.close();
+					
+					
+				} catch (IOException ioe) {
+					Log.e("finally. IO Exc: ", ioe.getMessage());
+				}
+			}
+			
+			
+			// send the email with the file attachment
+			if (f.exists() && f.canRead()) {
+				Intent i = new Intent(Intent.ACTION_SEND);
+				i.setType("text/csv");
+				i.putExtra(Intent.EXTRA_SUBJECT, "TaskTimer Data");
+				i.putExtra(Intent.EXTRA_TEXT, "Timers from the TaskTimer app by CoolTofu.com");
+				i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+				
+				startActivity(Intent.createChooser(i, "Send Mail"));
+			} else {
+				Toast t = Toast.makeText(this, "Can't send email.", Toast.LENGTH_SHORT);
+				t.show();
+			}
+			
+			
+			
+			
+		} else if (menuItemTitle == "Delete All Timers") {
 			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
 			alert.setTitle("Delete all Timers?");
 		 	
@@ -1092,7 +1202,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         // The activity is no longer visible (it is now "stopped")
         
         // The activity is about to be destroyed.
-        timer.cancel();
+       // timer.cancel();
         
         if (cursor != null)
         	cursor.close();
