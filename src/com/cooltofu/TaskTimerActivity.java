@@ -364,7 +364,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				}); 
 			}
     	};
-    	timer.scheduleAtFixedRate(totalTimerTask, 0, 1000);
+    	timer.scheduleAtFixedRate(totalTimerTask, 0, 300);
 			
     	
     	tracker = GoogleAnalyticsTracker.getInstance();
@@ -558,6 +558,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	
 	// long press context menu
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		
 		if (v.getTag() == TIMER_TAG) {
 			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
 			menu.add(0, (v.getId()), 0, CONTEXT_MENU_EDIT_TIME);

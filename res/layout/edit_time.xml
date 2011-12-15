@@ -1,9 +1,12 @@
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/editTimeLayout"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TableRow>
             <Button
@@ -120,3 +123,4 @@
 	                    android:text="Cancel" />    
           </LinearLayout>      
     </TableLayout>
+</LinearLayout>
