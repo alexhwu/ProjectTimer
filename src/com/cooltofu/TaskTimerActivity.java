@@ -54,7 +54,28 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	private final static int TIME_ID_PREFIX = 10000;
 	private final static int TASK_LABEL_ID_PREFIX = 20000;
 	private final static int START_STOP_ID_PREFIX = 30000;
-	private static final String PREFS_NAME = "MyPrefsFile";
+	private static final String TIME_FORMAT = "%02d:%02d:%02d";
+	final static String ALERT_NEW_TIMER_TITLE = "Add New Timer";
+	final static String ALERT_NEW_TIMER_MSG = "Enter Timer Label";
+	final static String OK_BTN_STRING = "Ok";
+	final static String CANCEL_BTN_STRING = "Cancel";
+	static final String TOGGLE_BTN_ON_LABEL = "ON";
+	static final String TOGGLE_BTN_OFF_LABEL = "OFF";
+	static final String TIMER_TAG = "Timer";
+	static final String CONTEXT_MENU_HEADER_TITLE = "Select Option";
+	static final String CONTEXT_MENU_EDIT_TIME = "Edit Time";
+	static final String CONTEXT_MENU_EDIT_LABEL = "Edit Label";
+	static final String CONTEXT_MENU_DELETE_TIMER = "Delete Timer";
+	static final String CONTEXT_MENU_DELETE_ALL_TIMERS = "Delete All Timers";
+	static final String CONTEXT_MENU_EMAIL_TIMERS = "Email Timers";
+	static final String nl = "\n";
+	static final String DATA_FILE_NAME = "timers.csv";
+	static final String EMAIL_TYPE = "text/csv";
+	static final String EMAIL_SUBJECT = "TaskTimer Data";
+	static final String EMAIL_BODY = "Timers from the TaskTimer app by CoolTofu.com";
+	static final String INTENT_CHOOSER_TITLE = "Send Mail";
+	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
+	final int PRESS_DELAY = 200; // delay on press event for time editing
 	
 	static List<Integer> timerIds = new ArrayList<Integer>();
 	
@@ -83,10 +104,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	private static TimerDbAdapter db;
 	private static Cursor cursor;
 	private static GoogleAnalyticsTracker tracker;
-	
 	private static int timerId;
-	
-	
 	
 	private static Button newTimerBtn;
 	private static AlertDialog.Builder alert;
@@ -94,10 +112,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	private static Button optionBtn;
 	private static TimerTask totalTimerTask;
 	
-	final static String ALERT_NEW_TIMER_TITLE = "Add New Timer";
-	final static String ALERT_NEW_TIMER_MSG = "Enter Timer Label";
-	final static String OK_BTN_STRING = "Ok";
-	final static String CANCEL_BTN_STRING = "Cancel";
 	
 	// add horizontal line
 	final static ViewGroup.LayoutParams hrParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1);
@@ -105,16 +119,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	static float scale;// = getResources().getDisplayMetrics().density;
 	static int pixels;// = (int) (65 * scale + 0.5f);
 	
-	static final String TOGGLE_BTN_ON_LABEL = "ON";
-	static final String TOGGLE_BTN_OFF_LABEL = "OFF";
-	static final String TIMER_TAG = "Timer";
-	static final String CONTEXT_MENU_HEADER_TITLE = "Select Option";
-	static final String CONTEXT_MENU_EDIT_TIME = "Edit Time";
-	static final String CONTEXT_MENU_EDIT_LABEL = "Edit Label";
-	static final String CONTEXT_MENU_DELETE_TIMER = "Delete Timer";
-	static final String CONTEXT_MENU_DELETE_ALL_TIMERS = "Delete All Timers";
-	static final String CONTEXT_MENU_EMAIL_TIMERS = "Email Timers";
-	static final String nl = "\n";
+	
 	static View hrView;
 	
 	static StringBuffer headerBuf;
@@ -123,15 +128,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	static File f;
 	static File sdcard;
 	static FileWriter writer;
-	static final String DATA_FILE_NAME = "timers.csv";
-	static final String EMAIL_TYPE = "text/csv";
-	static final String EMAIL_SUBJECT = "TaskTimer Data";
-	static final String EMAIL_BODY = "Timers from the TaskTimer app by CoolTofu.com";
-	static final String INTENT_CHOOSER_TITLE = "Send Mail";
 	
-	
-	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
-	final int PRESS_DELAY = 200; // delay on press event for time editing
 	
 	
 	
@@ -140,6 +137,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		// end user license agreement
 		Eula.show(this);
 		
 		setContentView(R.layout.main);
@@ -396,7 +394,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		innerTl.setLayoutParams(itlParams);
 
 		final TextView taskLabel = new TextView(innerTl.getContext());
-		taskLabel.setText(label);
+		taskLabel.setText((label.trim().equals("")) ? " " : " ");
 		taskLabel.setLayoutParams(taskLabelParams);
 		taskLabel.setTextSize(18);
 		taskLabel.setId(TASK_LABEL_ID_PREFIX + timerId);
@@ -428,12 +426,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 		mainTl = new TableLayout(TaskTimerActivity.this);
 		mainTl.setLayoutParams(mtlParams);
-		mainTl.setId(timerId); // set the layout id for reference
-									 // later
+		mainTl.setId(timerId); // set the layout id for reference later
 		mainTl.setPadding(0, 10, 0, 0);
 		mainTl.setTag(TIMER_TAG);
-		
-        
 
 		scale = getResources().getDisplayMetrics().density;
 		pixels = (int) (65 * scale + 0.5f);
@@ -474,23 +469,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 									timeText.setText(formatTimeTextDisplay(counter));
 									counter++;
 									timeText.setText(formatTimeTextDisplay(counter));
-									
-									
-									//isTimeEdited = false;
-									
-									/*
-									 * NOTE: is code below is used, the edited time reverts back to
-									 * original time before the edit
-									if (isTimeEdited) {
-										counter = convertToSeconds(timeText.getText().toString());
-										//timeText.setText(formatTimeTextDisplay(counter));
-										isTimeEdited = false;
-									}
-									
-									if (isTimeEdited == false) {
-										counter++; // seconds
-										timeText.setText(formatTimeTextDisplay(counter));
-									}*/
 								}
 							});
 							
@@ -700,8 +678,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
 				public void onCancel(DialogInterface arg0) {
-					// TODO Auto-generated method stub
-					//isDialogShowing = false;
+					
 					return;
 				}
 				
@@ -711,18 +688,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							deleteAllTimers();
 
-							//isDialogShowing = false;
-							// TODO: find a way to close context menu
-							// reset to timer list activity to prevent a null pointer exception
-							// scenario: the contextmenu is opened, and the user deletes all timers
-							// the contextmenu is still opened which will cause null exception when an item is selected
-							//Intent i = new Intent();
-		    				//i.setClass(TaskTimerActivity.this, TaskTimerActivity.class);
-		    				//startActivity(i);
-		    				
-		    				
-							//return;
-							
 						}
 					});
 
@@ -730,7 +695,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog,int which) {
-							// TODO Auto-generated method stub
 							return;
 						}
 					});
@@ -745,7 +709,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
 				public void onCancel(DialogInterface arg0) {
-					// TODO Auto-generated method stub
 					return;
 				}
 			});
@@ -760,7 +723,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 							db.deleteTimer(timerId);
 							
 							timerIds.remove(timerIds.indexOf(new Integer(timerId)));
-							//isDialogShowing = false;
 						}
 					});
 
@@ -768,8 +730,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog,int which) {
-							// TODO Auto-generated method stub
-							//isDialogShowing = false;
 							return;
 						}
 					});
@@ -791,8 +751,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
 				public void onCancel(DialogInterface arg0) {
-					// TODO Auto-generated method stub
-					//isDialogShowing = false;
 					return;
 				}
 				
@@ -802,7 +760,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							textView.setText(input.getText().toString());
-							//isDialogShowing = false;
 						}
 					});
 
@@ -810,17 +767,12 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog,int which) {
-							// TODO Auto-generated method stub
-							//isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
-			//isDialogShowing = true;
 			
 		} else if (menuItemTitle == CONTEXT_MENU_EDIT_TIME) {
-			//isDialogShowing = true;
-			
 			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
 			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			final ToggleButton startStopBtn = (ToggleButton) findViewById(START_STOP_ID_PREFIX + item.getItemId());
@@ -855,14 +807,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			dialog.show();
 			
 			
-			
-			
 			final Runnable onPressedIncrementHour = new Runnable() {
 				public void run() {
 					
 					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
 					int h = Integer.parseInt(hText.getText().toString());
-					//editedHour = formatDoubleDigit(++h);
 					hText.setText(formatDoubleDigit(incrementHour(h)));
 					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
 				}
@@ -872,7 +821,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					
 					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
 					int h = Integer.parseInt(hText.getText().toString());
-					//editedHour = formatDoubleDigit(++h);
 					hText.setText(formatDoubleDigit(decrementHour(h)));
 					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
 				}
@@ -885,7 +833,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					
 					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
 					int m = Integer.parseInt(mText.getText().toString());
-					//editedMinute = formatDoubleDigit(++m);
 					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
 					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
 				}
@@ -895,7 +842,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					
 					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
 					int m = Integer.parseInt(mText.getText().toString());
-					//editedMinute = formatDoubleDigit(++m);
 					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
 					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
 				}
@@ -906,7 +852,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void run() {
 					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
 					int s = Integer.parseInt(sText.getText().toString());
-					//editedSecond = formatDoubleDigit(++s);
 					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
 					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
 				}
@@ -915,7 +860,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void run() {
 					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
 					int s = Integer.parseInt(sText.getText().toString());
-					//editedSecond = formatDoubleDigit(++s);
 					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
 					handler.postAtTime(this, SystemClock.uptimeMillis()+repeatSpeed);
 				}
@@ -928,7 +872,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					
 					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
 					int h = Integer.parseInt(hText.getText().toString());
-					//editedHour = formatDoubleDigit(++h);
 					hText.setText(formatDoubleDigit(incrementHour(h)));
 				}
 			});
@@ -959,7 +902,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void onClick(View v) {
 					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
 					int m = Integer.parseInt(mText.getText().toString());
-					//editedMinute = formatDoubleDigit(++m);
 					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
 				}
 			});
@@ -987,7 +929,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void onClick(View v) {
 					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
 					int s = Integer.parseInt(sText.getText().toString());
-					//editedSecond = formatDoubleDigit(++s);
 					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
 				}
 			});
@@ -1016,7 +957,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void onClick(View v) {
 					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
 					int h = Integer.parseInt(hText.getText().toString());
-					//editedHour = formatDoubleDigit(++h);
 					hText.setText(formatDoubleDigit(decrementHour(h)));
 				}
 			});
@@ -1043,7 +983,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void onClick(View v) {
 					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
 					int m = Integer.parseInt(mText.getText().toString());
-					//editedMinute = formatDoubleDigit(++m);
 					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
 				}
 			});
@@ -1069,7 +1008,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				public void onClick(View v) {
 					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
 					int s = Integer.parseInt(sText.getText().toString());
-					//editedSecond = formatDoubleDigit(++s);
 					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
 				}
 			});
@@ -1107,13 +1045,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					int s = Integer.parseInt(sText.getText().toString());
 					
 					timeText.setText(formatDoubleDigit(h) + ":" + formatDoubleDigit(m) + ":" + formatDoubleDigit(s));
-					//isTimeEdited = true;
 					
 					// restart the timer
 					if (isOn)
 						startStopBtn.performClick();
-					
-					//isDialogShowing = false;
 					
 					dialog.dismiss();
 					
@@ -1123,13 +1058,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			Button editTimeCancelBtn = (Button) editTimeView.findViewById(R.id.editTimeCancelBtn);
 			editTimeCancelBtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-					//isTimeEdited = false;
-					
 					// restart the timer
 					if (isOn)
 						startStopBtn.performClick();
 					
-					//isDialogShowing = false;
 					dialog.dismiss();
 					
 				}
@@ -1156,11 +1088,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     	
         super.onResume();
         // The activity has become visible (it is now "resumed").
-        /*
-        sensorManager.registerListener(this,
-				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-				SensorManager.SENSOR_DELAY_NORMAL);
-        */
+      
         if (!db.isOpen())
 			db.open();
         
@@ -1169,8 +1097,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     }
     @Override
     protected void onPause() {
-    	//sensorManager.unregisterListener(this);
-    	
         super.onPause();
         
         // Another activity is taking focus (this activity is about to be "paused").
@@ -1180,17 +1106,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-        // The activity is no longer visible (it is now "stopped")
-        
-        // The activity is about to be destroyed.
-       // timer.cancel();
-        
-        //if (cursor != null)
-        //	cursor.close();
-        
-        
-        //if (db != null)
-        //	db.close();
     }
     
     @Override
@@ -1307,7 +1222,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		int min = rem / 60;
 		int sec = rem % 60;
 		
-		return String.format("%02d:%02d:%02d", hour, min, sec);
+		return String.format(TIME_FORMAT, hour, min, sec);
     }
     
     private int incrementHour(int num) {
@@ -1369,13 +1284,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     }
 
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
-		
 	}
-
-	
-
 	
 	private void deleteAllTimers() {
 		
@@ -1392,11 +1301,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			db.deleteTimer(id);
 		}
 		timerIds.clear();	
-		
 	}
-	
-	
-	
-	
 	
 }

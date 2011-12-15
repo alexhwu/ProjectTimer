@@ -4,10 +4,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+    
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
+    
         <Button
             android:id="@+id/timerBtn"
             android:layout_width="wrap_content"
@@ -35,79 +37,99 @@
             android:height="55dp"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/verticalLine" />
+        
     </RelativeLayout>
     <View
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="#383838" />
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >   
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#383838" />
         
-        <LinearLayout
-                android:id="@+id/linearLayout"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
-		    
-		    <TextView
-                android:id="@+id/moreScreenTextView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="15dp"
-                android:paddingTop="15dp"
-                android:text="TIP #1: Shake to delete all timers. Confirmation needed before deletion." />
-		    
-		    <TextView
-		        android:id="@+id/moreScreenTextView1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:paddingLeft="15dp"
-		        android:paddingTop="15dp"
-		        android:text="TIP #2: Press and hold the time/label for more options." />
-		    <ImageView
-		        android:id="@+id/imageView1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="280dp"
-		        android:layout_gravity="center_horizontal"
-		        android:src="@drawable/context_menu" />
-		    
-		    <TextView
-		        android:id="@+id/moreScreenTextView1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:paddingLeft="15dp"
-		        android:paddingTop="15dp"
-		        android:text="Created by CoolTofu" />
-		    <TextView
-		        android:id="@+id/moreScreenTextView1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:autoLink="web"
-		        android:paddingLeft="15dp"
-		        android:text="http://cooltofu.com" />
-		    <TextView
-		        android:id="@+id/moreScreenTextView2"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:padding="15dp"
-		        android:text="Launcher icon by Jonathan Britner" />
-		    <View
-		        android:layout_width="fill_parent"
-		        android:layout_height="1dp"
-		        android:background="#383838" />
-		    <Button
-		        android:id="@+id/moreScreenOkBtn"
-		        android:layout_width="fill_parent"
-		        android:layout_height="55dp"
-		        android:background="#000000"
-		        android:textColor="#CCCCCC"
-		        android:text="Back to Main Screen" />
-		    <View
-		        android:layout_width="fill_parent"
-		        android:layout_height="1dp"
-		        android:background="#383838" />
-		    </LinearLayout>
-	</ScrollView>
+    <LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical" >
+	        
+	    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:orientation="horizontal">
+	        
+		   
+		    <LinearLayout
+	            android:id="@+id/bottomLayout"
+	            android:layout_alignParentBottom="true"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="vertical">
+	            
+	            <View
+	                android:layout_width="fill_parent"
+	                android:layout_height="1dp"
+	                android:background="#383838" />
+	            <Button
+	                android:id="@+id/moreScreenOkBtn"
+	                android:layout_width="fill_parent"
+	                android:layout_height="55dp"
+	                android:background="#000000"
+	                android:textColor="#CCCCCC"
+	                android:text="Back to Main Screen" />
+	            <View
+	                android:layout_width="fill_parent"
+	                android:layout_height="1dp"
+	                android:background="#383838" />
+	        </LinearLayout>
+		    <ScrollView
+		        android:id="@+id/scrollView1"
+		        android:layout_above="@+id/bottomLayout"
+		        android:layout_alignParentTop="true"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content" >   
+		        	        <LinearLayout
+		            android:id="@+id/linearLayout"
+		            android:layout_width="fill_parent"
+		            android:layout_height="638dp"
+		            android:orientation="vertical" >
+				    <TextView
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:paddingLeft="15dp"
+		                android:paddingTop="15dp"
+		                android:text="TIP #1: Shake to delete all timers. Confirmation needed before deletion." />
+				    
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:paddingLeft="15dp"
+				        android:paddingTop="15dp"
+				        android:text="TIP #2: Press and hold the time/label for more options." />
+				    <ImageView
+				        android:id="@+id/imageView1"
+				        android:layout_width="wrap_content"
+				        android:layout_height="280dp"
+				        android:layout_marginLeft="15dp"
+				        android:src="@drawable/context_menu" />
+				    
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:paddingLeft="15dp"
+				        android:paddingTop="15dp"
+				        android:text="Created by CoolTofu" />
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:autoLink="web"
+				        android:paddingLeft="15dp"
+				        android:text="http://cooltofu.com" />
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:padding="15dp"
+				        android:text="Launcher icon by Jonathan Britner" />
+				    
+				    </LinearLayout>
+			</ScrollView>
+			
+	    </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>
