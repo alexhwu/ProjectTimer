@@ -51,45 +51,89 @@ import com.cooltofu.db.TimerDbAdapter;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class TaskTimerActivity extends Activity implements OnClickListener {
-	final static int TIME_ID_PREFIX = 10000;
-	final static int TASK_LABEL_ID_PREFIX = 20000;
-	final static int START_STOP_ID_PREFIX = 30000;
+	private final static int TIME_ID_PREFIX = 10000;
+	private final static int TASK_LABEL_ID_PREFIX = 20000;
+	private final static int START_STOP_ID_PREFIX = 30000;
+	private static final String PREFS_NAME = "MyPrefsFile";
 	
-	static List timerIds = new ArrayList();
+	static List<Integer> timerIds = new ArrayList<Integer>();
 	
 	
 	static String editedHour;
 	static String editedMinute;
 	static String editedSecond;
 	
-	LayoutParams startStopBtnLayoutParams;
-	LayoutParams mtlParams;
-	LayoutParams itlParams;
-	LayoutParams timeTextParams;
-	LayoutParams taskLabelParams;
-	LayoutParams llParams;
-
-	TableLayout mainTl;
-	TableLayout innerTl;
-	TableRow tr;
-	LinearLayout ll;
-
+	static LayoutParams startStopBtnLayoutParams;
+	static LayoutParams mtlParams;
+	static LayoutParams itlParams;
+	static LayoutParams timeTextParams;
+	static LayoutParams taskLabelParams;
+	static LayoutParams llParams;
+	static TableLayout.LayoutParams tableRowParams;
 	
-	int viewIdCounter = 0;
+	static TableLayout mainTl;
+	static TableLayout innerTl;
+	static TableRow tr;
+	static LinearLayout ll;
+	static RelativeLayout sv;
+	
 	Timer timer = new Timer();
-	final Handler handler = new Handler();
+	static Handler handler = new Handler();
 
-	private TimerDbAdapter db;
-	private Cursor cursor;
+	private static TimerDbAdapter db;
+	private static Cursor cursor;
+	private static GoogleAnalyticsTracker tracker;
 	
-	public static final String PREFS_NAME = "MyPrefsFile";
-	public GoogleAnalyticsTracker tracker;
-	
-	//private SensorManager sensorManager;
-	//private long lastUpdate = System.currentTimeMillis();
+	private static int timerId;
 	
 	
-	//private boolean isDialogShowing = false;
+	
+	private static Button newTimerBtn;
+	private static AlertDialog.Builder alert;
+	private static Button moreBtn;
+	private static Button optionBtn;
+	private static TimerTask totalTimerTask;
+	
+	final static String ALERT_NEW_TIMER_TITLE = "Add New Timer";
+	final static String ALERT_NEW_TIMER_MSG = "Enter Timer Label";
+	final static String OK_BTN_STRING = "Ok";
+	final static String CANCEL_BTN_STRING = "Cancel";
+	
+	// add horizontal line
+	final static ViewGroup.LayoutParams hrParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1);
+	
+	static float scale;// = getResources().getDisplayMetrics().density;
+	static int pixels;// = (int) (65 * scale + 0.5f);
+	
+	static final String TOGGLE_BTN_ON_LABEL = "ON";
+	static final String TOGGLE_BTN_OFF_LABEL = "OFF";
+	static final String TIMER_TAG = "Timer";
+	static final String CONTEXT_MENU_HEADER_TITLE = "Select Option";
+	static final String CONTEXT_MENU_EDIT_TIME = "Edit Time";
+	static final String CONTEXT_MENU_EDIT_LABEL = "Edit Label";
+	static final String CONTEXT_MENU_DELETE_TIMER = "Delete Timer";
+	static final String CONTEXT_MENU_DELETE_ALL_TIMERS = "Delete All Timers";
+	static final String CONTEXT_MENU_EMAIL_TIMERS = "Email Timers";
+	static final String nl = "\n";
+	static View hrView;
+	
+	static StringBuffer headerBuf;
+	static StringBuffer timeBuf;
+	
+	static File f;
+	static File sdcard;
+	static FileWriter writer;
+	static final String DATA_FILE_NAME = "timers.csv";
+	static final String EMAIL_TYPE = "text/csv";
+	static final String EMAIL_SUBJECT = "TaskTimer Data";
+	static final String EMAIL_BODY = "Timers from the TaskTimer app by CoolTofu.com";
+	static final String INTENT_CHOOSER_TITLE = "Send Mail";
+	
+	
+	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
+	final int PRESS_DELAY = 200; // delay on press event for time editing
+	
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -98,19 +142,18 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 		Eula.show(this);
 		
-		
-		
-		
 		setContentView(R.layout.main);
+		
 		
 		startStopBtnLayoutParams = ((Button) findViewById(R.id.button1)).getLayoutParams();
 		timeTextParams = ((TextView) findViewById(R.id.timeText)).getLayoutParams();
-
 		taskLabelParams = ((TextView) findViewById(R.id.taskLabel)).getLayoutParams();
 		llParams = ((LinearLayout) findViewById(R.id.linearLayout)).getLayoutParams();
 		mtlParams = ((TableLayout) findViewById(R.id.tableLayout)).getLayoutParams();
 		itlParams = ((TableLayout) findViewById(R.id.tableLayout2)).getLayoutParams();
 		ll = (LinearLayout) findViewById(R.id.linearLayout);
+		
+		
 		
 		// get timers from db
 		db = new TimerDbAdapter(this);
@@ -123,57 +166,51 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		if (cursor != null) {
 			
 			timerIds.clear();
+			int seconds = 0;
+			long timestamp = 0;
+			long now = Calendar.getInstance().getTimeInMillis();
+			long elapsed = 0;
+			boolean isTimerOn;
 			
 			cursor.moveToFirst();
 			while (cursor.isAfterLast() == false) {
 				// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-				int id = cursor.getInt(0);
-				String label = cursor.getString(1);
-				int seconds = cursor.getInt(2);
-				long timestamp = cursor.getLong(3); // milliseconds
-				boolean isOn = (cursor.getInt(4) == 1) ? true : false;
-				
+				timerId = cursor.getInt(0);
+				seconds = cursor.getInt(2);
+				timestamp = cursor.getLong(3); // milliseconds
+				isTimerOn = (cursor.getInt(4) == 1) ? true : false;
 				
 				// add timestamp value to seconds if needed
 				// calculate the seconds to add since the activity was destroyed
-				if (isOn && timestamp > 0) {
-					long now = Calendar.getInstance().getTimeInMillis();
-					long elapsed = now - timestamp;  // milliseconds
+				if (isTimerOn && timestamp > 0) {
+					elapsed = now - timestamp;  // milliseconds
 					seconds += ((int) (Math.round(elapsed/1000 + .5))); // add .5 to lessen the lost milliseconds
-					// TODO: keep timer counter in millis for better accuracy
 				}
 				
-				createTaskTimer(id, label, seconds, isOn);
-				
-				
-				timerIds.add(id);
+				createTaskTimer(cursor.getInt(0), cursor.getString(1), seconds, isTimerOn);
+				timerIds.add(timerId);
 				cursor.moveToNext();
-			}
-			
-		}
+			}// while cursor
+		}// if cursor != null
 		
 
 		
-		Button newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
-		
+		newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
 		newTimerBtn.setOnTouchListener(new View.OnTouchListener() {
 			
 			public boolean onTouch(View v,MotionEvent evt) {
 				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						((Button) v).setTextColor(Color.DKGRAY);
+						setButtonEffect((Button)v, MotionEvent.ACTION_DOWN);
 						break;
 					
 					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						((Button) v).setTextColor(Color.LTGRAY);
+						setButtonEffect((Button)v, MotionEvent.ACTION_UP);
 						break;
 					
 					case MotionEvent.ACTION_CANCEL:
-						v.setBackgroundColor(Color.BLACK);
-						((Button) v).setTextColor(Color.LTGRAY);
+						setButtonEffect((Button)v, MotionEvent.ACTION_UP);
 						break;
 				}
 				
@@ -185,14 +222,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 
 		newTimerBtn.setOnClickListener(new View.OnClickListener() {
-			
-			
 			public void onClick(View v) {
-				
-				
-				AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
-				alert.setTitle("Add New Timer");
-				alert.setMessage("Enter Timer Label");
+				alert = new AlertDialog.Builder(TaskTimerActivity.this);
+				alert.setTitle(ALERT_NEW_TIMER_TITLE);
+				alert.setMessage(ALERT_NEW_TIMER_MSG);
 
 				final EditText input = new EditText(TaskTimerActivity.this);
 				input.setSingleLine(); // one line tall
@@ -200,47 +233,37 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				alert.setView(input);
 				
 				alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
 					public void onCancel(DialogInterface arg0) {
-						// TODO Auto-generated method stub
-						//isDialogShowing = false;
 						return;
 					}
-					
 				});
 				
-				alert.setPositiveButton("Ok",
+				alert.setPositiveButton(OK_BTN_STRING,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
+								final String label = input.getText().toString();
 								
-								String label = input.getText().toString();
 								// create db entry for new timer
-								long timerId = db.createTimer(label, 0, 0, false);
+								timerId = (int) db.createTimer(label, 0, 0, false);
 								
 								if (timerId == -1) {
 									// db error
 									// TODO: handle error
 								}
 								
-								timerIds.add(timerId);	
-								createTaskTimer((int) timerId, label, 0, false);
-								//isDialogShowing = false;
+								createTaskTimer(timerId, label, 0, false);
+								timerIds.add(new Integer(timerId));
+								
 							}
 						});
 
 				alert.setNegativeButton("Cancel",
 						new DialogInterface.OnClickListener() {
-
 							public void onClick(DialogInterface dialog, int which) {
-								// TODO Auto-generated method stub
-								//isDialogShowing = false;
 								return;
 							}
 						});
 				alert.show();
-				//isDialogShowing = true;
-				
-				
 			}
 		});
 
@@ -248,19 +271,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 		//-------------------------------
 		// More button actions
-		final Button moreBtn = (Button) findViewById(R.id.moreBtn);
+		moreBtn = (Button) findViewById(R.id.moreBtn);
 		moreBtn.setOnTouchListener(new View.OnTouchListener() {
-				
 			public boolean onTouch(View v,MotionEvent evt) {
-				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						moreBtn.setTextColor(Color.DKGRAY);
+						setButtonEffect((Button)v, MotionEvent.ACTION_DOWN);
 						break;
 					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						moreBtn.setTextColor(Color.LTGRAY);
+						setButtonEffect((Button)v, MotionEvent.ACTION_UP);
 						break;
 				}
 				
@@ -269,14 +288,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		}); // moreBtn.setOnTouchListener()
 		
 		moreBtn.setOnClickListener(new View.OnClickListener() {
-
 			public void onClick(View v) {
 				Intent i = new Intent();
 				i.setClass(TaskTimerActivity.this, MoreScreen.class);
 				startActivity(i);
-				
 			}
-		
 		});
 		
 		
@@ -288,36 +304,22 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
             }
         };
         
-        RelativeLayout sv = (RelativeLayout) findViewById(R.id.relativeLayout);
+        sv = (RelativeLayout) findViewById(R.id.relativeLayout);
         sv.setOnClickListener(TaskTimerActivity.this);
         sv.setOnTouchListener(gestureListener);
         
         
-        
-        // shake event
-        /*
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-    	sensorManager.registerListener(this,
-    			sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-    			SensorManager.SENSOR_DELAY_NORMAL);
-    	lastUpdate = System.currentTimeMillis();
-    	*/
-    	
     	//-------------------------------
 		// Options button actions
-		final Button optionBtn = (Button) findViewById(R.id.optionBtn);
+		optionBtn = (Button) findViewById(R.id.optionBtn);
 		optionBtn.setOnTouchListener(new View.OnTouchListener() {
-				
 			public boolean onTouch(View v,MotionEvent evt) {
-				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						optionBtn.setTextColor(Color.DKGRAY);
+						setButtonEffect(optionBtn, MotionEvent.ACTION_DOWN);
 						break;
 					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						optionBtn.setTextColor(Color.LTGRAY);
+						setButtonEffect(optionBtn, MotionEvent.ACTION_UP);
 						break;
 				}
 				
@@ -326,56 +328,40 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		}); // optionBtn.setOnTouchListener()
 		
 		optionBtn.setOnClickListener(new View.OnClickListener() {
-
 			public void onClick(View v) {
 				openContextMenu(v);
 			}
-		
 		});
 		registerForContextMenu(optionBtn);
 		
     	// calculate total if there are timers
-    	TimerTask totalTimerTask;
+    	
     	final TextView totalTextView = (TextView) findViewById(R.id.sumText);
     	
     	totalTimerTask = new TimerTask() {
-			
+    		int seconds = 0;
+    		int len = 0;
+    		TableLayout tv;
+    		TextView timeValue;
     		
 			public void run() {
-				
 				handler.post(new Runnable() {
-
 					public void run() {
-						int seconds = 0;
+						seconds = 0;
+						len = timerIds.size();
 						
+						for (int i = 0; i < len; i++) {
+							// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+							int id = (Integer) timerIds.get(i);
+							tv = (TableLayout) findViewById(id);
+							
+				        	if (tv == null) continue; // none found; continue to next iteration
+				        	
+				        	// table layout found, which means a timer also exists; save the time value
+				        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
+				        	seconds += convertToSeconds(timeValue.getText().toString());
+						}	
 						
-						cursor = db.fetchAllTimers();
-						startManagingCursor(cursor);
-						if (cursor != null && cursor.getCount() > 0) {
-							
-							
-					        
-							cursor.moveToFirst();
-							while (cursor.isAfterLast() == false) {
-								// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-								int id = cursor.getInt(0);
-								
-								TableLayout tv = (TableLayout) findViewById(id);
-					        	
-					        	if (tv == null) continue; // none found; continue to next iteration
-					        
-					        	
-					        	
-					        	// table layout found, which means a timer also exists; save the time value
-					        	TextView timeValue = (TextView) findViewById(10000+id);
-					        	seconds += convertToSeconds(timeValue.getText().toString());
-					        	
-					        	
-								cursor.moveToNext();
-							}
-						
-							
-						}
 						totalTextView.setText(formatTimeTextDisplay(seconds));
 					}
 				});
@@ -391,8 +377,21 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		tracker.trackEvent("Startup", "onCreate", "", -1);
 	}//onCreate
 
+	private void setButtonEffect(Button btn, int action) {
+		if (action == MotionEvent.ACTION_DOWN) {
+			btn.setBackgroundColor(Color.WHITE);
+			btn.setTextColor(Color.DKGRAY);
+		} else {
+			btn.setBackgroundColor(Color.BLACK);
+			btn.setTextColor(Color.LTGRAY);
+		}
+		
+	}
+	
+	
 	
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
+	
 		innerTl = new TableLayout(TaskTimerActivity.this);
 		innerTl.setLayoutParams(itlParams);
 
@@ -410,19 +409,18 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		timeText.setId(TIME_ID_PREFIX + timerId);
 		timeText.setTextColor(Color.LTGRAY);
 		
-		TableRow _tr2 = new TableRow(TaskTimerActivity.this);
-		_tr2.addView(timeText);
-		innerTl.addView(_tr2);
+		tr = new TableRow(TaskTimerActivity.this);
+		tr.addView(timeText);
+		innerTl.addView(tr);
 
-		TableRow _tr3 = new TableRow(TaskTimerActivity.this);
-		_tr3.addView(taskLabel);
-		innerTl.addView(_tr3);
+		tr = new TableRow(TaskTimerActivity.this);
+		tr.addView(taskLabel);
+		innerTl.addView(tr);
 
-		// add horizontal line
-		ViewGroup.LayoutParams p = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1);
+		
 
-		View hrView = new View(TaskTimerActivity.this);
-		hrView.setLayoutParams(p);
+		hrView = new View(TaskTimerActivity.this);
+		hrView.setLayoutParams(hrParams);
 		hrView.setBackgroundColor(Color.GRAY);
 		hrView.getBackground().setAlpha(120);
 		innerTl.addView(hrView);
@@ -433,16 +431,15 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		mainTl.setId(timerId); // set the layout id for reference
 									 // later
 		mainTl.setPadding(0, 10, 0, 0);
-		mainTl.setTag("Timer");
+		mainTl.setTag(TIMER_TAG);
 		
         
 
-		//ViewGroup.LayoutParams btnParams = new ViewGroup.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 55);
-		final float scale = getResources().getDisplayMetrics().density;
-		int pixels = (int) (65 * scale + 0.5f);
+		scale = getResources().getDisplayMetrics().density;
+		pixels = (int) (65 * scale + 0.5f);
 
 		final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
-		startStopBtn.setText("OFF");
+		startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
@@ -462,7 +459,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 				if (startStopBtn.isChecked()) {
 					
-		        	startStopBtn.setText("ON");
+		        	startStopBtn.setText(TOGGLE_BTN_ON_LABEL);
 		        	startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_on));
 		        
 					
@@ -504,7 +501,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 					timer.scheduleAtFixedRate(timerTask, 1000, 1000);
 				
 				} else {
-					startStopBtn.setText("OFF");
+					startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
 					startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 					handler.removeCallbacks(timerTask);
 
@@ -520,18 +517,18 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			startStopBtn.performClick();
 		}
 		
-		TableRow _tr = new TableRow(mainTl.getContext());
-		_tr.addView(startStopBtn);
-		_tr.addView(innerTl);
+		tr = new TableRow(mainTl.getContext());
+		tr.addView(startStopBtn);
+		tr.addView(innerTl);
 		
 
-		TableLayout.LayoutParams tableRowParams = new TableLayout.LayoutParams(
+		tableRowParams = new TableLayout.LayoutParams(
 				TableLayout.LayoutParams.FILL_PARENT,
 				TableLayout.LayoutParams.FILL_PARENT);
 		tableRowParams.setMargins(0, 2, 0, 2);
-		_tr.setLayoutParams(tableRowParams);
+		tr.setLayoutParams(tableRowParams);
 
-		mainTl.addView(_tr);
+		mainTl.addView(tr);
 
 		// add timer and task label to inner table
 		ll.addView(mainTl);
@@ -540,9 +537,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		innerTl.setOnTouchListener(new View.OnTouchListener() {
 			
 			public boolean onTouch(View v,MotionEvent evt) {
-				int action = evt.getAction() & MotionEvent.ACTION_MASK;
 				
-				switch(action) {
+				
+				switch(evt.getAction()) {
 						
 					case MotionEvent.ACTION_DOWN:
 						v.setBackgroundColor(Color.WHITE);
@@ -586,34 +583,33 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	
 	// long press context menu
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		if (v.getTag() == "Timer") {
-			menu.setHeaderTitle("Select Option");
-			menu.add(0, (v.getId()), 0, "Edit Time");
-			menu.add(0, (v.getId()), 1, "Edit Label");
-			menu.add(0, v.getId(), 2, "Delete Timer");
+		if (v.getTag() == TIMER_TAG) {
+			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
+			menu.add(0, (v.getId()), 0, CONTEXT_MENU_EDIT_TIME);
+			menu.add(0, (v.getId()), 1, CONTEXT_MENU_EDIT_LABEL);
+			menu.add(0, v.getId(), 2, CONTEXT_MENU_DELETE_TIMER);
 		} else {
 			// options button
-			menu.setHeaderTitle("Select Option");
-			menu.add(1, 1, 0, "Delete All Timers");
-			menu.add(1, 2, 1, "Email Timers");
+			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
+			menu.add(1, 1, 0, CONTEXT_MENU_DELETE_ALL_TIMERS);
+			menu.add(1, 2, 1, CONTEXT_MENU_EMAIL_TIMERS);
 		}
-		
 	}
 	
-	private String escapeQuote(String s) {
+	private static String escapeQuote(String s) {
 		return s.replaceAll("\"", "\"\"");
 	}
 	
 	public boolean onContextItemSelected(final MenuItem item) {
 
 		String menuItemTitle = (String) item.getTitle();
-		String nl = "\n";
 		
-		if (menuItemTitle == "Email Timers") {
+		
+		if (menuItemTitle == CONTEXT_MENU_EMAIL_TIMERS) {
 			//
 			// create the csv file
-			StringBuffer headerBuf = new StringBuffer();
-			StringBuffer timeBuf = new StringBuffer();
+			headerBuf = new StringBuffer();
+			timeBuf = new StringBuffer();
 			int len = timerIds.size();
 	    	
 	        
@@ -621,9 +617,13 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	        if (len > 0) {
 				int id = 0;
 				
+				TextView timeValue;
+				TextView labelValue;
+				String label;
+				
 				for (int i = 0; i < len; i++) {
 					// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-					id = Integer.parseInt(timerIds.get(i).toString());
+					id = (Integer) timerIds.get(i);
 					
 					TableLayout tv = (TableLayout) findViewById(id);
 		        	
@@ -631,11 +631,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		        
 		        	
 		        	// table layout found, which means a timer also exists; save the time value
-		        	TextView timeValue = (TextView) findViewById(10000+id);
+		        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
 		        	
 		        	// save the timer label
-		        	TextView labelValue = (TextView) findViewById(20000+id);
-		        	String label = labelValue.getText().toString();
+		        	labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX+id);
+		        	label = labelValue.getText().toString();
 		        	
 		        	if (i == (len -1)) {
 		        		headerBuf.append("\""+ escapeQuote(label) +"\"");
@@ -651,28 +651,23 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	        
 		
 			
-			File f = null;
-			File sdcard = null;
-			FileWriter writer = null;
+			
 			try {
 				sdcard = new File(Environment.getExternalStorageDirectory() + "/data/com/cooltofu/tasktimer/");
 				sdcard.mkdirs();
 				
-				f = new File(sdcard, "timers.csv");
-				
-				
+				f = new File(sdcard, DATA_FILE_NAME);
 				writer = new FileWriter(f);
 				writer.write(headerBuf.toString() + nl);
 				writer.write(timeBuf.toString() + nl);
 				writer.flush();
 				
-				
-				
-				
 			} catch (FileNotFoundException ex) {
 				Log.e("file not found", ex.getMessage());
+				Toast.makeText(this, "Can't write to external SD card.", Toast.LENGTH_LONG).show();
 			} catch (IOException ioex) {
 				Log.e("io ex: ", ioex.getMessage());
+				Toast.makeText(this, "Can't write to external SD card.", Toast.LENGTH_LONG).show();
 			} finally {
 				try {
 					if (writer != null)
@@ -688,22 +683,18 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			// send the email with the file attachment
 			if (f.exists() && f.canRead()) {
 				Intent i = new Intent(Intent.ACTION_SEND);
-				i.setType("text/csv");
-				i.putExtra(Intent.EXTRA_SUBJECT, "TaskTimer Data");
-				i.putExtra(Intent.EXTRA_TEXT, "Timers from the TaskTimer app by CoolTofu.com");
+				i.setType(EMAIL_TYPE);
+				i.putExtra(Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
+				i.putExtra(Intent.EXTRA_TEXT, EMAIL_BODY);
 				i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
 				
-				startActivity(Intent.createChooser(i, "Send Mail"));
+				startActivity(Intent.createChooser(i, INTENT_CHOOSER_TITLE));
 			} else {
-				Toast t = Toast.makeText(this, "Can't send email.", Toast.LENGTH_SHORT);
-				t.show();
+				Toast.makeText(this, "Can't send email.", Toast.LENGTH_LONG).show();
 			}
 			
-			
-			
-			
-		} else if (menuItemTitle == "Delete All Timers") {
-			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
+		} else if (menuItemTitle == CONTEXT_MENU_DELETE_ALL_TIMERS) {
+			alert = new AlertDialog.Builder(TaskTimerActivity.this);
 			alert.setTitle("Delete all Timers?");
 		 	
 			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -715,7 +706,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				}
 				
 			});
-			alert.setPositiveButton("Ok",
+			alert.setPositiveButton(OK_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							deleteAllTimers();
@@ -735,47 +726,45 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 						}
 					});
 
-			alert.setNegativeButton("Cancel",
+			alert.setNegativeButton(CANCEL_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog,int which) {
 							// TODO Auto-generated method stub
-							//isDialogShowing = false;
 							return;
 						}
 					});
 			alert.show();
-			//isDialogShowing = true;
 			
-		} else if (menuItemTitle == "Delete Timer") {
+		} else if (menuItemTitle == CONTEXT_MENU_DELETE_TIMER) {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
-			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert = new AlertDialog.Builder(TaskTimerActivity.this);
 			alert.setTitle("Delete " + textView.getText().toString() + "?");
 		 	
 			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
 				public void onCancel(DialogInterface arg0) {
 					// TODO Auto-generated method stub
-					//isDialogShowing = false;
 					return;
 				}
-				
 			});
-			alert.setPositiveButton("Ok",
+			alert.setPositiveButton(OK_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							// get the innerTl view
 							TableLayout tv = (TableLayout) findViewById(item.getItemId());
 							ll.removeView(tv);
+							timerId = (int) item.getItemId();
 							
-							db.deleteTimer(item.getItemId());
-							timerIds.remove(item.getItemId());
+							db.deleteTimer(timerId);
+							
+							timerIds.remove(timerIds.indexOf(new Integer(timerId)));
 							//isDialogShowing = false;
 						}
 					});
 
-			alert.setNegativeButton("Cancel",
+			alert.setNegativeButton(CANCEL_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog,int which) {
@@ -787,11 +776,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			alert.show();
 			//isDialogShowing = true;
 			
-		} else if (menuItemTitle == "Edit Label") {
+		} else if (menuItemTitle == CONTEXT_MENU_EDIT_LABEL) {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
-			AlertDialog.Builder alert = new AlertDialog.Builder(TaskTimerActivity.this);
-			alert.setTitle("Edit Label");
+			alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert.setTitle(CONTEXT_MENU_EDIT_LABEL);
 
 			final EditText input = new EditText(TaskTimerActivity.this);
 			input.setSingleLine(); // one line tall
@@ -809,7 +798,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 			});
 			
-			alert.setPositiveButton("Ok",
+			alert.setPositiveButton(OK_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							textView.setText(input.getText().toString());
@@ -817,7 +806,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 						}
 					});
 
-			alert.setNegativeButton("Cancel",
+			alert.setNegativeButton(CANCEL_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog,int which) {
@@ -829,7 +818,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			alert.show();
 			//isDialogShowing = true;
 			
-		} else if (menuItemTitle == "Edit Time") {
+		} else if (menuItemTitle == CONTEXT_MENU_EDIT_TIME) {
 			//isDialogShowing = true;
 			
 			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
@@ -866,8 +855,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			dialog.show();
 			
 			
-			final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
-			final int PRESS_DELAY = 200; // delay on press event for time editing
+			
 			
 			final Runnable onPressedIncrementHour = new Runnable() {
 				public void run() {
@@ -949,9 +937,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				public final boolean onTouch(View v, MotionEvent event) {
 					
-					int action = event.getAction();
 					
-					switch(action) {
+					switch(event.getAction()) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedIncrementHour);
 							handler.postAtTime(onPressedIncrementHour, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
@@ -980,9 +967,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				public final boolean onTouch(View v, MotionEvent event) {
 					
-					int action = event.getAction();
-					
-					switch(action) {
+					switch(event.getAction()) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedIncrementMinute);
 							handler.postAtTime(onPressedIncrementMinute, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
@@ -1010,9 +995,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				public final boolean onTouch(View v, MotionEvent event) {
 					
-					int action = event.getAction();
-					
-					switch(action) {
+					switch(event.getAction()) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedIncrementSecond);
 							handler.postAtTime(onPressedIncrementSecond, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
@@ -1041,9 +1024,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				public final boolean onTouch(View v, MotionEvent event) {
 					
-					int action = event.getAction();
-					
-					switch(action) {
+					switch(event.getAction()) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedDecrementHour);
 							handler.postAtTime(onPressedDecrementHour, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
@@ -1070,9 +1051,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				public final boolean onTouch(View v, MotionEvent event) {
 					
-					int action = event.getAction();
-					
-					switch(action) {
+					switch(event.getAction()) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedDecrementMinute);
 							handler.postAtTime(onPressedDecrementMinute, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
@@ -1098,9 +1077,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				
 				public final boolean onTouch(View v, MotionEvent event) {
 					
-					int action = event.getAction();
-					
-					switch(action) {
+					switch(event.getAction()) {
 						case MotionEvent.ACTION_DOWN:
 							handler.removeCallbacks(onPressedDecrementSecond);
 							handler.postAtTime(onPressedDecrementSecond, SystemClock.uptimeMillis()+repeatSpeed+PRESS_DELAY);
@@ -1238,35 +1215,46 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     	
         int len = timerIds.size();
         
+        TableLayout tv;
+        int id = 0;
+        TextView timeValue;
+        int seconds = 0;
+        TextView labelValue;
+        String label;
+        ToggleButton btn;
+        boolean isOn;
+        long timestamp = 0;
+        
+        Calendar cal = Calendar.getInstance();
         
 		for (int i=0; i < len; i++) {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-			int id = Integer.parseInt(timerIds.get(i).toString());
+			id = (Integer) timerIds.get(i);
 			
-			TableLayout tv = (TableLayout) findViewById(id);
+			tv = (TableLayout) findViewById(id);
         	
         	if (tv == null) continue; // none found; continue to next iteration
         
         	
         	
         	// table layout found, which means a timer also exists; save the time value
-        	TextView timeValue = (TextView) findViewById(10000+id);
-        	int seconds = convertToSeconds(timeValue.getText().toString());
+        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
+        	seconds = convertToSeconds(timeValue.getText().toString());
         	
         	
         	// save the timer label
-        	TextView labelValue = (TextView) findViewById(20000+id);
-        	String label = labelValue.getText().toString();
+        	labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX+id);
+        	label = labelValue.getText().toString();
         	
         	
         	// save the state of the timer; running or not
-        	ToggleButton btn = (ToggleButton) findViewById(30000+id);
-        	boolean isOn = btn.isChecked();
+        	btn = (ToggleButton) findViewById(START_STOP_ID_PREFIX+id);
+        	isOn = btn.isChecked();
         	
         	
         	// save the timestamp; used for timers that are active when activity is destroyed
-        	Calendar cal = Calendar.getInstance();
-        	long timestamp = cal.getTimeInMillis();
+        	
+        	timestamp = cal.getTimeInMillis();
         	
         	
         	db.updateTimer(id, label, seconds, timestamp, isOn);
@@ -1392,19 +1380,18 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	private void deleteAllTimers() {
 		
 		int len = timerIds.size();
-	
+		int id = 0;
+		TableLayout tv;
+		
 		for (int i = 0; i < len; i++) {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-			int id = Integer.parseInt(timerIds.get(i).toString());
-			TableLayout tv = (TableLayout) findViewById(id);
+			id = (Integer) timerIds.get(i);
+			tv = (TableLayout) findViewById(id);
 			ll.removeView(tv);
 			
 			db.deleteTimer(id);
-			timerIds.clear();
 		}
-		
-	
-		
+		timerIds.clear();	
 		
 	}
 	
