@@ -25,7 +25,7 @@
             android:id="@+id/verticalLine"
             android:layout_width="1dp"
             android:layout_height="55dp"
-            android:background="#383838"
+            android:background="#696758"
             android:layout_toRightOf="@+id/timerBtn" />
         <Button
             android:id="@+id/moreBtn"
@@ -42,7 +42,7 @@
     <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="#383838" />
+                    android:background="#696758" />
         
     <LinearLayout
 	    android:layout_width="fill_parent"
@@ -65,7 +65,7 @@
 	            <View
 	                android:layout_width="fill_parent"
 	                android:layout_height="1dp"
-	                android:background="#383838" />
+	                android:background="#696758" />
 	            <Button
 	                android:id="@+id/moreScreenOkBtn"
 	                android:layout_width="fill_parent"
@@ -73,10 +73,7 @@
 	                android:background="#000000"
 	                android:textColor="#CCCCCC"
 	                android:text="Back to Main Screen" />
-	            <View
-	                android:layout_width="fill_parent"
-	                android:layout_height="1dp"
-	                android:background="#383838" />
+	      
 	        </LinearLayout>
 		    <ScrollView
 		        android:id="@+id/scrollView1"
@@ -87,7 +84,7 @@
 		        	        <LinearLayout
 		            android:id="@+id/linearLayout"
 		            android:layout_width="fill_parent"
-		            android:layout_height="638dp"
+		            android:layout_height="wrap_content"
 		            android:orientation="vertical" >
 				    <TextView
                         android:layout_width="wrap_content"
@@ -106,7 +103,7 @@
 				    <ImageView
 				        android:id="@+id/imageView1"
 				        android:layout_width="wrap_content"
-				        android:layout_height="280dp"
+				        android:layout_height="wrap_content"
 				        android:layout_marginLeft="15dp"
 				        android:src="@drawable/context_menu" />
 				    

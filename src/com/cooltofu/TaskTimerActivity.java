@@ -386,9 +386,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	
 		innerTl = new TableLayout(TaskTimerActivity.this);
 		innerTl.setLayoutParams(itlParams);
-
+		String trimmedLabel = (label.trim().equals("")) ? " " : label;
 		final TextView taskLabel = new TextView(innerTl.getContext());
-		taskLabel.setText((label.trim().equals("")) ? " " : " ");
+		taskLabel.setText(trimmedLabel);
 		taskLabel.setLayoutParams(taskLabelParams);
 		taskLabel.setTextSize(18);
 		taskLabel.setId(TASK_LABEL_ID_PREFIX + timerId);

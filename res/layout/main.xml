@@ -25,7 +25,7 @@
 	        android:id="@+id/verticalLine"
 		    android:layout_width="1dp"
 		    android:layout_height="55dp"
-		    android:background="#383838"
+		    android:background="#696758"
 		    android:layout_toRightOf="@+id/newTimerBtn" />
 	    <Button
 	        android:id="@+id/moreBtn"
@@ -42,7 +42,7 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="#383838" />
+        android:background="#696758" />
     
     
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -126,7 +126,7 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:background="#383838" />
+                android:background="#696758" />
             
             <LinearLayout 
                 android:layout_width="fill_parent"
@@ -147,7 +147,7 @@
                 <View
                     android:layout_width="1dp"
                     android:layout_height="55dp"
-                    android:background="#383838" />
+                    android:background="#696758" />
                         
                     <TableLayout
                           android:id="@+id/sumTableLayout"
