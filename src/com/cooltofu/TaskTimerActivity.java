@@ -356,7 +356,10 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				        	seconds += convertToSeconds(timeValue.getText().toString());
 						}	
 						
-						totalTextView.setText(formatTimeTextDisplay(seconds));
+						if (seconds == 0)
+							totalTextView.setText("");
+						else
+							totalTextView.setText(formatTimeTextDisplay(seconds));
 					}
 				}); 
 			}
