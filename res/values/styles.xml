@@ -2,4 +2,5 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <color name="text_color">#CCCCCC</color>
     <color name="menu_bg">#556270</color>
+    <color name="menu_down_bg">#83AF9B</color>
 </resources>

@@ -375,7 +375,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 
 	private void setButtonEffect(Button btn, int action) {
 		if (action == MotionEvent.ACTION_DOWN) {
-			btn.setBackgroundColor(Color.WHITE);
+			btn.setBackgroundColor(getResources().getColor(R.color.menu_down_bg));
 			btn.setTextColor(Color.DKGRAY);
 		} else {
 			//btn.getBackground().setColorFilter(Color.parseColor(R.color.menu_bg));
@@ -391,7 +391,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	
 		innerTl = new TableLayout(TaskTimerActivity.this);
 		innerTl.setLayoutParams(itlParams);
-		String trimmedLabel = (label.trim().equals("")) ? " " : label;
+		String trimmedLabel = (label.trim().equals("")) ? " " : label.trim();
 		final TextView taskLabel = new TextView(innerTl.getContext());
 		taskLabel.setText(trimmedLabel);
 		taskLabel.setLayoutParams(taskLabelParams);
@@ -759,7 +759,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			alert.setPositiveButton(OK_BTN_STRING,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
-							textView.setText(input.getText().toString());
+							textView.setText(input.getText().toString().trim());
 						}
 					});
 

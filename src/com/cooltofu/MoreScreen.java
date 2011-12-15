@@ -153,7 +153,7 @@ public class MoreScreen extends Activity implements OnClickListener {
 	
 	private void setButtonEffect(Button btn, int action) {
 		if (action == MotionEvent.ACTION_DOWN) {
-			btn.setBackgroundColor(Color.WHITE);
+			btn.setBackgroundColor(getResources().getColor(R.color.menu_down_bg));
 			btn.setTextColor(Color.DKGRAY);
 		} else {
 			//btn.getBackground().setColorFilter(Color.parseColor(R.color.menu_bg));
