@@ -142,7 +142,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		
 		setContentView(R.layout.main);
 		
-		
 		startStopBtnLayoutParams = ((Button) findViewById(R.id.button1)).getLayoutParams();
 		timeTextParams = ((TextView) findViewById(R.id.timeText)).getLayoutParams();
 		taskLabelParams = ((TextView) findViewById(R.id.taskLabel)).getLayoutParams();
@@ -151,12 +150,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		itlParams = ((TableLayout) findViewById(R.id.tableLayout2)).getLayoutParams();
 		ll = (LinearLayout) findViewById(R.id.linearLayout);
 		
-		
-		
 		// get timers from db
 		db = new TimerDbAdapter(this);
 		db.open();
-		
 		
 		cursor = db.fetchAllTimers();
 		startManagingCursor(cursor);
@@ -362,13 +358,11 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 						
 						totalTextView.setText(formatTimeTextDisplay(seconds));
 					}
-				});
+				}); 
 			}
     	};
     	timer.scheduleAtFixedRate(totalTimerTask, 0, 1000);
 			
-    	
-    	
     	
     	tracker = GoogleAnalyticsTracker.getInstance();
 		tracker.startNewSession("UA-27584987-1", this);
@@ -569,8 +563,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		} else {
 			// options button
 			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
-			menu.add(1, 1, 0, CONTEXT_MENU_DELETE_ALL_TIMERS);
-			menu.add(1, 2, 1, CONTEXT_MENU_EMAIL_TIMERS);
+			menu.add(1, 1, 0, CONTEXT_MENU_EMAIL_TIMERS);
+			menu.add(1, 2, 1, CONTEXT_MENU_DELETE_ALL_TIMERS);
 		}
 	}
 	

@@ -90,11 +90,11 @@
 		            android:layout_height="638dp"
 		            android:orientation="vertical" >
 				    <TextView
-		                android:layout_width="wrap_content"
-		                android:layout_height="wrap_content"
-		                android:paddingLeft="15dp"
-		                android:paddingTop="15dp"
-		                android:text="TIP #1: Shake to delete all timers. Confirmation needed before deletion." />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="15dp"
+                        android:text="TIP #1: Use the Options button at the bottom left of the screen for more actions." />
 				    
 				    <TextView
 				        android:layout_width="wrap_content"
@@ -102,6 +102,7 @@
 				        android:paddingLeft="15dp"
 				        android:paddingTop="15dp"
 				        android:text="TIP #2: Press and hold the time/label for more options." />
+				    
 				    <ImageView
 				        android:id="@+id/imageView1"
 				        android:layout_width="wrap_content"
