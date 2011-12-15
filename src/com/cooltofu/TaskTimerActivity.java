@@ -16,9 +16,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -77,6 +77,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	static final String INTENT_CHOOSER_TITLE = "Send Mail";
 	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
 	final int PRESS_DELAY = 200; // delay on press event for time editing
+	final static String PREF_NAME = "MY_PREF";
+	final static String SAMPLE_PROJECT_LABEL = "Sample Project";
 	
 	static List<Integer> timerIds = new ArrayList<Integer>();
 	
@@ -329,45 +331,32 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		});
 		registerForContextMenu(optionBtn);
 		
-    	// calculate total if there are timers
     	
-    	final TextView totalTextView = (TextView) findViewById(R.id.sumText);
-    	
-    	totalTimerTask = new TimerTask() {
-    		int seconds = 0;
-    		int len = 0;
-    		TableLayout tv;
-    		TextView timeValue;
-    		
-			public void run() {
-				handler.post(new Runnable() {
-					public void run() {
-						seconds = 0;
-						len = timerIds.size();
-						
-						for (int i = 0; i < len; i++) {
-							// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
-							int id = (Integer) timerIds.get(i);
-							tv = (TableLayout) findViewById(id);
-							
-				        	if (tv == null) continue; // none found; continue to next iteration
-				        	
-				        	// table layout found, which means a timer also exists; save the time value
-				        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
-				        	seconds += convertToSeconds(timeValue.getText().toString());
-						}	
-						
-						if (seconds == 0)
-							totalTextView.setText("");
-						else
-							totalTextView.setText(formatTimeTextDisplay(seconds));
-					}
-				}); 
-			}
-    	};
-    	timer.scheduleAtFixedRate(totalTimerTask, 0, 300);
 			
     	
+    	// if on first access, add a sample timer to the window
+    	SharedPreferences settings = getSharedPreferences(PREF_NAME, 0);
+    	boolean isAccessed = settings.getBoolean("isAccessed", false);
+    	if (isAccessed == false) {
+    		timerId = (int) db.createTimer(SAMPLE_PROJECT_LABEL, 0, 0, false);
+			
+			if (timerId == -1) {
+				// db error
+				// TODO: handle error
+			}
+			
+			createTaskTimer(timerId, SAMPLE_PROJECT_LABEL, 5025, false);
+			timerIds.add(timerId);
+			
+			
+	    	SharedPreferences.Editor editor = settings.edit();
+	    	editor.putBoolean("isAccessed", true);
+	    	editor.commit(); 
+    	}
+    	
+    	
+    	
+    	// Google Analytics
     	tracker = GoogleAnalyticsTracker.getInstance();
 		tracker.startNewSession("UA-27584987-1", this);
 		tracker.trackEvent("Startup", "onCreate", "", -1);
@@ -1092,7 +1081,43 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         if (!db.isOpen())
 			db.open();
         
-		
+// calculate total if there are timers
+    	
+    	final TextView totalTextView = (TextView) findViewById(R.id.sumText);
+    	
+    	totalTimerTask = new TimerTask() {
+    		int seconds = 0;
+    		int len = 0;
+    		TableLayout tv;
+    		TextView timeValue;
+    		
+			public void run() {
+				handler.post(new Runnable() {
+					public void run() {
+						seconds = 0;
+						len = timerIds.size();
+						
+						for (int i = 0; i < len; i++) {
+							// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+							int id = (Integer) timerIds.get(i);
+							tv = (TableLayout) findViewById(id);
+							
+				        	if (tv == null) continue; // none found; continue to next iteration
+				        	
+				        	// table layout found, which means a timer also exists; save the time value
+				        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
+				        	seconds += convertToSeconds(timeValue.getText().toString());
+						}	
+						
+						if (seconds == 0)
+							totalTextView.setText("");
+						else
+							totalTextView.setText(formatTimeTextDisplay(seconds));
+					}
+				}); 
+			}
+    	};
+    	timer.scheduleAtFixedRate(totalTimerTask, 0, 300);
         
     }
     @Override
