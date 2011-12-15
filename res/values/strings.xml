@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="hello">Hello World, TaskTimerActivity!</string>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <string name="app_name">Task Timer</string>
     <string name="eula_title">End User Agreement</string>
     <string name="eula_accept">I Accept</string>
     <string name="eula_refuse">I Do Not Accept</string>
-
+    <string name="text_color">#CCCCCC</string>
+    <string name="menu_bg">#556270</string>
 </resources>

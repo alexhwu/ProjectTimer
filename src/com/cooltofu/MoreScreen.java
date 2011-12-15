@@ -26,16 +26,13 @@ public class MoreScreen extends Activity implements OnClickListener {
 				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						moreBtn.setTextColor(Color.DKGRAY);
+						setButtonEffect(moreBtn, MotionEvent.ACTION_DOWN);
 						break;
 					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						moreBtn.setTextColor(Color.LTGRAY);
+						setButtonEffect(moreBtn, MotionEvent.ACTION_UP);
 						break;
 					case MotionEvent.ACTION_CANCEL:
-						v.setBackgroundColor(Color.BLACK);
-						((Button) v).setTextColor(Color.LTGRAY);
+						setButtonEffect(moreBtn, MotionEvent.ACTION_UP);
 						break;
 				}
 				
@@ -58,16 +55,13 @@ public class MoreScreen extends Activity implements OnClickListener {
 				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						btn.setTextColor(Color.DKGRAY);
+						setButtonEffect(btn, MotionEvent.ACTION_DOWN);
 						break;
 					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						btn.setTextColor(Color.LTGRAY);
+						setButtonEffect(btn, MotionEvent.ACTION_UP);
 						break;
 					case MotionEvent.ACTION_CANCEL:
-						v.setBackgroundColor(Color.BLACK);
-						((Button) v).setTextColor(Color.LTGRAY);
+						setButtonEffect(btn, MotionEvent.ACTION_UP);
 						break;
 				}
 				
@@ -83,16 +77,15 @@ public class MoreScreen extends Activity implements OnClickListener {
 				
 				switch(evt.getAction()) {
 					case MotionEvent.ACTION_DOWN:
-						v.setBackgroundColor(Color.WHITE);
-						timerBtn.setTextColor(Color.DKGRAY);
+						setButtonEffect(timerBtn, MotionEvent.ACTION_DOWN);
+						//v.setBackgroundColor(Color.WHITE);
+						//timerBtn.setTextColor(Color.DKGRAY);
 						break;
 					case MotionEvent.ACTION_UP:
-						v.setBackgroundColor(Color.BLACK);
-						timerBtn.setTextColor(Color.LTGRAY);
+						setButtonEffect(timerBtn, MotionEvent.ACTION_UP);
 						break;
 					case MotionEvent.ACTION_CANCEL:
-						v.setBackgroundColor(Color.BLACK);
-						((Button) v).setTextColor(Color.LTGRAY);
+						setButtonEffect(timerBtn, MotionEvent.ACTION_UP);
 						break;
 				}
 				
@@ -155,6 +148,18 @@ public class MoreScreen extends Activity implements OnClickListener {
 
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	private void setButtonEffect(Button btn, int action) {
+		if (action == MotionEvent.ACTION_DOWN) {
+			btn.setBackgroundColor(Color.WHITE);
+			btn.setTextColor(Color.DKGRAY);
+		} else {
+			//btn.getBackground().setColorFilter(Color.parseColor(R.color.menu_bg));
+			btn.setBackgroundColor(getResources().getColor(R.color.menu_bg));
+			btn.setTextColor(Color.LTGRAY);
+		}
 		
 	}
 }
