@@ -38,11 +38,7 @@
 	        android:layout_alignParentRight="true"
 	        android:layout_toRightOf="@+id/verticalLine" />
 	</RelativeLayout>
-	    
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#696758" />
+	
     
     
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"

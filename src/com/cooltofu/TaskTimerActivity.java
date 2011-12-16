@@ -400,7 +400,7 @@ public class TaskTimerActivity extends Activity {
 		hrView.setLayoutParams(hrParams);
 		hrView.setBackgroundColor(Color.GRAY);
 		hrView.getBackground().setAlpha(120);
-		innerTl.addView(hrView);
+		//innerTl.addView(hrView);
 		
 		
 		mainTl = new TableLayout(TaskTimerActivity.this);
@@ -489,6 +489,8 @@ public class TaskTimerActivity extends Activity {
 
 		// add timer and task label to inner table
 		ll.addView(mainTl);
+
+		mainTl.addView(hrView);
 
 		
 		innerTl.setOnTouchListener(new View.OnTouchListener() {
