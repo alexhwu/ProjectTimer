@@ -1,16 +1,15 @@
 package com.cooltofu;
 
+
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ScrollView;
+
+
 
 public class MoreScreen extends Activity {
 	public void onCreate(Bundle savedInstanceState) {

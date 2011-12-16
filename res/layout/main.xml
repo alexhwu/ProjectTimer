@@ -79,6 +79,7 @@
                                 android:layout_width="65dp"
                                 android:layout_height="65dp"
                                 android:textSize="12dp"
+                                android:textColor="@color/text_color"
                                 android:text="Start" />
                             
                                 <TableLayout

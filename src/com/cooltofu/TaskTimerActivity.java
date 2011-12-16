@@ -419,7 +419,7 @@ public class TaskTimerActivity extends Activity {
 		startStopBtn.setWidth(pixels);
 		startStopBtn.setId(START_STOP_ID_PREFIX + timerId);
 		startStopBtn.setBackgroundColor(Color.BLACK);
-		startStopBtn.setTextColor(Color.LTGRAY);
+		startStopBtn.setTextColor(R.color.text_color);
 		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 		
 		
