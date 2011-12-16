@@ -30,10 +30,11 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -536,6 +537,12 @@ public class TaskTimerActivity extends Activity {
 		
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
 	
 	// long press context menu
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -558,134 +565,161 @@ public class TaskTimerActivity extends Activity {
 		return s.replaceAll("\"", "\"\"");
 	}
 	
+	private void emailTimers() {
+		//
+		// create the csv file
+		headerBuf = new StringBuffer("Project,Time,Note");
+		rowBuf = new StringBuffer();
+		
+		int len = timerIds.size();
+    	
+        
+        
+        if (len > 0) {
+			int id = 0;
+			
+			TextView timeValue;
+			TextView labelValue;
+			String label;
+			String note = "";
+			
+			for (int i = 0; i < len; i++) {
+				
+				id = (Integer) timerIds.get(i);
+				
+				TableLayout tv = (TableLayout) findViewById(id);
+	        	
+	        	if (tv == null) continue; // none found; continue to next iteration
+	        
+	        	
+	        	cursor = db.getNote(id);
+	        	startManagingCursor(cursor);
+	        	
+	        	if (cursor != null)
+	        		note = cursor.getString(0);
+	        	
+	        	// table layout found, which means a timer also exists; save the time value
+	        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
+	        	
+	        	// save the timer label
+	        	labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX+id);
+	        	label = labelValue.getText().toString();
+	        	
+        
+        		rowBuf.append("\""+ escapeQuote(label) +"\",");
+        		rowBuf.append("\""+ timeValue.getText().toString() + "\",");
+        		rowBuf.append("\""+ escapeQuote(note) + "\"");
+        		
+        		if (i < (len-1))
+        			rowBuf.append(nl);
+	        	
+			}
+		}
+        
+	
+		
+		
+		try {
+			sdcard = new File(Environment.getExternalStorageDirectory() + "/data/com/cooltofu/tasktimer/");
+			sdcard.mkdirs();
+			
+			f = new File(sdcard, DATA_FILE_NAME);
+			writer = new FileWriter(f);
+			writer.write(headerBuf.toString() + nl);
+			writer.write(rowBuf.toString());
+			writer.flush();
+			
+		} catch (FileNotFoundException ex) {
+			Log.e("file not found", ex.getMessage());
+			Toast.makeText(this, "Can't write to external SD card.", Toast.LENGTH_LONG).show();
+			
+		} catch (IOException ioex) {
+			Log.e("io ex: ", ioex.getMessage());
+			Toast.makeText(this, "Can't write to external SD card.", Toast.LENGTH_LONG).show();
+			
+		} finally {
+			try {
+				if (writer != null)
+					writer.close();
+				
+				
+			} catch (IOException ioe) {
+				Log.e("finally. IO Exc: ", ioe.getMessage());
+			}
+		}
+		
+		
+		// send the email with the file attachment
+		if (f.exists() && f.canRead()) {
+			Intent i = new Intent(Intent.ACTION_SEND);
+			i.setType(EMAIL_TYPE);
+			i.putExtra(Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
+			i.putExtra(Intent.EXTRA_TEXT, EMAIL_BODY);
+			i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+			
+			startActivity(Intent.createChooser(i, INTENT_CHOOSER_TITLE));
+		} else {
+			Toast.makeText(this, "Can't send email.", Toast.LENGTH_LONG).show();
+		}
+		
+		
+	}
+	
+	private void confirmDeleteAllTimers() {
+		alert = new AlertDialog.Builder(TaskTimerActivity.this);
+		alert.setTitle("Delete all Timers?");
+	 	
+		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+			public void onCancel(DialogInterface arg0) {
+				
+				return;
+			}
+			
+		});
+		alert.setPositiveButton(OK_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						deleteAllTimers();
+
+					}
+				});
+
+		alert.setNegativeButton(CANCEL_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog,int which) {
+						return;
+					}
+				});
+		alert.show();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.email_timers:
+				emailTimers();
+				return true;
+			case R.id.delete_all_timers:
+				confirmDeleteAllTimers();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	
 	public boolean onContextItemSelected(final MenuItem item) {
 
 		String menuItemTitle = (String) item.getTitle();
 		
 		
 		if (menuItemTitle == CONTEXT_MENU_EMAIL_TIMERS) {
-			//
-			// create the csv file
-			headerBuf = new StringBuffer("Project,Time,Note");
-			rowBuf = new StringBuffer();
-			
-			int len = timerIds.size();
-	    	
-	        
-	        
-	        if (len > 0) {
-				int id = 0;
-				
-				TextView timeValue;
-				TextView labelValue;
-				String label;
-				String note = "";
-				
-				for (int i = 0; i < len; i++) {
-					
-					id = (Integer) timerIds.get(i);
-					
-					TableLayout tv = (TableLayout) findViewById(id);
-		        	
-		        	if (tv == null) continue; // none found; continue to next iteration
-		        
-		        	
-		        	cursor = db.getNote(id);
-		        	startManagingCursor(cursor);
-		        	
-		        	if (cursor != null)
-		        		note = cursor.getString(0);
-		        	
-		        	// table layout found, which means a timer also exists; save the time value
-		        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
-		        	
-		        	// save the timer label
-		        	labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX+id);
-		        	label = labelValue.getText().toString();
-		        	
-	        
-	        		rowBuf.append("\""+ escapeQuote(label) +"\",");
-	        		rowBuf.append("\""+ timeValue.getText().toString() + "\",");
-	        		rowBuf.append("\""+ escapeQuote(note) + "\"");
-	        		
-	        		if (i < (len-1))
-	        			rowBuf.append(nl);
-		        	
-				}
-			}
-	        
-		
-			
-			
-			try {
-				sdcard = new File(Environment.getExternalStorageDirectory() + "/data/com/cooltofu/tasktimer/");
-				sdcard.mkdirs();
-				
-				f = new File(sdcard, DATA_FILE_NAME);
-				writer = new FileWriter(f);
-				writer.write(headerBuf.toString() + nl);
-				writer.write(rowBuf.toString());
-				writer.flush();
-				
-			} catch (FileNotFoundException ex) {
-				Log.e("file not found", ex.getMessage());
-				Toast.makeText(this, "Can't write to external SD card.", Toast.LENGTH_LONG).show();
-			} catch (IOException ioex) {
-				Log.e("io ex: ", ioex.getMessage());
-				Toast.makeText(this, "Can't write to external SD card.", Toast.LENGTH_LONG).show();
-			} finally {
-				try {
-					if (writer != null)
-						writer.close();
-					
-					
-				} catch (IOException ioe) {
-					Log.e("finally. IO Exc: ", ioe.getMessage());
-				}
-			}
-			
-			
-			// send the email with the file attachment
-			if (f.exists() && f.canRead()) {
-				Intent i = new Intent(Intent.ACTION_SEND);
-				i.setType(EMAIL_TYPE);
-				i.putExtra(Intent.EXTRA_SUBJECT, EMAIL_SUBJECT);
-				i.putExtra(Intent.EXTRA_TEXT, EMAIL_BODY);
-				i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
-				
-				startActivity(Intent.createChooser(i, INTENT_CHOOSER_TITLE));
-			} else {
-				Toast.makeText(this, "Can't send email.", Toast.LENGTH_LONG).show();
-			}
+			emailTimers();
 			
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_ALL_TIMERS) {
-			alert = new AlertDialog.Builder(TaskTimerActivity.this);
-			alert.setTitle("Delete all Timers?");
-		 	
-			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-				public void onCancel(DialogInterface arg0) {
-					
-					return;
-				}
-				
-			});
-			alert.setPositiveButton(OK_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							deleteAllTimers();
-
-						}
-					});
-
-			alert.setNegativeButton(CANCEL_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog,int which) {
-							return;
-						}
-					});
-			alert.show();
+			confirmDeleteAllTimers();
 			
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_TIMER) {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
