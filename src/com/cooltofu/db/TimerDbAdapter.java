@@ -12,6 +12,7 @@ public class TimerDbAdapter {
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_LABEL = "label";
 	public static final String KEY_SECONDS = "seconds";
+	public static final String KEY_NOTE = "note";
 	public static final String KEY_TIMESTAMP = "timestamp";
 	public static final String KEY_IS_ON = "is_on";
 	private static final String DB_TABLE = "timer";
@@ -98,12 +99,31 @@ public class TimerDbAdapter {
 		return mCursor;
 	}
 
+	public Cursor getNote(long rowId) throws SQLException {
+		Cursor mCursor = db.query(true, DB_TABLE, new String[] { KEY_NOTE }, KEY_ROWID + "=" + rowId, null, null, null, null, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
+	
+	public boolean updateNote(long rowId, String note) {
+		ContentValues values = createNoteContentValues(note);
+		return db.update(DB_TABLE, values, KEY_ROWID + "=" + rowId, null) > 0;
+	}
+	
 	private ContentValues createContentValues(String label, int seconds, long timestamp, boolean isOn) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_LABEL, label);
 		values.put(KEY_SECONDS, seconds);
 		values.put(KEY_TIMESTAMP, timestamp);
 		values.put(KEY_IS_ON, isOn);
+		return values;
+	}
+	
+	private ContentValues createNoteContentValues(String note) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_NOTE, note);
 		return values;
 	}
 

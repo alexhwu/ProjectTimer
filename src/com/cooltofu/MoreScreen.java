@@ -12,33 +12,12 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ScrollView;
 
-public class MoreScreen extends Activity implements OnClickListener {
+public class MoreScreen extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		setContentView(R.layout.more);
-		
-		final Button moreBtn = (Button) findViewById(R.id.moreBtn);
-		moreBtn.setOnTouchListener(new View.OnTouchListener() {
-				
-			public boolean onTouch(View v,MotionEvent evt) {
-				
-				switch(evt.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						setButtonEffect(moreBtn, MotionEvent.ACTION_DOWN);
-						break;
-					case MotionEvent.ACTION_UP:
-						setButtonEffect(moreBtn, MotionEvent.ACTION_UP);
-						break;
-					case MotionEvent.ACTION_CANCEL:
-						setButtonEffect(moreBtn, MotionEvent.ACTION_UP);
-						break;
-				}
-				
-				return false;
-			}
-		}); // moreBtn.setOnTouchListener()
 		
 		final Button btn = (Button) findViewById(R.id.moreScreenOkBtn);
 		btn.setOnClickListener(new View.OnClickListener() {
@@ -70,86 +49,9 @@ public class MoreScreen extends Activity implements OnClickListener {
 		}); // more screen ok btn.setOnTouchListener()
 		
 		
-		final Button timerBtn = (Button) findViewById(R.id.timerBtn);
-		timerBtn.setOnTouchListener(new View.OnTouchListener() {
-				
-			public boolean onTouch(View v,MotionEvent evt) {
-				
-				switch(evt.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						setButtonEffect(timerBtn, MotionEvent.ACTION_DOWN);
-						//v.setBackgroundColor(Color.WHITE);
-						//timerBtn.setTextColor(Color.DKGRAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						setButtonEffect(timerBtn, MotionEvent.ACTION_UP);
-						break;
-					case MotionEvent.ACTION_CANCEL:
-						setButtonEffect(timerBtn, MotionEvent.ACTION_UP);
-						break;
-				}
-				
-				return false;
-			}
-		}); // moreBtn.setOnTouchListener()
 		
-		timerBtn.setOnClickListener(new View.OnClickListener() {
-
-			public void onClick(View v) {
-				//Intent i = new Intent();
-				//i.setClass(MoreScreen.this, TaskTimerActivity.class);
-				//startActivity(i);
-				finish();
-			}
-		
-		});
-		
-		
-		// handle swipe gestures
-		gestureDetector = new GestureDetector(new MyGestureDetector());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
-        
-        ScrollView sv = (ScrollView) findViewById(R.id.scrollView1);
-        sv.setOnClickListener(MoreScreen.this);
-        sv.setOnTouchListener(gestureListener);
 	}
 	
-	private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-    private GestureDetector gestureDetector;
-    View.OnTouchListener gestureListener;
-    
-	class MyGestureDetector extends SimpleOnGestureListener {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-                // right to left swipe
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    //Toast.makeText(MoreScreen.this, "Left Swipe", Toast.LENGTH_SHORT).show();
-                	// do nothing
-                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    //Toast.makeText(MoreScreen.this, "Right Swipe", Toast.LENGTH_SHORT).show();
-                	MoreScreen.this.finish();
-                }
-            } catch (Exception e) {
-                // nothing
-            }
-            return false;
-        }
-
-    }
-
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	private void setButtonEffect(Button btn, int action) {
 		if (action == MotionEvent.ACTION_DOWN) {

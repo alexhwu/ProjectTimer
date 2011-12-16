@@ -9,7 +9,8 @@ public class TimerTable {
 								+ "label text,"
 								+ "seconds integer not null,"
 								+ "timestamp text default \"0\","
-								+ "is_on integer default 0);";
+								+ "is_on integer default 0,"
+								+ "note text default \"\")";
 	
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(DATABASE_CREATE);

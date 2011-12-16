@@ -5,40 +5,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
     
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
     
-        <Button
-            android:id="@+id/timerBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="... Timer"
-            android:gravity="center"
-            android:paddingRight="15dp"
-            android:background="@color/menu_bg"
-            android:textColor="@color/text_color"
-            android:height="55dp"
-            android:paddingLeft="15dp" />
-        <View
-            android:id="@+id/verticalLine"
-            android:layout_width="1dp"
-            android:layout_height="55dp"
-            android:background="#CCCCCC"
-            android:layout_toRightOf="@+id/timerBtn" />
-        <Button
-            android:id="@+id/moreBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="More Info"
-            android:background="@color/menu_bg"
-            android:textColor="@color/text_color"
-            android:height="55dp"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/verticalLine" />
-        
-    </RelativeLayout>
     <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
@@ -69,7 +36,7 @@
 	            <Button
 	                android:id="@+id/moreScreenOkBtn"
 	                android:layout_width="fill_parent"
-	                android:layout_height="55dp"
+	                android:layout_height="50dp"
 	                android:background="@color/menu_bg"
 	                android:textColor="@color/text_color"
 	                android:text="Back to Main Screen" />
@@ -85,13 +52,15 @@
 		            android:id="@+id/linearLayout"
 		            android:layout_width="fill_parent"
 		            android:layout_height="wrap_content"
+		            android:paddingRight="15dp"
 		            android:orientation="vertical" >
+				    
 				    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingLeft="15dp"
                         android:paddingTop="15dp"
-                        android:text="TIP #1: Use the Options button at the bottom left of the screen for more actions." />
+                        android:text="TIP #1: Click the OFF/ON button to start/stop the timer." />
 				    
 				    <TextView
 				        android:layout_width="wrap_content"
@@ -100,18 +69,18 @@
 				        android:paddingTop="15dp"
 				        android:text="TIP #2: Press and hold the time/label for more options." />
 				    
-				    <ImageView
-				        android:id="@+id/imageView1"
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:layout_marginLeft="15dp"
-				        android:src="@drawable/context_menu" />
+				    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="15dp"
+                        android:text="TIP #3: Use the Options button at the bottom left of the screen for more actions." />
 				    
 				    <TextView
 				        android:layout_width="wrap_content"
 				        android:layout_height="wrap_content"
 				        android:paddingLeft="15dp"
-				        android:paddingTop="15dp"
+				        android:paddingTop="45dp"
 				        android:text="Created by CoolTofu" />
 				    <TextView
 				        android:layout_width="wrap_content"

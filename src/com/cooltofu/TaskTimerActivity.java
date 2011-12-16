@@ -28,8 +28,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -51,7 +50,7 @@ import android.widget.ToggleButton;
 import com.cooltofu.db.TimerDbAdapter;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
-public class TaskTimerActivity extends Activity implements OnClickListener {
+public class TaskTimerActivity extends Activity {
 	private final static int TIME_ID_PREFIX = 10000;
 	private final static int TASK_LABEL_ID_PREFIX = 20000;
 	private final static int START_STOP_ID_PREFIX = 30000;
@@ -60,15 +59,18 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	final static String ALERT_NEW_TIMER_MSG = "Enter Timer Label";
 	final static String OK_BTN_STRING = "Ok";
 	final static String CANCEL_BTN_STRING = "Cancel";
+	final static String SAVE_BTN_STRING = "Save";
 	static final String TOGGLE_BTN_ON_LABEL = "ON";
 	static final String TOGGLE_BTN_OFF_LABEL = "OFF";
 	static final String TIMER_TAG = "Timer";
 	static final String CONTEXT_MENU_HEADER_TITLE = "Select Option";
 	static final String CONTEXT_MENU_EDIT_TIME = "Edit Time";
 	static final String CONTEXT_MENU_EDIT_LABEL = "Edit Label";
+	static final String CONTEXT_MENU_EDIT_NOTE = "Edit Note";
 	static final String CONTEXT_MENU_DELETE_TIMER = "Delete Timer";
 	static final String CONTEXT_MENU_DELETE_ALL_TIMERS = "Delete All Timers";
 	static final String CONTEXT_MENU_EMAIL_TIMERS = "Email Timers";
+	
 	static final String nl = "\n";
 	static final String DATA_FILE_NAME = "timers.csv";
 	static final String EMAIL_TYPE = "text/csv";
@@ -126,7 +128,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 	static View hrView;
 	
 	static StringBuffer headerBuf;
-	static StringBuffer timeBuf;
+	static StringBuffer rowBuf;
 	
 	static File f;
 	static File sdcard;
@@ -293,18 +295,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		});
 		
 		
-		// handle swipe gestures
-		gestureDetector = new GestureDetector(new MyGestureDetector());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
-        
-        sv = (RelativeLayout) findViewById(R.id.relativeLayout);
-        sv.setOnClickListener(TaskTimerActivity.this);
-        sv.setOnTouchListener(gestureListener);
-        
         
     	//-------------------------------
 		// Options button actions
@@ -554,7 +544,8 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
 			menu.add(0, (v.getId()), 0, CONTEXT_MENU_EDIT_TIME);
 			menu.add(0, (v.getId()), 1, CONTEXT_MENU_EDIT_LABEL);
-			menu.add(0, v.getId(), 2, CONTEXT_MENU_DELETE_TIMER);
+			menu.add(0, (v.getId()), 2, CONTEXT_MENU_EDIT_NOTE);
+			menu.add(0, v.getId(), 3, CONTEXT_MENU_DELETE_TIMER);
 		} else {
 			// options button
 			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
@@ -575,8 +566,9 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		if (menuItemTitle == CONTEXT_MENU_EMAIL_TIMERS) {
 			//
 			// create the csv file
-			headerBuf = new StringBuffer();
-			timeBuf = new StringBuffer();
+			headerBuf = new StringBuffer("Project,Time,Note");
+			rowBuf = new StringBuffer();
+			
 			int len = timerIds.size();
 	    	
 	        
@@ -587,15 +579,22 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				TextView timeValue;
 				TextView labelValue;
 				String label;
+				String note = "";
 				
 				for (int i = 0; i < len; i++) {
-					// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+					
 					id = (Integer) timerIds.get(i);
 					
 					TableLayout tv = (TableLayout) findViewById(id);
 		        	
 		        	if (tv == null) continue; // none found; continue to next iteration
 		        
+		        	
+		        	cursor = db.getNote(id);
+		        	startManagingCursor(cursor);
+		        	
+		        	if (cursor != null)
+		        		note = cursor.getString(0);
 		        	
 		        	// table layout found, which means a timer also exists; save the time value
 		        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
@@ -604,14 +603,13 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 		        	labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX+id);
 		        	label = labelValue.getText().toString();
 		        	
-		        	if (i == (len -1)) {
-		        		headerBuf.append("\""+ escapeQuote(label) +"\"");
-		        		timeBuf.append("\""+ timeValue.getText().toString() + "\"");
-		        	}
-		        	else {
-		        		headerBuf.append("\""+ escapeQuote(label) +"\",");
-		        		timeBuf.append("\"" + timeValue.getText().toString() + "\",");
-		        	}
+	        
+	        		rowBuf.append("\""+ escapeQuote(label) +"\",");
+	        		rowBuf.append("\""+ timeValue.getText().toString() + "\",");
+	        		rowBuf.append("\""+ escapeQuote(note) + "\"");
+	        		
+	        		if (i < (len-1))
+	        			rowBuf.append(nl);
 		        	
 				}
 			}
@@ -626,7 +624,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 				f = new File(sdcard, DATA_FILE_NAME);
 				writer = new FileWriter(f);
 				writer.write(headerBuf.toString() + nl);
-				writer.write(timeBuf.toString() + nl);
+				writer.write(rowBuf.toString());
 				writer.flush();
 				
 			} catch (FileNotFoundException ex) {
@@ -760,7 +758,59 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
 						}
 					});
 			alert.show();
+		} else if (menuItemTitle == CONTEXT_MENU_EDIT_NOTE) {
+			//final TextView textView = (TextView) findViewById(TASK_NOTE_ID_PREFIX + item.getItemId());
+			final int id = item.getItemId();
 			
+			alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert.setTitle(CONTEXT_MENU_EDIT_NOTE);
+
+			final EditText input = new EditText(TaskTimerActivity.this);
+			input.setGravity(Gravity.TOP);
+			input.setLines(5); // one line tall
+			
+			
+			// get the note from the DB if available
+			cursor = db.getNote(id);
+			startManagingCursor(cursor);
+			String note = "";
+			
+			if (cursor != null) {
+				note = cursor.getString(0);
+				input.setText(note);
+			}
+			
+			input.setSelection(input.getText().length());
+			alert.setView(input);
+			
+			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+				public void onCancel(DialogInterface arg0) {
+					return;
+				}
+				
+			});
+			
+			alert.setPositiveButton(SAVE_BTN_STRING,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							if (db.updateNote(id, input.getText().toString().trim()))
+								Toast.makeText(TaskTimerActivity.this, "Your note is saved.", Toast.LENGTH_SHORT).show();
+							else
+								Toast.makeText(TaskTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
+							
+							return;
+						}
+					});
+
+			alert.setNegativeButton(CANCEL_BTN_STRING,
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,int which) {
+							return;
+						}
+					});
+			alert.show();
 		} else if (menuItemTitle == CONTEXT_MENU_EDIT_TIME) {
 			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
 			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -1081,7 +1131,7 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
         if (!db.isOpen())
 			db.open();
         
-// calculate total if there are timers
+        // calculate total if there are timers
     	
     	final TextView totalTextView = (TextView) findViewById(R.id.sumText);
     	
@@ -1277,39 +1327,6 @@ public class TaskTimerActivity extends Activity implements OnClickListener {
     }
     
     
-    private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-    private GestureDetector gestureDetector;
-    View.OnTouchListener gestureListener;
-    
-	class MyGestureDetector extends SimpleOnGestureListener {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-                // right to left swipe
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    
-                	Intent i = new Intent();
-    				i.setClass(TaskTimerActivity.this, MoreScreen.class);
-    				startActivity(i);
-                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    
-                	// do nothing
-                }
-            } catch (Exception e) {
-                // nothing
-            }
-            return false;
-        }
-        
-
-    }
-
-	public void onClick(View v) {
-	}
 	
 	private void deleteAllTimers() {
 		
