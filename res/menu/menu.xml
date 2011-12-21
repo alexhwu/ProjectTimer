@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/email_timers"
-          android:title="Email Timers" />
-    <item android:id="@+id/delete_all_timers"
-          android:title="Delete All Timers" />
-</menu>

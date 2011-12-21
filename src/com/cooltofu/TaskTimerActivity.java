@@ -31,7 +31,6 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,12 +48,14 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cooltofu.db.TimerDbAdapter;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class TaskTimerActivity extends Activity {
 	private final static int TIME_ID_PREFIX = 10000;
 	private final static int TASK_LABEL_ID_PREFIX = 20000;
 	private final static int START_STOP_ID_PREFIX = 30000;
+	private final static int EMAIL_TIMERS_MENU_ID = 40000;
+	private final static int DELETE_ALL_TIMERS_MENU_ID = 50000;
+	
 	private static final String TIME_FORMAT = "%02d:%02d:%02d";
 	final static String ALERT_NEW_TIMER_TITLE = "Add New Timer";
 	final static String ALERT_NEW_TIMER_MSG = "Enter Timer Label";
@@ -109,7 +110,6 @@ public class TaskTimerActivity extends Activity {
 
 	private static TimerDbAdapter db;
 	private static Cursor cursor;
-	private static GoogleAnalyticsTracker tracker;
 	private static int timerId;
 	
 	private static Button newTimerBtn;
@@ -134,7 +134,6 @@ public class TaskTimerActivity extends Activity {
 	static File f;
 	static File sdcard;
 	static FileWriter writer;
-	
 	
 	
 	
@@ -301,10 +300,7 @@ public class TaskTimerActivity extends Activity {
     	
     	
     	
-    	// Google Analytics
-    	tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.startNewSession("UA-27584987-1", this);
-		tracker.trackEvent("Startup", "onCreate", "", -1);
+    	
 	}//onCreate
 
 	
@@ -483,8 +479,8 @@ public class TaskTimerActivity extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
+		menu.add(1, EMAIL_TIMERS_MENU_ID, 0, "Email Timers");
+		menu.add(1, DELETE_ALL_TIMERS_MENU_ID, 1, "Delete All Timers");
 		return true;
 	}
 	
@@ -642,10 +638,10 @@ public class TaskTimerActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.email_timers:
+			case EMAIL_TIMERS_MENU_ID:
 				emailTimers();
 				return true;
-			case R.id.delete_all_timers:
+			case DELETE_ALL_TIMERS_MENU_ID:
 				confirmDeleteAllTimers();
 				return true;
 			default:
