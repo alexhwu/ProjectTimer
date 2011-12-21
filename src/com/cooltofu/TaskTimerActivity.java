@@ -196,27 +196,7 @@ public class TaskTimerActivity extends Activity {
 
 		
 		newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
-		newTimerBtn.setOnTouchListener(new View.OnTouchListener() {
-			
-			public boolean onTouch(View v,MotionEvent evt) {
-				
-				switch(evt.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						setButtonEffect((Button)v, MotionEvent.ACTION_DOWN);
-						break;
-					
-					case MotionEvent.ACTION_UP:
-						setButtonEffect((Button)v, MotionEvent.ACTION_UP);
-						break;
-					
-					case MotionEvent.ACTION_CANCEL:
-						setButtonEffect((Button)v, MotionEvent.ACTION_UP);
-						break;
-				}
-				
-				return false;
-			}
-		});
+		
 
 		
 		
@@ -226,7 +206,7 @@ public class TaskTimerActivity extends Activity {
 				alert = new AlertDialog.Builder(TaskTimerActivity.this);
 				alert.setTitle(ALERT_NEW_TIMER_TITLE);
 				alert.setMessage(ALERT_NEW_TIMER_MSG);
-
+					
 				final EditText input = new EditText(TaskTimerActivity.this);
 				input.setSingleLine(); // one line tall
 				input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -272,20 +252,7 @@ public class TaskTimerActivity extends Activity {
 		//-------------------------------
 		// More button actions
 		moreBtn = (Button) findViewById(R.id.moreBtn);
-		moreBtn.setOnTouchListener(new View.OnTouchListener() {
-			public boolean onTouch(View v,MotionEvent evt) {
-				switch(evt.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						setButtonEffect((Button)v, MotionEvent.ACTION_DOWN);
-						break;
-					case MotionEvent.ACTION_UP:
-						setButtonEffect((Button)v, MotionEvent.ACTION_UP);
-						break;
-				}
-				
-				return false;
-			}
-		}); // moreBtn.setOnTouchListener()
+		
 		
 		moreBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -300,20 +267,7 @@ public class TaskTimerActivity extends Activity {
     	//-------------------------------
 		// Options button actions
 		optionBtn = (Button) findViewById(R.id.optionBtn);
-		optionBtn.setOnTouchListener(new View.OnTouchListener() {
-			public boolean onTouch(View v,MotionEvent evt) {
-				switch(evt.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						setButtonEffect(optionBtn, MotionEvent.ACTION_DOWN);
-						break;
-					case MotionEvent.ACTION_UP:
-						setButtonEffect(optionBtn, MotionEvent.ACTION_UP);
-						break;
-				}
-				
-				return false;
-			}
-		}); // optionBtn.setOnTouchListener()
+		
 		
 		optionBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -353,18 +307,6 @@ public class TaskTimerActivity extends Activity {
 		tracker.trackEvent("Startup", "onCreate", "", -1);
 	}//onCreate
 
-	private void setButtonEffect(Button btn, int action) {
-		if (action == MotionEvent.ACTION_DOWN) {
-			btn.setBackgroundColor(getResources().getColor(R.color.menu_down_bg));
-			btn.setTextColor(Color.DKGRAY);
-		} else {
-			//btn.getBackground().setColorFilter(Color.parseColor(R.color.menu_bg));
-			btn.setBackgroundColor(getResources().getColor(R.color.menu_bg));
-			btn.setTextColor(Color.LTGRAY);
-		}
-		
-	}
-	
 	
 	
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
@@ -796,10 +738,11 @@ public class TaskTimerActivity extends Activity {
 			alert.show();
 		} else if (menuItemTitle == CONTEXT_MENU_EDIT_NOTE) {
 			//final TextView textView = (TextView) findViewById(TASK_NOTE_ID_PREFIX + item.getItemId());
+			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			final int id = item.getItemId();
 			
 			alert = new AlertDialog.Builder(TaskTimerActivity.this);
-			alert.setTitle(CONTEXT_MENU_EDIT_NOTE);
+			alert.setTitle("Note for " + textView.getText().toString());
 
 			final EditText input = new EditText(TaskTimerActivity.this);
 			input.setGravity(Gravity.TOP);
@@ -1196,14 +1139,14 @@ public class TaskTimerActivity extends Activity {
 						}	
 						
 						if (seconds == 0)
-							totalTextView.setText("");
+							totalTextView.setText("00:00:00");
 						else
 							totalTextView.setText(formatTimeTextDisplay(seconds));
 					}
 				}); 
 			}
     	};
-    	timer.scheduleAtFixedRate(totalTimerTask, 0, 300);
+    	timer.scheduleAtFixedRate(totalTimerTask, 0, 200);
         
     }
     @Override

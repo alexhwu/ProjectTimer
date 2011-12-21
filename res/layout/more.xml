@@ -37,7 +37,7 @@
 	                android:id="@+id/moreScreenOkBtn"
 	                android:layout_width="fill_parent"
 	                android:layout_height="50dp"
-	                android:background="@color/menu_bg"
+	                android:background="@drawable/custom_button"
 	                android:textColor="@color/text_color"
 	                android:text="Back to Main Screen" />
 	      
@@ -88,12 +88,7 @@
 				        android:autoLink="web"
 				        android:paddingLeft="15dp"
 				        android:text="http://cooltofu.com" />
-				    <TextView
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:padding="15dp"
-				        android:text="Launcher icon by Jonathan Britner" />
-				    
+				   
 				    </LinearLayout>
 			</ScrollView>
 			

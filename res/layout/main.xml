@@ -15,7 +15,7 @@
 	        android:text="Add New Timer"
 	        android:gravity="center"
 	        android:paddingRight="85dp"
-	        android:background="@color/menu_bg"
+	        android:background="@drawable/custom_button"
 	        android:textColor="@color/text_color"
 	        android:height="55dp"
 	        android:drawableLeft="@drawable/add"
@@ -25,14 +25,14 @@
 	        android:id="@+id/verticalLine"
 		    android:layout_width="1dp"
 		    android:layout_height="55dp"
-		    android:background="#CCCCCC"
+		    android:background="@color/btn_start"
 		    android:layout_toRightOf="@+id/newTimerBtn" />
 	    <Button
 	        android:id="@+id/moreBtn"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="More Info"
-	        android:background="@color/menu_bg"
+	        android:background="@drawable/custom_button"
 	        android:textColor="@color/text_color"
 	        android:height="55dp"
 	        android:layout_alignParentRight="true"
@@ -133,7 +133,7 @@
                 <Button 
                     android:id="@+id/optionBtn"
                     android:layout_width="wrap_content"
-                    android:background="@color/menu_bg"
+                    android:background="@drawable/custom_button"
                     android:textColor="@color/text_color" 
                     android:layout_height="50dp" 
                     android:gravity="center"
@@ -148,34 +148,27 @@
                         
                     <TableLayout
                           android:id="@+id/sumTableLayout"
-                          android:layout_width="0dp"
-                          android:layout_weight="1"
+                          android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_gravity="center"
-                          android:stretchColumns="0"
                           android:orientation="vertical">
                           
                           <TableRow>
                               <TextView
                                   android:id="@+id/sumText"
-                                  android:layout_width="fill_parent"
+                                  android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
                                   android:textSize="28dp"
                                   android:layout_marginLeft="15dp"
                                   android:text="00:00:00" />
-                          </TableRow>
-                          <!-- 
-                          <TableRow>
                               <TextView
                                   android:id="@+id/sumLabel"
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
+                                  android:textSize="15dp"
                                   android:layout_marginLeft="15dp"
-                                  android:layout_marginRight="8dp"
-                                  android:textSize="13dp"
                                   android:text="Total Time" />
                           </TableRow>
-                           -->
                   </TableLayout>
                 
             </LinearLayout>
