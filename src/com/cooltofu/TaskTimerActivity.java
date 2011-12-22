@@ -1151,7 +1151,7 @@ public class TaskTimerActivity extends Activity {
         
         // Another activity is taking focus (this activity is about to be "paused").
         saveTimers();
-      
+        totalTimerTask.cancel();
     }
     @Override
     protected void onStop() {
@@ -1162,14 +1162,11 @@ public class TaskTimerActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         
-        saveTimers();
-        
         // The activity is about to be destroyed.
         timer.cancel();
         
         if (cursor != null)
         	cursor.close();
-        
         
         if (db != null)
         	db.close();
