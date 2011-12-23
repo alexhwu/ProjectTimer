@@ -25,7 +25,7 @@
 	        android:id="@+id/verticalLine"
 		    android:layout_width="1dp"
 		    android:layout_height="55dp"
-		    android:background="@color/btn_start"
+		    android:background="@color/btn_end"
 		    android:layout_toRightOf="@+id/newTimerBtn" />
 	    <Button
 	        android:id="@+id/moreBtn"
@@ -38,7 +38,10 @@
 	        android:layout_alignParentRight="true"
 	        android:layout_toRightOf="@+id/verticalLine" />
 	</RelativeLayout>
-	
+	<View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#696758" />
     
     
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"

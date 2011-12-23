@@ -4,6 +4,6 @@
     <color name="menu_bg">#556270</color>
     <color name="menu_down_bg">#83AF9B</color>
     <color name="btn_start">#556270</color>
-    <color name="btn_end">#53777A</color>
+    <color name="btn_end">#000000</color>
     <color name="btn_end_pressed">#A7DBD8</color>
 </resources>
