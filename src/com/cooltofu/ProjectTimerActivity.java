@@ -49,7 +49,7 @@ import android.widget.ToggleButton;
 
 import com.cooltofu.db.TimerDbAdapter;
 
-public class TaskTimerActivity extends Activity {
+public class ProjectTimerActivity extends Activity {
 	private final static int TIME_ID_PREFIX = 10000;
 	private final static int TASK_LABEL_ID_PREFIX = 20000;
 	private final static int START_STOP_ID_PREFIX = 30000;
@@ -76,8 +76,8 @@ public class TaskTimerActivity extends Activity {
 	static final String nl = "\n";
 	static final String DATA_FILE_NAME = "timers.csv";
 	static final String EMAIL_TYPE = "text/csv";
-	static final String EMAIL_SUBJECT = "TaskTimer Data";
-	static final String EMAIL_BODY = "Timers from the TaskTimer app by CoolTofu.com";
+	static final String EMAIL_SUBJECT = "Project Time Data";
+	static final String EMAIL_BODY = "Data from the Project Timer app by CoolTofu.com";
 	static final String INTENT_CHOOSER_TITLE = "Send Mail";
 	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
 	final int PRESS_DELAY = 200; // delay on press event for time editing
@@ -202,11 +202,11 @@ public class TaskTimerActivity extends Activity {
 
 		newTimerBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				alert = new AlertDialog.Builder(TaskTimerActivity.this);
+				alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 				alert.setTitle(ALERT_NEW_TIMER_TITLE);
 				alert.setMessage(ALERT_NEW_TIMER_MSG);
 					
-				final EditText input = new EditText(TaskTimerActivity.this);
+				final EditText input = new EditText(ProjectTimerActivity.this);
 				input.setSingleLine(); // one line tall
 				input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
 				alert.setView(input);
@@ -256,7 +256,7 @@ public class TaskTimerActivity extends Activity {
 		moreBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent();
-				i.setClass(TaskTimerActivity.this, MoreScreen.class);
+				i.setClass(ProjectTimerActivity.this, MoreScreen.class);
 				startActivity(i);
 			}
 		});
@@ -307,7 +307,7 @@ public class TaskTimerActivity extends Activity {
 	
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
 	
-		innerTl = new TableLayout(TaskTimerActivity.this);
+		innerTl = new TableLayout(ProjectTimerActivity.this);
 		innerTl.setLayoutParams(itlParams);
 		String trimmedLabel = (label.trim().equals("")) ? " " : label.trim();
 		final TextView taskLabel = new TextView(innerTl.getContext());
@@ -317,31 +317,31 @@ public class TaskTimerActivity extends Activity {
 		taskLabel.setId(TASK_LABEL_ID_PREFIX + timerId);
 		taskLabel.setTextColor(Color.LTGRAY);
 
-		final TextView timeText = new TextView(TaskTimerActivity.this);
+		final TextView timeText = new TextView(ProjectTimerActivity.this);
 		timeText.setText(formatTimeTextDisplay(seconds));
 		timeText.setLayoutParams(timeTextParams);
 		timeText.setTextSize(28);
 		timeText.setId(TIME_ID_PREFIX + timerId);
 		timeText.setTextColor(Color.LTGRAY);
 		
-		tr = new TableRow(TaskTimerActivity.this);
+		tr = new TableRow(ProjectTimerActivity.this);
 		tr.addView(timeText);
 		innerTl.addView(tr);
 
-		tr = new TableRow(TaskTimerActivity.this);
+		tr = new TableRow(ProjectTimerActivity.this);
 		tr.addView(taskLabel);
 		innerTl.addView(tr);
 
 		
 
-		hrView = new View(TaskTimerActivity.this);
+		hrView = new View(ProjectTimerActivity.this);
 		hrView.setLayoutParams(hrParams);
 		hrView.setBackgroundColor(Color.GRAY);
 		hrView.getBackground().setAlpha(120);
 		//innerTl.addView(hrView);
 		
 		
-		mainTl = new TableLayout(TaskTimerActivity.this);
+		mainTl = new TableLayout(ProjectTimerActivity.this);
 		mainTl.setLayoutParams(mtlParams);
 		mainTl.setId(timerId); // set the layout id for reference later
 		mainTl.setPadding(0, 10, 0, 0);
@@ -350,7 +350,7 @@ public class TaskTimerActivity extends Activity {
 		scale = getResources().getDisplayMetrics().density;
 		pixels = (int) (65 * scale + 0.5f);
 
-		final ToggleButton startStopBtn = new ToggleButton(TaskTimerActivity.this);
+		final ToggleButton startStopBtn = new ToggleButton(ProjectTimerActivity.this);
 		startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
@@ -560,7 +560,7 @@ public class TaskTimerActivity extends Activity {
 		
 		
 		try {
-			sdcard = new File(Environment.getExternalStorageDirectory() + "/data/com/cooltofu/tasktimer/");
+			sdcard = new File(Environment.getExternalStorageDirectory() + "/data/com/cooltofu/projecttimer/");
 			sdcard.mkdirs();
 			
 			f = new File(sdcard, DATA_FILE_NAME);
@@ -606,7 +606,7 @@ public class TaskTimerActivity extends Activity {
 	}
 	
 	private void confirmDeleteAllTimers() {
-		alert = new AlertDialog.Builder(TaskTimerActivity.this);
+		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 		alert.setTitle("Delete all Timers?");
 	 	
 		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -664,7 +664,7 @@ public class TaskTimerActivity extends Activity {
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_TIMER) {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
-			alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 			alert.setTitle("Delete " + textView.getText().toString() + "?");
 		 	
 			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -700,10 +700,10 @@ public class TaskTimerActivity extends Activity {
 		} else if (menuItemTitle == CONTEXT_MENU_EDIT_LABEL) {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			
-			alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 			alert.setTitle(CONTEXT_MENU_EDIT_LABEL);
 
-			final EditText input = new EditText(TaskTimerActivity.this);
+			final EditText input = new EditText(ProjectTimerActivity.this);
 			input.setSingleLine(); // one line tall
 			input.setText(textView.getText().toString());
 			input.setSelection(input.getText().length());
@@ -737,10 +737,10 @@ public class TaskTimerActivity extends Activity {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
 			final int id = item.getItemId();
 			
-			alert = new AlertDialog.Builder(TaskTimerActivity.this);
+			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 			alert.setTitle("Note for " + textView.getText().toString());
 
-			final EditText input = new EditText(TaskTimerActivity.this);
+			final EditText input = new EditText(ProjectTimerActivity.this);
 			input.setGravity(Gravity.TOP);
 			input.setLines(5); // one line tall
 			
@@ -770,9 +770,9 @@ public class TaskTimerActivity extends Activity {
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							if (db.updateNote(id, input.getText().toString().trim()))
-								Toast.makeText(TaskTimerActivity.this, "Your note is saved.", Toast.LENGTH_SHORT).show();
+								Toast.makeText(ProjectTimerActivity.this, "Your note is saved.", Toast.LENGTH_SHORT).show();
 							else
-								Toast.makeText(TaskTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
+								Toast.makeText(ProjectTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
 							
 							return;
 						}

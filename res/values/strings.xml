@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <string name="app_name">Task Timer</string>
+    <string name="app_name">Project Timer</string>
     <string name="eula_title">End User Agreement</string>
     <string name="eula_accept">I Accept</string>
     <string name="eula_refuse">I Do Not Accept</string>
