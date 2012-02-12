@@ -47,7 +47,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+
+import com.cooltofu.R;
 import com.cooltofu.db.TimerDbAdapter;
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 public class ProjectTimerActivity extends Activity {
 	private final static int TIME_ID_PREFIX = 10000;
@@ -55,6 +60,7 @@ public class ProjectTimerActivity extends Activity {
 	private final static int START_STOP_ID_PREFIX = 30000;
 	private final static int EMAIL_TIMERS_MENU_ID = 40000;
 	private final static int DELETE_ALL_TIMERS_MENU_ID = 50000;
+	private final static int RESET_ALL_TIMERS_MENU_ID = 60000;
 	
 	private static final String TIME_FORMAT = "%02d:%02d:%02d";
 	final static String ALERT_NEW_TIMER_TITLE = "Add New Timer";
@@ -70,14 +76,16 @@ public class ProjectTimerActivity extends Activity {
 	static final String CONTEXT_MENU_EDIT_LABEL = "Edit Label";
 	static final String CONTEXT_MENU_EDIT_NOTE = "Edit Note";
 	static final String CONTEXT_MENU_DELETE_TIMER = "Delete Timer";
+	static final String CONTEXT_MENU_RESET_TIMER = "Reset Timer";
+	static final String CONTEXT_MENU_RESET_ALL_TIMERS = "Reset All Timers";
 	static final String CONTEXT_MENU_DELETE_ALL_TIMERS = "Delete All Timers";
 	static final String CONTEXT_MENU_EMAIL_TIMERS = "Email Timers";
 	
 	static final String nl = "\n";
 	static final String DATA_FILE_NAME = "timers.csv";
 	static final String EMAIL_TYPE = "text/csv";
-	static final String EMAIL_SUBJECT = "Project Time Data";
-	static final String EMAIL_BODY = "Data from the Project Timer app by CoolTofu.com";
+	static final String EMAIL_SUBJECT = "Trial Version: Project Time Data";
+	static final String EMAIL_BODY = "Data from the Project Timer app by CoolTofu.com. Please purchase the app if you find it useful. \r\r\n\n Thank you :) \r\n\r\nhttps://market.android.com/details?id=com.cooltofu.projecttimer";
 	static final String INTENT_CHOOSER_TITLE = "Send Mail";
 	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
 	final int PRESS_DELAY = 200; // delay on press event for time editing
@@ -135,7 +143,9 @@ public class ProjectTimerActivity extends Activity {
 	static File sdcard;
 	static FileWriter writer;
 	
+	static int timerCount = 0;
 	
+	private AdView adView;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -189,6 +199,8 @@ public class ProjectTimerActivity extends Activity {
 				createTaskTimer(cursor.getInt(0), cursor.getString(1), seconds, isTimerOn);
 				timerIds.add(timerId);
 				cursor.moveToNext();
+				
+				timerCount++;
 			}// while cursor
 		}// if cursor != null
 		
@@ -202,47 +214,67 @@ public class ProjectTimerActivity extends Activity {
 
 		newTimerBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				alert = new AlertDialog.Builder(ProjectTimerActivity.this);
-				alert.setTitle(ALERT_NEW_TIMER_TITLE);
-				alert.setMessage(ALERT_NEW_TIMER_MSG);
+				if (timerCount >= 5) {
+					// alert trial version
+					alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+					alert.setTitle("Trial Version");
+					alert.setMessage("Please purchase the app for unlimited timers.");
 					
-				final EditText input = new EditText(ProjectTimerActivity.this);
-				input.setSingleLine(); // one line tall
-				input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-				alert.setView(input);
-				
-				alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-					public void onCancel(DialogInterface arg0) {
-						return;
-					}
-				});
-				
-				alert.setPositiveButton(OK_BTN_STRING,
+					
+					alert.setPositiveButton(OK_BTN_STRING,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								final String label = input.getText().toString();
-								
-								// create db entry for new timer
-								timerId = (int) db.createTimer(label, 0, 0, false);
-								
-								if (timerId == -1) {
-									// db error
-									// TODO: handle error
-								}
-								
-								createTaskTimer(timerId, label, 0, false);
-								timerIds.add(new Integer(timerId));
-								
-							}
-						});
-
-				alert.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
 								return;
 							}
 						});
-				alert.show();
+					alert.show();
+				} else {
+				
+				
+					timerCount++;
+					
+					alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+					alert.setTitle(ALERT_NEW_TIMER_TITLE);
+					alert.setMessage(ALERT_NEW_TIMER_MSG);
+						
+					final EditText input = new EditText(ProjectTimerActivity.this);
+					input.setSingleLine(); // one line tall
+					input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+					alert.setView(input);
+					
+					alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+						public void onCancel(DialogInterface arg0) {
+							return;
+						}
+					});
+					
+					alert.setPositiveButton(OK_BTN_STRING,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									final String label = input.getText().toString();
+									
+									// create db entry for new timer
+									timerId = (int) db.createTimer(label, 0, 0, false);
+									
+									if (timerId == -1) {
+										// db error
+										// TODO: handle error
+									}
+									
+									createTaskTimer(timerId, label, 0, false);
+									timerIds.add(new Integer(timerId));
+									
+								}
+							});
+	
+					alert.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									return;
+								}
+							});
+					alert.show();
+				}
 			}
 		});
 
@@ -300,7 +332,23 @@ public class ProjectTimerActivity extends Activity {
     	
     	
     	
-    	
+    	// Create the adView
+        adView = new AdView(this, AdSize.BANNER, "a14edeef620bb3a");
+
+        
+        // Lookup your LinearLayout assuming itÍs been given
+        // the attribute android:id="@+id/mainLayout"
+        LinearLayout layout = (LinearLayout)findViewById(R.id.ads);
+
+        // Add the adView to it
+        layout.addView(adView);
+
+        AdRequest adRequest = new AdRequest();
+        
+
+        // Initiate a generic request to load it with an ad
+        adView.loadAd(adRequest);
+
 	}//onCreate
 
 	
@@ -480,7 +528,8 @@ public class ProjectTimerActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(1, EMAIL_TIMERS_MENU_ID, 0, "Email Timers");
-		menu.add(1, DELETE_ALL_TIMERS_MENU_ID, 1, "Delete All Timers");
+		menu.add(1, RESET_ALL_TIMERS_MENU_ID, 1, "Reset All Timers");
+		menu.add(1, DELETE_ALL_TIMERS_MENU_ID, 2, "Delete All Timers");
 		return true;
 	}
 	
@@ -492,12 +541,14 @@ public class ProjectTimerActivity extends Activity {
 			menu.add(0, (v.getId()), 0, CONTEXT_MENU_EDIT_TIME);
 			menu.add(0, (v.getId()), 1, CONTEXT_MENU_EDIT_LABEL);
 			menu.add(0, (v.getId()), 2, CONTEXT_MENU_EDIT_NOTE);
-			menu.add(0, v.getId(), 3, CONTEXT_MENU_DELETE_TIMER);
+			menu.add(0, (v.getId()), 3, CONTEXT_MENU_RESET_TIMER);
+			menu.add(0, v.getId(), 4, CONTEXT_MENU_DELETE_TIMER);
 		} else {
 			// options button
 			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
 			menu.add(1, 1, 0, CONTEXT_MENU_EMAIL_TIMERS);
-			menu.add(1, 2, 1, CONTEXT_MENU_DELETE_ALL_TIMERS);
+			menu.add(1, 2, 1, CONTEXT_MENU_RESET_ALL_TIMERS);
+			menu.add(1, 3, 2, CONTEXT_MENU_DELETE_ALL_TIMERS);
 		}
 	}
 	
@@ -605,6 +656,36 @@ public class ProjectTimerActivity extends Activity {
 		
 	}
 	
+	private void confirmResetAllTimers() {
+		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+		alert.setTitle("Reset all Timers?");
+	 	
+		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+			public void onCancel(DialogInterface arg0) {
+				
+				return;
+			}
+			
+		});
+		alert.setPositiveButton(OK_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						resetAllTimers();
+
+					}
+				});
+
+		alert.setNegativeButton(CANCEL_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog,int which) {
+						return;
+					}
+				});
+		alert.show();
+	}
+	
 	private void confirmDeleteAllTimers() {
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 		alert.setTitle("Delete all Timers?");
@@ -641,6 +722,9 @@ public class ProjectTimerActivity extends Activity {
 			case EMAIL_TIMERS_MENU_ID:
 				emailTimers();
 				return true;
+			case RESET_ALL_TIMERS_MENU_ID:
+				confirmResetAllTimers();
+				return true;	
 			case DELETE_ALL_TIMERS_MENU_ID:
 				confirmDeleteAllTimers();
 				return true;
@@ -657,9 +741,43 @@ public class ProjectTimerActivity extends Activity {
 		
 		if (menuItemTitle == CONTEXT_MENU_EMAIL_TIMERS) {
 			emailTimers();
+		} else if (menuItemTitle == CONTEXT_MENU_RESET_ALL_TIMERS) {
+			confirmResetAllTimers();
 			
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_ALL_TIMERS) {
 			confirmDeleteAllTimers();
+		} else if (menuItemTitle == CONTEXT_MENU_RESET_TIMER) {
+			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
+			
+			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+			alert.setTitle("Reset " + textView.getText().toString() + "?");
+		 	
+			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+				public void onCancel(DialogInterface arg0) {
+					return;
+				}
+			});
+			alert.setPositiveButton(OK_BTN_STRING,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							// get the innerTl view
+							//TableLayout tv = (TableLayout) findViewById(item.getItemId());
+							
+				        	// table layout found, which means a timer also exists; reset the time value
+				        	TextView timeValue = (TextView) findViewById(TIME_ID_PREFIX+item.getItemId());
+				        	timeValue.setText(formatTimeTextDisplay(0));
+						}
+					});
+
+			alert.setNegativeButton(CANCEL_BTN_STRING,
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,int which) {
+							return;
+						}
+					});
+			alert.show();
 			
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_TIMER) {
 			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
@@ -684,6 +802,7 @@ public class ProjectTimerActivity extends Activity {
 							db.deleteTimer(timerId);
 							
 							timerIds.remove(timerIds.indexOf(new Integer(timerId)));
+							timerCount--;
 						}
 					});
 
@@ -1160,8 +1279,8 @@ public class ProjectTimerActivity extends Activity {
     
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        
+    	adView.destroy();
+    	
         // The activity is about to be destroyed.
         timer.cancel();
         
@@ -1170,7 +1289,8 @@ public class ProjectTimerActivity extends Activity {
         
         if (db != null)
         	db.close();
-        
+     
+        super.onDestroy();
     }
     
     private void saveTimers() {
@@ -1298,7 +1418,34 @@ public class ProjectTimerActivity extends Activity {
     	return --num;
     }
     
-    
+    private void resetAllTimers() {
+		
+		int len = timerIds.size();
+		
+		if (len > 0) {
+			int id = 0;
+			TableLayout tv;
+			TextView timeValue;
+			
+			for (int i = 0; i < len; i++) {
+				
+				id = (Integer) timerIds.get(i);
+				
+				tv = (TableLayout) findViewById(id);
+	        	
+	        	if (tv == null) continue; // none found; continue to next iteration
+	        
+	        	
+	        	// table layout found, which means a timer also exists; reset the time value
+	        	timeValue = (TextView) findViewById(TIME_ID_PREFIX+id);
+	        	timeValue.setText(formatTimeTextDisplay(0));
+			}
+			
+			saveTimers();
+		}
+			
+		
+	}
 	
 	private void deleteAllTimers() {
 		
@@ -1315,6 +1462,7 @@ public class ProjectTimerActivity extends Activity {
 			db.deleteTimer(id);
 		}
 		timerIds.clear();	
+		timerCount = 0;
 	}
 	
 }
