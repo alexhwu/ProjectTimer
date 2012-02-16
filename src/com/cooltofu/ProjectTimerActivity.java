@@ -144,7 +144,7 @@ public class ProjectTimerActivity extends Activity {
 	static FileWriter writer;
 	
 	static int timerCount = 0;
-	
+	static int MAX_TIMER_COUNT = 0; // limit for trial version
 	private AdView adView;
 	
 	@Override
@@ -214,7 +214,7 @@ public class ProjectTimerActivity extends Activity {
 
 		newTimerBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if (timerCount >= 5) {
+				if (MAX_TIMER_COUNT > 0 && timerCount >= MAX_TIMER_COUNT) {
 					// alert trial version
 					alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 					alert.setTitle("Trial Version");
