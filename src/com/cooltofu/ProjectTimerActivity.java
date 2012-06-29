@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -47,8 +50,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-
-import com.cooltofu.R;
 import com.cooltofu.db.TimerDbAdapter;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
@@ -85,7 +86,7 @@ public class ProjectTimerActivity extends Activity {
 	static final String DATA_FILE_NAME = "timers.csv";
 	static final String EMAIL_TYPE = "text/csv";
 	static final String EMAIL_SUBJECT = "Trial Version: Project Time Data";
-	static final String EMAIL_BODY = "Data from the Project Timer app by CoolTofu.com. Please purchase the app if you find it useful. \r\r\n\n Thank you :) \r\n\r\nhttps://market.android.com/details?id=com.cooltofu.projecttimer";
+	static final String EMAIL_BODY = "Data from the Project Timer app by CoolTofu.com.";
 	static final String INTENT_CHOOSER_TITLE = "Send Mail";
 	final int repeatSpeed = 120; // how fast to repeat the action for increment/decrement time
 	final int PRESS_DELAY = 200; // delay on press event for time editing
@@ -559,8 +560,11 @@ public class ProjectTimerActivity extends Activity {
 	private void emailTimers() {
 		//
 		// create the csv file
-		headerBuf = new StringBuffer("Project,Time,Note");
+		headerBuf = new StringBuffer("Date,Project,Time,Note");
 		rowBuf = new StringBuffer();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		Date date = new Date();
+		String now = dateFormat.format(date);
 		
 		int len = timerIds.size();
     	
@@ -596,7 +600,7 @@ public class ProjectTimerActivity extends Activity {
 	        	labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX+id);
 	        	label = labelValue.getText().toString();
 	        	
-        
+	        	rowBuf.append("\""+ escapeQuote(now) +"\",");
         		rowBuf.append("\""+ escapeQuote(label) +"\",");
         		rowBuf.append("\""+ timeValue.getText().toString() + "\",");
         		rowBuf.append("\""+ escapeQuote(note) + "\"");
