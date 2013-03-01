@@ -51,9 +51,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cooltofu.db.TimerDbAdapter;
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
 
 public class ProjectTimerActivity extends Activity {
 	private final static int TIME_ID_PREFIX = 10000;
@@ -146,7 +143,7 @@ public class ProjectTimerActivity extends Activity {
 	
 	static int timerCount = 0;
 	static int MAX_TIMER_COUNT = 0; // limit for trial version
-	private AdView adView;
+	//private AdView adView;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -334,21 +331,21 @@ public class ProjectTimerActivity extends Activity {
     	
     	
     	// Create the adView
-        adView = new AdView(this, AdSize.BANNER, "a14edeef620bb3a");
+        //adView = new AdView(this, AdSize.BANNER, "a14edeef620bb3a");
 
         
         // Lookup your LinearLayout assuming itÍs been given
         // the attribute android:id="@+id/mainLayout"
-        LinearLayout layout = (LinearLayout)findViewById(R.id.ads);
+        //LinearLayout layout = (LinearLayout)findViewById(R.id.ads);
 
         // Add the adView to it
-        layout.addView(adView);
+        //layout.addView(adView);
 
-        AdRequest adRequest = new AdRequest();
+        //AdRequest adRequest = new AdRequest();
         
 
         // Initiate a generic request to load it with an ad
-        adView.loadAd(adRequest);
+        //adView.loadAd(adRequest);
 
 	}//onCreate
 
@@ -1283,7 +1280,7 @@ public class ProjectTimerActivity extends Activity {
     
     @Override
     protected void onDestroy() {
-    	adView.destroy();
+    	//adView.destroy();
     	
         // The activity is about to be destroyed.
         timer.cancel();
