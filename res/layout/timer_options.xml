@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android">
+                                    <TableLayout
+                                        android:id="@+id/timerOptions"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal"
+                                        android:stretchColumns="0" >
+                                        <TableRow>
+                                            <Button
+                                                android:id="@+id/undoButton"
+                                                android:layout_width="55dp"
+                                                android:layout_height="45dp"
+                                                android:text="Undo"
+                                                android:textColor="@color/button_text_color"
+                                                android:textSize="12dp"
+                                                android:visibility="invisible" />
+                                            <Button
+                                                android:id="@+id/editButton"
+                                                android:layout_width="55dp"
+                                                android:layout_height="45dp"
+                                                android:text="Edit"
+                                                android:textColor="@color/button_text_color"
+                                                android:textSize="12dp" />
+                                            <Button
+                                                android:id="@+id/resetButton"
+                                                android:layout_width="55dp"
+                                                android:layout_height="45dp"
+                                                android:text="Reset"
+                                                android:textColor="@color/button_text_color"
+                                                android:textSize="12dp" />
+                                            <Button
+                                                android:id="@+id/alarmButton"
+                                                android:layout_width="55dp"
+                                                android:layout_height="45dp"
+                                                android:text="Alarm"
+                                                android:textColor="@color/button_text_color"
+                                                android:textSize="12dp" />
+                                            <Button
+                                                android:id="@+id/noteButton"
+                                                android:layout_width="55dp"
+                                                android:layout_height="45dp"
+                                                android:text="Note"
+                                                android:textColor="@color/button_text_color"
+                                                android:textSize="12dp" />
+                                        </TableRow>
+                                    </TableLayout>
+                                </TableRow>

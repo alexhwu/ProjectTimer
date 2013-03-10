@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;

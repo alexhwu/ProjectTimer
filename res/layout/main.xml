@@ -2,181 +2,128 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-	    <Button
-	        android:id="@+id/newTimerBtn"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="Add New Timer"
-	        android:gravity="center"
-	        android:paddingRight="85dp"
-	        android:background="@drawable/custom_button"
-	        android:textColor="@color/text_color"
-	        android:height="55dp"
-	        android:drawableLeft="@drawable/add"
-	        android:paddingLeft="19dp"
-            android:drawablePadding="15dp" />
-	    <View
-	        android:id="@+id/verticalLine"
-		    android:layout_width="1dp"
-		    android:layout_height="55dp"
-		    android:background="@color/btn_end"
-		    android:layout_toRightOf="@+id/newTimerBtn" />
-	    <Button
-	        android:id="@+id/moreBtn"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="More Info"
-	        android:background="@drawable/custom_button"
-	        android:textColor="@color/text_color"
-	        android:height="55dp"
-	        android:layout_alignParentRight="true"
-	        android:layout_toRightOf="@+id/verticalLine" />
-	</RelativeLayout>
-	<View
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="#696758" />
-    
-    
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:id="@+id/relativeLayout">
-	    <LinearLayout 
-            android:layout_width="fill_parent" 
+    android:orientation="vertical" >
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+            android:id="@+id/newTimerBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_button"
+            android:drawableLeft="@drawable/add"
+            android:drawablePadding="15dp"
+            android:gravity="center"
+            android:height="55dp"
+            android:paddingLeft="19dp"
+            android:paddingRight="85dp"
+            android:text="Add New Timer"
+            android:textColor="@color/text_color" />
+        <View
+            android:id="@+id/verticalLine"
+            android:layout_width="1dp"
+            android:layout_height="55dp"
+            android:layout_toRightOf="@+id/newTimerBtn"
+            android:background="@color/btn_end" />
+        <Button
+            android:id="@+id/moreBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/verticalLine"
+            android:background="@drawable/custom_button"
+            android:height="55dp"
+            android:text="More Info"
+            android:textColor="@color/text_color" />
+    </RelativeLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#696758" />
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/relativeLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_above="@+id/ads" >
+            android:layout_above="@+id/footer" >
             <ScrollView
                 android:id="@+id/scrollView1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
-                
                 <LinearLayout
-                android:id="@+id/linearLayout"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
-                    <TableLayout
-                    android:id="@+id/tableLayout"
+                    android:id="@+id/linearLayout"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    >
-                    
-                        <TableRow>
-                                            
-                            <ToggleButton
-                                android:id="@+id/button1"
-                                android:layout_width="65dp"
-                                android:layout_height="65dp"
-                                android:textSize="12dp"
-                                android:textColor="@color/text_color"
-                                android:text="Start" />
-                            
-                                <TableLayout
-                                android:id="@+id/tableLayout2"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                android:stretchColumns="0"
-                                android:orientation="vertical">
-                                
-                                    <TableRow>
-                                        <TextView
-                                            android:id="@+id/timeText"
-                                            android:layout_width="fill_parent"
-                                            android:layout_height="wrap_content"
-                                            android:textSize="28dp"
-                                            android:layout_marginLeft="15dp"
-                                            android:text="00:00:00" />
-                                    </TableRow>
-                                    <TableRow>
-                                        <TextView
-                                            android:id="@+id/taskLabel"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginLeft="15dp"
-                                            android:layout_marginRight="8dp"
-                                            android:textSize="18dp"
-                                            android:ellipsize="start"
-                                            android:autoText="true"
-                                            android:text="" />
-                                    </TableRow>
-                                </TableLayout>
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical" >
+                    <TableLayout
+                        android:id="@+id/tableLayout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible" >
                         
-                     </TableRow>
-                 </TableLayout>
-                 </LinearLayout>
-                 
+                    </TableLayout>
+                </LinearLayout>
             </ScrollView>
         </LinearLayout>
-        <LinearLayout 
-            android:layout_width="fill_parent" android:id="@+id/ads"
+        <LinearLayout
+            android:id="@+id/footer"
+            android:layout_width="fill_parent"
             android:layout_height="50dip"
-            android:orientation="vertical"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical" >
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:background="#696758" />
-            
-            <LinearLayout 
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:orientation="horizontal">
-                
-                <Button 
+                android:orientation="horizontal" >
+                <Button
                     android:id="@+id/optionBtn"
                     android:layout_width="wrap_content"
+                    android:layout_height="50dp"
                     android:background="@drawable/custom_button"
-                    android:textColor="@color/text_color" 
-                    android:layout_height="50dp" 
                     android:gravity="center"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="Options"/>
-                
+                    android:text="Options"
+                    android:textColor="@color/text_color" />
                 <View
                     android:layout_width="1dp"
                     android:layout_height="55dp"
                     android:background="#696758" />
-                        
-                    <TableLayout
-                          android:id="@+id/sumTableLayout"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_gravity="center"
-                          android:orientation="vertical">
-                          
-                          <TableRow>
-                              <TextView
-                                  android:id="@+id/sumText"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:textSize="28dp"
-                                  android:layout_marginLeft="15dp"
-                                  android:text="00:00:00" />
-                              <TextView
-                                  android:id="@+id/sumLabel"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:textSize="15dp"
-                                  android:layout_marginLeft="15dp"
-                                  android:text="Total Time" />
-                          </TableRow>
-                  </TableLayout>
-                
+                <TableLayout
+                    android:id="@+id/sumTableLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical" >
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/sumText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="15dp"
+                            android:text="00:00:00"
+                            android:textSize="28dp" />
+                        <TextView
+                            android:id="@+id/sumLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="15dp"
+                            android:text="Total Time"
+                            android:textSize="15dp" />
+                    </TableRow>
+                </TableLayout>
             </LinearLayout>
-        </LinearLayout>    
-	    
-	        
-	</RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>

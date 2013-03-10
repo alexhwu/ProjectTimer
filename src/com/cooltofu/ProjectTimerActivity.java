@@ -103,10 +103,12 @@ public class ProjectTimerActivity extends Activity {
 	static LayoutParams timeTextParams;
 	static LayoutParams taskLabelParams;
 	static LayoutParams llParams;
+	static LayoutParams timerOptionsParams;
 	static TableLayout.LayoutParams tableRowParams;
 
 	static TableLayout mainTl;
 	static TableLayout innerTl;
+	static TableLayout timerOptionsLayout;
 	static TableRow tr;
 	static LinearLayout ll;
 	static RelativeLayout sv;
@@ -150,14 +152,6 @@ public class ProjectTimerActivity extends Activity {
 		Eula.show(this);
 
 		setContentView(R.layout.main);
-
-		startStopBtnLayoutParams = ((Button) findViewById(R.id.button1)).getLayoutParams();
-		timeTextParams = ((TextView) findViewById(R.id.timeText)).getLayoutParams();
-		taskLabelParams = ((TextView) findViewById(R.id.taskLabel)).getLayoutParams();
-		llParams = ((LinearLayout) findViewById(R.id.linearLayout)).getLayoutParams();
-		mtlParams = ((TableLayout) findViewById(R.id.tableLayout)).getLayoutParams();
-		itlParams = ((TableLayout) findViewById(R.id.tableLayout2)).getLayoutParams();
-		ll = (LinearLayout) findViewById(R.id.linearLayout);
 
 		// get timers from db
 		db = new TimerDbAdapter(this);
@@ -208,50 +202,20 @@ public class ProjectTimerActivity extends Activity {
 
 		newTimerBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-
 				timerCount++;
 
-				alert = new AlertDialog.Builder(ProjectTimerActivity.this);
-				alert.setTitle(ALERT_NEW_TIMER_TITLE);
-				alert.setMessage(ALERT_NEW_TIMER_MSG);
+				final String label = "Timer Label";
 
-				final EditText input = new EditText(ProjectTimerActivity.this);
-				input.setSingleLine(); // one line tall
-				input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-				alert.setView(input);
+				// create db entry for new timer
+				timerId = (int) db.createTimer(label, 0, 0, false);
 
-				alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-					public void onCancel(DialogInterface arg0) {
-						return;
-					}
-				});
+				if (timerId == -1) {
+					// db error
+					// TODO: handle error
+				}
 
-				alert.setPositiveButton(OK_BTN_STRING,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								final String label = input.getText().toString();
-
-								// create db entry for new timer
-								timerId = (int) db.createTimer(label, 0, 0, false);
-
-								if (timerId == -1) {
-									// db error
-									// TODO: handle error
-								}
-
-								createTaskTimer(timerId, label, 0, false);
-								timerIds.add(new Integer(timerId));
-
-							}
-						});
-
-				alert.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								return;
-							}
-						});
-				alert.show();
+				createTaskTimer(timerId, label, 0, false);
+				timerIds.add(Integer.valueOf(timerId));
 			}
 		});
 
@@ -299,48 +263,25 @@ public class ProjectTimerActivity extends Activity {
 
 	}// onCreate
 
+	public void handleTimerClick(View v) {
+		Toast.makeText(v.getContext(), "Test click", Toast.LENGTH_SHORT).show();
+	}
+
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
+		mainTl = (TableLayout) findViewById(R.id.tableLayout);
+		View child = getLayoutInflater().inflate(R.layout.timer, null);
+		child.setId(timerId);
+		child.setOnLongClickListener(new View.OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				// openContextMenu(v);
+				// TODO: long click enables drap and drop reordering
+				Toast.makeText(v.getContext(), "Long press", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+		});
 
-		innerTl = new TableLayout(ProjectTimerActivity.this);
-		innerTl.setLayoutParams(itlParams);
-		String trimmedLabel = (label.trim().equals("")) ? " " : label.trim();
-		final TextView taskLabel = new TextView(innerTl.getContext());
-		taskLabel.setText(trimmedLabel);
-		taskLabel.setLayoutParams(taskLabelParams);
-		taskLabel.setTextSize(18);
-		taskLabel.setId(TASK_LABEL_ID_PREFIX + timerId);
-		taskLabel.setTextColor(Color.LTGRAY);
-
-		final TextView timeText = new TextView(ProjectTimerActivity.this);
-		timeText.setText(formatTimeTextDisplay(seconds));
-		timeText.setLayoutParams(timeTextParams);
-		timeText.setTextSize(28);
-		timeText.setId(TIME_ID_PREFIX + timerId);
-		timeText.setTextColor(Color.LTGRAY);
-
-		tr = new TableRow(ProjectTimerActivity.this);
-		tr.addView(timeText);
-		innerTl.addView(tr);
-
-		tr = new TableRow(ProjectTimerActivity.this);
-		tr.addView(taskLabel);
-		innerTl.addView(tr);
-
-		hrView = new View(ProjectTimerActivity.this);
-		hrView.setLayoutParams(hrParams);
-		hrView.setBackgroundColor(Color.GRAY);
-		hrView.getBackground().setAlpha(120);
-
-		mainTl = new TableLayout(ProjectTimerActivity.this);
-		mainTl.setLayoutParams(mtlParams);
-		mainTl.setId(timerId); // set the layout id for reference later
-		mainTl.setPadding(0, 10, 0, 0);
-		mainTl.setTag(TIMER_TAG);
-
-		scale = getResources().getDisplayMetrics().density;
-		pixels = (int) (65 * scale + 0.5f);
-
-		final ToggleButton startStopBtn = new ToggleButton(ProjectTimerActivity.this);
+		final TextView timeText = (TextView) child.findViewById(R.id.timeText);
+		final ToggleButton startStopBtn = (ToggleButton) child.findViewById(R.id.button1);
 		startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
@@ -349,7 +290,6 @@ public class ProjectTimerActivity extends Activity {
 		startStopBtn.setBackgroundColor(Color.BLACK);
 		startStopBtn.setTextColor(getResources().getColor(R.color.text_color));
 		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
-
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
 			TimerTask timerTask;
@@ -398,61 +338,7 @@ public class ProjectTimerActivity extends Activity {
 			startStopBtn.performClick();
 		}
 
-		tr = new TableRow(mainTl.getContext());
-		tr.addView(startStopBtn);
-		tr.addView(innerTl);
-
-		tableRowParams = new TableLayout.LayoutParams(
-				TableLayout.LayoutParams.FILL_PARENT,
-				TableLayout.LayoutParams.FILL_PARENT);
-		tableRowParams.setMargins(0, 2, 0, 2);
-		tr.setLayoutParams(tableRowParams);
-
-		mainTl.addView(tr);
-
-		// add timer and task label to inner table
-		ll.addView(mainTl);
-
-		mainTl.addView(hrView);
-
-		innerTl.setOnTouchListener(new View.OnTouchListener() {
-
-			public boolean onTouch(View v, MotionEvent evt) {
-
-				switch (evt.getAction()) {
-
-				case MotionEvent.ACTION_DOWN:
-					v.setBackgroundColor(Color.WHITE);
-					taskLabel.setTextColor(Color.DKGRAY);
-					timeText.setTextColor(Color.DKGRAY);
-					break;
-
-				case MotionEvent.ACTION_UP:
-					v.setBackgroundColor(Color.BLACK);
-					taskLabel.setTextColor(Color.LTGRAY);
-					timeText.setTextColor(Color.LTGRAY);
-					break;
-
-				case MotionEvent.ACTION_CANCEL:
-					v.setBackgroundColor(Color.BLACK);
-					taskLabel.setTextColor(Color.LTGRAY);
-					timeText.setTextColor(Color.LTGRAY);
-					break;
-				}
-
-				return false;
-			}
-		});
-
-		innerTl.setOnLongClickListener(new View.OnLongClickListener() {
-			public boolean onLongClick(View v) {
-				openContextMenu(v);
-				return true;
-			}
-		});
-
-		// set long press event
-		registerForContextMenu(mainTl);
+		mainTl.addView(child);
 
 	}
 
@@ -510,9 +396,9 @@ public class ProjectTimerActivity extends Activity {
 
 				id = (Integer) timerIds.get(i);
 
-				TableLayout tv = (TableLayout) findViewById(id);
+				tr = (TableRow) findViewById(id);
 
-				if (tv == null)
+				if (tr == null)
 					continue; // none found; continue to next iteration
 
 				cursor = db.getNote(id);
@@ -523,10 +409,10 @@ public class ProjectTimerActivity extends Activity {
 
 				// table layout found, which means a timer also exists; save the
 				// time value
-				timeValue = (TextView) findViewById(TIME_ID_PREFIX + id);
+				timeValue = (TextView) tr.findViewById(R.id.timeText);
 
 				// save the timer label
-				labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX + id);
+				labelValue = (TextView) tr.findViewById(R.id.taskLabel);
 				label = labelValue.getText().toString();
 
 				rowBuf.append("\"" + escapeQuote(now) + "\",");
@@ -721,7 +607,7 @@ public class ProjectTimerActivity extends Activity {
 
 							db.deleteTimer(timerId);
 
-							timerIds.remove(timerIds.indexOf(new Integer(timerId)));
+							timerIds.remove(timerIds.indexOf(Integer.valueOf(timerId)));
 							timerCount--;
 						}
 					});
@@ -1133,7 +1019,6 @@ public class ProjectTimerActivity extends Activity {
 		totalTimerTask = new TimerTask() {
 			int seconds = 0;
 			int len = 0;
-			TableLayout tv;
 			TextView timeValue;
 
 			public void run() {
@@ -1145,15 +1030,15 @@ public class ProjectTimerActivity extends Activity {
 						for (int i = 0; i < len; i++) {
 							// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 							int id = (Integer) timerIds.get(i);
-							tv = (TableLayout) findViewById(id);
+							tr = (TableRow) findViewById(id);
 
-							if (tv == null)
+							if (tr == null)
 								continue; // none found; continue to next
 											// iteration
 
 							// table layout found, which means a timer also
 							// exists; save the time value
-							timeValue = (TextView) findViewById(TIME_ID_PREFIX + id);
+							timeValue = (TextView) tr.findViewById(R.id.timeText);
 							seconds += convertToSeconds(timeValue.getText().toString());
 						}
 
@@ -1200,17 +1085,14 @@ public class ProjectTimerActivity extends Activity {
 	}
 
 	private void saveTimers() {
-
 		int len = timerIds.size();
-
-		TableLayout tv;
 		int id = 0;
 		TextView timeValue;
 		int seconds = 0;
 		TextView labelValue;
 		String label;
 		ToggleButton btn;
-		boolean isOn;
+		boolean isOn = false;
 		long timestamp = 0;
 
 		Calendar cal = Calendar.getInstance();
@@ -1219,33 +1101,32 @@ public class ProjectTimerActivity extends Activity {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 			id = (Integer) timerIds.get(i);
 
-			tv = (TableLayout) findViewById(id);
+			tr = (TableRow) findViewById(id);
 
-			if (tv == null)
+			if (tr == null)
 				continue; // none found; continue to next iteration
 
 			// table layout found, which means a timer also exists; save the
 			// time value
-			timeValue = (TextView) findViewById(TIME_ID_PREFIX + id);
+			timeValue = (TextView) tr.findViewById(R.id.timeText);
 			seconds = convertToSeconds(timeValue.getText().toString());
 
 			// save the timer label
-			labelValue = (TextView) findViewById(TASK_LABEL_ID_PREFIX + id);
+			labelValue = (TextView) tr.findViewById(R.id.taskLabel);
 			label = labelValue.getText().toString();
 
 			// save the state of the timer; running or not
-			btn = (ToggleButton) findViewById(START_STOP_ID_PREFIX + id);
-			isOn = btn.isChecked();
+			btn = (ToggleButton) tr.findViewById(R.id.button1);
+
+			if (btn != null)
+				isOn = btn.isChecked();
 
 			// save the timestamp; used for timers that are active when activity
 			// is destroyed
-
 			timestamp = cal.getTimeInMillis();
-
 			db.updateTimer(id, label, seconds, timestamp, isOn);
 
 		}
-
 	}
 
 	private int convertToSeconds(String t) {
@@ -1323,21 +1204,19 @@ public class ProjectTimerActivity extends Activity {
 
 		if (len > 0) {
 			int id = 0;
-			TableLayout tv;
 			TextView timeValue;
 
 			for (int i = 0; i < len; i++) {
 
 				id = (Integer) timerIds.get(i);
+				tr = (TableRow) findViewById(id);
 
-				tv = (TableLayout) findViewById(id);
-
-				if (tv == null)
+				if (tr == null)
 					continue; // none found; continue to next iteration
 
 				// table layout found, which means a timer also exists; reset
 				// the time value
-				timeValue = (TextView) findViewById(TIME_ID_PREFIX + id);
+				timeValue = (TextView) tr.findViewById(R.id.timeText);
 				timeValue.setText(formatTimeTextDisplay(0));
 			}
 
@@ -1350,13 +1229,12 @@ public class ProjectTimerActivity extends Activity {
 
 		int len = timerIds.size();
 		int id = 0;
-		TableLayout tv;
 
 		for (int i = 0; i < len; i++) {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 			id = (Integer) timerIds.get(i);
-			tv = (TableLayout) findViewById(id);
-			ll.removeView(tv);
+			tr = (TableRow) findViewById(id);
+			mainTl.removeView(tr);
 
 			db.deleteTimer(id);
 		}
