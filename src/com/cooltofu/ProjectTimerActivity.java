@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -264,7 +265,20 @@ public class ProjectTimerActivity extends Activity {
 	}// onCreate
 
 	public void handleTimerClick(View v) {
-		Toast.makeText(v.getContext(), "Test click", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(v.getContext(), "Test click", Toast.LENGTH_SHORT).show();
+		View timerOption = v.findViewById(R.id.timerOptions);
+		
+		if (timerOption == null) {
+			View child = getLayoutInflater().inflate(R.layout.timer_options, null);
+			((ViewGroup) v.findViewById(R.id.tableLayout2)).addView(child);
+		} else {
+			if (timerOption.getVisibility() == View.GONE) {
+				timerOption.setVisibility(View.VISIBLE);
+			}
+			else {
+				timerOption.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
