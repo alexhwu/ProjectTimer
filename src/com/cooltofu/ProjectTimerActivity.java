@@ -352,13 +352,13 @@ public class ProjectTimerActivity extends Activity {
 			startStopBtn.performClick();
 		}
 
-		mainTl.addView(child);
+		mainTl.addView(child,0); // add to top of table
 		
 		// add horizontal line
 		View lineView = new View(this);
 		lineView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
 		lineView.setBackgroundColor(Color.rgb(51,51,51));
-		mainTl.addView(lineView);
+		mainTl.addView(lineView,1);
 
 	}
 
