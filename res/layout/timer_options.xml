@@ -17,10 +17,10 @@
                 android:textSize="12dp"
                 android:visibility="gone" />
             <Button
-                android:id="@+id/editButton"
+                android:id="@+id/editTimeButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Edit"
+                android:text="Time"
                 android:textColor="@color/button_text_color"
                 android:textSize="12dp"
                 android:onClick="editTime" />
@@ -32,12 +32,13 @@
                 android:textColor="@color/button_text_color"
                 android:textSize="12dp" />
             <Button
-                android:id="@+id/alarmButton"
+                android:id="@+id/editLabelButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Alarm"
+                android:text="Label"
                 android:textColor="@color/button_text_color"
-                android:textSize="12dp" />
+                android:textSize="12dp" 
+                android:onClick="editLabel" />
             <Button
                 android:id="@+id/noteButton"
                 android:layout_width="55dp"
