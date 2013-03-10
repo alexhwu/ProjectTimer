@@ -353,9 +353,305 @@ public class ProjectTimerActivity extends Activity {
 		}
 
 		mainTl.addView(child);
+		
+		// add horizontal line
+		View lineView = new View(this);
+		lineView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+		lineView.setBackgroundColor(Color.rgb(51,51,51));
+		mainTl.addView(lineView);
 
 	}
 
+	public void editTime(View v) {
+		// TODO: find a better way to find outer table layout
+		View parent = (View) v.getParent().getParent().getParent().getParent();
+		
+		final TextView timeText = (TextView) parent.findViewById(R.id.timeText);
+		final TextView taskLabel = (TextView) parent.findViewById(R.id.taskLabel);
+		final ToggleButton startStopBtn = (ToggleButton) parent.findViewById(R.id.button1);
+		final boolean isOn = false;
+		
+		if (startStopBtn != null)
+			startStopBtn.isChecked();
+
+		// if timer is running, stop until finished editing time
+		if (isOn)
+			startStopBtn.performClick();
+
+		String[] timeArray = timeText.getText().toString().split(":");
+
+		final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final View editTimeView = inflater.inflate(R.layout.edit_time, null);
+
+		final TextView hourText = (TextView) editTimeView.findViewById(R.id.editHourText);
+		final String hour = timeArray[0];
+		hourText.setText(hour);
+
+		TextView minuteText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+		String minute = timeArray[1];
+		minuteText.setText(minute);
+
+		TextView secondText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+		String second = timeArray[2];
+		secondText.setText(second);
+
+		final Dialog dialog = new Dialog(this);
+		dialog.setTitle("Edit Time for " + taskLabel.getText().toString());
+		dialog.setContentView(editTimeView);
+		dialog.show();
+
+		final Runnable onPressedIncrementHour = new Runnable() {
+			public void run() {
+
+				final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+				int h = Integer.parseInt(hText.getText().toString());
+				hText.setText(formatDoubleDigit(incrementHour(h)));
+				handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
+			}
+		};
+		final Runnable onPressedDecrementHour = new Runnable() {
+			public void run() {
+
+				final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+				int h = Integer.parseInt(hText.getText().toString());
+				hText.setText(formatDoubleDigit(decrementHour(h)));
+				handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
+			}
+		};
+
+		final Runnable onPressedIncrementMinute = new Runnable() {
+			public void run() {
+
+				final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+				int m = Integer.parseInt(mText.getText().toString());
+				mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
+				handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
+			}
+		};
+		final Runnable onPressedDecrementMinute = new Runnable() {
+			public void run() {
+
+				final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+				int m = Integer.parseInt(mText.getText().toString());
+				mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
+				handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
+			}
+		};
+
+		final Runnable onPressedIncrementSecond = new Runnable() {
+			public void run() {
+				final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+				int s = Integer.parseInt(sText.getText().toString());
+				sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
+				handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
+			}
+		};
+		final Runnable onPressedDecrementSecond = new Runnable() {
+			public void run() {
+				final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+				int s = Integer.parseInt(sText.getText().toString());
+				sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
+				handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
+			}
+		};
+		// ------------------------------------------------------------------------
+		// set the click function for the increment buttons
+		Button hourUpBtn = (Button) editTimeView.findViewById(R.id.editHourUpBtn);
+		hourUpBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+
+				final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+				int h = Integer.parseInt(hText.getText().toString());
+				hText.setText(formatDoubleDigit(incrementHour(h)));
+			}
+		});
+
+		hourUpBtn.setOnTouchListener(new View.OnTouchListener() {
+
+			public final boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					handler.removeCallbacks(onPressedIncrementHour);
+					handler.postAtTime(onPressedIncrementHour, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
+					break;
+				case MotionEvent.ACTION_UP:
+					handler.removeCallbacks(onPressedIncrementHour);
+					break;
+				}
+				return false;
+			}
+
+		});
+
+		Button minuteUpBtn = (Button) editTimeView.findViewById(R.id.editMinuteUpBtn);
+		minuteUpBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+				int m = Integer.parseInt(mText.getText().toString());
+				mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
+			}
+		});
+		minuteUpBtn.setOnTouchListener(new View.OnTouchListener() {
+
+			public final boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					handler.removeCallbacks(onPressedIncrementMinute);
+					handler.postAtTime(onPressedIncrementMinute, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
+					break;
+				case MotionEvent.ACTION_UP:
+					handler.removeCallbacks(onPressedIncrementMinute);
+					break;
+				}
+				return false;
+			}
+
+		});
+
+		Button secondUpBtn = (Button) editTimeView.findViewById(R.id.editSecondUpBtn);
+		secondUpBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+				int s = Integer.parseInt(sText.getText().toString());
+				sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
+			}
+		});
+		secondUpBtn.setOnTouchListener(new View.OnTouchListener() {
+
+			public final boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					handler.removeCallbacks(onPressedIncrementSecond);
+					handler.postAtTime(onPressedIncrementSecond, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
+					break;
+				case MotionEvent.ACTION_UP:
+					handler.removeCallbacks(onPressedIncrementSecond);
+					break;
+				}
+				return false;
+			}
+
+		});
+
+		// ------------------------------------------------------------------------
+		// set the click function for the decrement buttons
+		Button hourDownBtn = (Button) editTimeView.findViewById(R.id.editHourDownBtn);
+		hourDownBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+				int h = Integer.parseInt(hText.getText().toString());
+				hText.setText(formatDoubleDigit(decrementHour(h)));
+			}
+		});
+		hourDownBtn.setOnTouchListener(new View.OnTouchListener() {
+
+			public final boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					handler.removeCallbacks(onPressedDecrementHour);
+					handler.postAtTime(onPressedDecrementHour, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
+					break;
+				case MotionEvent.ACTION_UP:
+					handler.removeCallbacks(onPressedDecrementHour);
+					break;
+				}
+				return false;
+			}
+
+		});
+
+		Button minuteDownBtn = (Button) editTimeView.findViewById(R.id.editMinuteDownBtn);
+		minuteDownBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+				int m = Integer.parseInt(mText.getText().toString());
+				mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
+			}
+		});
+		minuteDownBtn.setOnTouchListener(new View.OnTouchListener() {
+
+			public final boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					handler.removeCallbacks(onPressedDecrementMinute);
+					handler.postAtTime(onPressedDecrementMinute, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
+					break;
+				case MotionEvent.ACTION_UP:
+					handler.removeCallbacks(onPressedDecrementMinute);
+					break;
+				}
+				return false;
+			}
+		});
+
+		Button secondDownBtn = (Button) editTimeView.findViewById(R.id.editSecondDownBtn);
+		secondDownBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+				int s = Integer.parseInt(sText.getText().toString());
+				sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
+			}
+		});
+		secondDownBtn.setOnTouchListener(new View.OnTouchListener() {
+
+			public final boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					handler.removeCallbacks(onPressedDecrementSecond);
+					handler.postAtTime(onPressedDecrementSecond, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
+					break;
+				case MotionEvent.ACTION_UP:
+					handler.removeCallbacks(onPressedDecrementSecond);
+					break;
+				}
+				return false;
+			}
+
+		});
+
+		Button editTimeOkBtn = (Button) editTimeView.findViewById(R.id.editTimeOkBtn);
+		editTimeOkBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+
+				final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
+				int h = Integer.parseInt(hText.getText().toString());
+
+				final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
+				int m = Integer.parseInt(mText.getText().toString());
+
+				final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
+				int s = Integer.parseInt(sText.getText().toString());
+
+				timeText.setText(formatDoubleDigit(h) + ":" + formatDoubleDigit(m) + ":" + formatDoubleDigit(s));
+
+				// restart the timer
+				if (isOn)
+					startStopBtn.performClick();
+
+				dialog.dismiss();
+
+			}
+		});
+
+		Button editTimeCancelBtn = (Button) editTimeView.findViewById(R.id.editTimeCancelBtn);
+		editTimeCancelBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// restart the timer
+				if (isOn)
+					startStopBtn.performClick();
+
+				dialog.dismiss();
+
+			}
+		});
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(1, EMAIL_TIMERS_MENU_ID, 0, "Email Timers");

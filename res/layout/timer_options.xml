@@ -22,7 +22,8 @@
                 android:layout_height="45dp"
                 android:text="Edit"
                 android:textColor="@color/button_text_color"
-                android:textSize="12dp" />
+                android:textSize="12dp"
+                android:onClick="editTime" />
             <Button
                 android:id="@+id/resetButton"
                 android:layout_width="55dp"
