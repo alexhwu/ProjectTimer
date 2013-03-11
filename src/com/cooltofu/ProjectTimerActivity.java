@@ -401,6 +401,64 @@ public class ProjectTimerActivity extends Activity {
 		alert.show();
 	}
 
+	public void editNote(View v) {
+		// TODO: find a better way to find outer table layout
+		View parent = (View) v.getParent().getParent().getParent().getParent();
+				
+		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
+		final int id = ((View) parent.getParent()).getId();
+
+		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+		alert.setTitle("Note for " + textView.getText().toString());
+
+		final EditText input = new EditText(ProjectTimerActivity.this);
+		input.setGravity(Gravity.TOP);
+		input.setLines(5); // one line tall
+
+		// get the note from the DB if available
+		cursor = db.getNote(id);
+		startManagingCursor(cursor);
+		String note = "";
+
+		if (cursor != null) {
+			note = cursor.getString(0);
+			input.setText(note);
+		}
+
+		input.setSelection(input.getText().length());
+		alert.setView(input);
+
+		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+			public void onCancel(DialogInterface arg0) {
+				return;
+			}
+
+		});
+
+		alert.setPositiveButton(SAVE_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if (db.updateNote(id, input.getText().toString().trim())) {
+							//Toast.makeText(ProjectTimerActivity.this, "Your note is saved.", Toast.LENGTH_SHORT).show();
+						}
+						else
+							Toast.makeText(ProjectTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
+
+						return;
+					}
+				});
+
+		alert.setNegativeButton(CANCEL_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+		alert.show();
+	}
+	
 	public void editTime(View v) {
 		// TODO: find a better way to find outer table layout
 		View parent = (View) v.getParent().getParent().getParent().getParent();
