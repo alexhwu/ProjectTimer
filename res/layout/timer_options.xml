@@ -6,45 +6,40 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
         <TableRow>
-            <Button
+            <ImageButton
                 android:id="@+id/deleteButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Delete"
-                android:textColor="@color/button_text_color"
-                android:textSize="12dp"
+                android:background="#000000"
+                android:src="@drawable/content_discard"
                 android:onClick="deleteTime"/>
-            <Button
+            <ImageButton
                 android:id="@+id/editTimeButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Time"
-                android:textColor="@color/button_text_color"
-                android:textSize="12dp"
+                android:background="#000000"
+                android:src="@drawable/device_access_time"
                 android:onClick="editTime" />
-            <Button
+            <ImageButton
                 android:id="@+id/resetButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Reset"
-                android:textColor="@color/button_text_color"
-                android:textSize="12dp"
+                android:src="@drawable/images_rotate_left"
+                android:background="#000000"
                 android:onClick="resetTimer" />
-            <Button
+            <ImageButton
                 android:id="@+id/editLabelButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Label"
-                android:textColor="@color/button_text_color"
-                android:textSize="12dp" 
+                android:src="@drawable/collections_labels"
+                android:background="#000000"
                 android:onClick="editLabel" />
-            <Button
+            <ImageButton
                 android:id="@+id/editNoteButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Note"
-                android:textColor="@color/button_text_color"
-                android:textSize="12dp"
+                android:src="@drawable/content_edit"
+                android:background="#000000"
                 android:onClick="editNote" />
         </TableRow>
     </TableLayout>

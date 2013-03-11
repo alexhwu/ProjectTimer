@@ -441,6 +441,8 @@ public class ProjectTimerActivity extends Activity {
 		input.setSingleLine(); // one line tall
 		input.setText(textView.getText().toString());
 		input.setSelection(input.getText().length());
+		
+		
 		alert.setView(input);
 
 		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -465,6 +467,7 @@ public class ProjectTimerActivity extends Activity {
 					}
 				});
 		alert.show();
+		
 	}
 
 	public void editNote(View v) {
