@@ -1620,22 +1620,22 @@ public class ProjectTimerActivity extends Activity {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 			id = (Integer) timerIds.get(i);
 
-			tr = (TableRow) findViewById(id);
+			tl = (TableLayout) findViewById(id);
 
-			if (tr == null)
+			if (tl == null)
 				continue; // none found; continue to next iteration
 
 			// table layout found, which means a timer also exists; save the
 			// time value
-			timeValue = (TextView) tr.findViewById(R.id.timeText);
+			timeValue = (TextView) tl.findViewById(R.id.timeText);
 			seconds = convertToSeconds(timeValue.getText().toString());
 
 			// save the timer label
-			labelValue = (TextView) tr.findViewById(R.id.taskLabel);
+			labelValue = (TextView) tl.findViewById(R.id.taskLabel);
 			label = labelValue.getText().toString();
 
 			// save the state of the timer; running or not
-			btn = (ToggleButton) tr.findViewById(R.id.button1);
+			btn = (ToggleButton) tl.findViewById(R.id.button1);
 
 			if (btn != null)
 				isOn = btn.isChecked();
