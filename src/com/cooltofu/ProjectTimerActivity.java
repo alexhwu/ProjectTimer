@@ -23,12 +23,10 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -41,6 +39,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -266,18 +267,45 @@ public class ProjectTimerActivity extends Activity {
 	}// onCreate
 
 	public void handleTimerClick(View v) {
-		//Toast.makeText(v.getContext(), "Test click", Toast.LENGTH_SHORT).show();
-		View timerOption = v.findViewById(R.id.timerOptions);
-		
+		final View timerOption = v.findViewById(R.id.timerOptions);
+
+		TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, 0, 4);
+		slideDownAnimation.setDuration(100);
+		slideDownAnimation.setFillAfter(true);
+
+		TranslateAnimation slideUpAnimation = new TranslateAnimation(0, 0, 5, -65);
+		slideUpAnimation.setAnimationListener(new AnimationListener() {
+
+			public void onAnimationEnd(Animation animation) {
+				// TODO Auto-generated method stub
+				timerOption.setVisibility(View.GONE);
+			}
+
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+			}
+
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+			}
+		});
+		slideUpAnimation.setDuration(100);
+		slideUpAnimation.setFillAfter(true);
+
 		if (timerOption == null) {
 			View child = getLayoutInflater().inflate(R.layout.timer_options, null);
+			child.setVisibility(View.VISIBLE);
 			((ViewGroup) v.findViewById(R.id.tableLayout2)).addView(child);
+
+			child.startAnimation(slideDownAnimation);
 		} else {
+
 			if (timerOption.getVisibility() == View.GONE) {
 				timerOption.setVisibility(View.VISIBLE);
+				timerOption.startAnimation(slideDownAnimation);
 			}
 			else {
-				timerOption.setVisibility(View.GONE);
+				timerOption.startAnimation(slideUpAnimation);
 			}
 		}
 	}
@@ -352,20 +380,21 @@ public class ProjectTimerActivity extends Activity {
 			startStopBtn.performClick();
 		}
 
-		container.addView(child,0); // add to top of table
-		
-//		// add horizontal line
-//		View lineView = new View(this);
-//		lineView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
-//		lineView.setBackgroundColor(Color.rgb(51,51,51));
-//		mainTl.addView(lineView,0);
+		container.addView(child, 0); // add to top of table
+
+		// // add horizontal line
+		// View lineView = new View(this);
+		// lineView.setLayoutParams(new
+		// TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+		// lineView.setBackgroundColor(Color.rgb(51,51,51));
+		// mainTl.addView(lineView,0);
 
 	}
-	
+
 	public void resetTimer(View v) {
 		// TODO: find a better way to find outer table layout
 		final View parent = (View) v.getParent().getParent().getParent().getParent();
-				
+
 		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
 
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
@@ -397,10 +426,11 @@ public class ProjectTimerActivity extends Activity {
 				});
 		alert.show();
 	}
+
 	public void editLabel(View v) {
 		// TODO: find a better way to find outer table layout
 		View parent = (View) v.getParent().getParent().getParent().getParent();
-				
+
 		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
 
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
@@ -439,7 +469,7 @@ public class ProjectTimerActivity extends Activity {
 	public void editNote(View v) {
 		// TODO: find a better way to find outer table layout
 		View parent = (View) v.getParent().getParent().getParent().getParent();
-				
+
 		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
 		final int id = ((View) parent.getParent().getParent()).getId();
 
@@ -475,7 +505,9 @@ public class ProjectTimerActivity extends Activity {
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if (db.updateNote(id, input.getText().toString().trim())) {
-							//Toast.makeText(ProjectTimerActivity.this, "Your note is saved.", Toast.LENGTH_SHORT).show();
+							// Toast.makeText(ProjectTimerActivity.this,
+							// "Your note is saved.",
+							// Toast.LENGTH_SHORT).show();
 						}
 						else
 							Toast.makeText(ProjectTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
@@ -493,16 +525,16 @@ public class ProjectTimerActivity extends Activity {
 				});
 		alert.show();
 	}
-	
+
 	public void editTime(View v) {
 		// TODO: find a better way to find outer table layout
 		View parent = (View) v.getParent().getParent().getParent().getParent();
-		
+
 		final TextView timeText = (TextView) parent.findViewById(R.id.timeText);
 		final TextView taskLabel = (TextView) parent.findViewById(R.id.taskLabel);
 		final ToggleButton startStopBtn = (ToggleButton) parent.findViewById(R.id.button1);
 		final boolean isOn = false;
-		
+
 		if (startStopBtn != null)
 			startStopBtn.isChecked();
 
@@ -783,7 +815,7 @@ public class ProjectTimerActivity extends Activity {
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(1, EMAIL_TIMERS_MENU_ID, 0, "Email Timers");
