@@ -61,14 +61,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical" >
-                    <TableLayout
-                        android:id="@+id/tableLayout"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="visible" >
-                        
-                    </TableLayout>
+                    
                 </LinearLayout>
             </ScrollView>
         </LinearLayout>

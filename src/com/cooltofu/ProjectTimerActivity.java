@@ -110,8 +110,9 @@ public class ProjectTimerActivity extends Activity {
 	static TableLayout mainTl;
 	static TableLayout innerTl;
 	static TableLayout timerOptionsLayout;
+	static TableLayout tl;
 	static TableRow tr;
-	static LinearLayout ll;
+	static LinearLayout container;
 	static RelativeLayout sv;
 
 	Timer timer = new Timer();
@@ -282,7 +283,7 @@ public class ProjectTimerActivity extends Activity {
 	}
 
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
-		mainTl = (TableLayout) findViewById(R.id.tableLayout);
+		container = (LinearLayout) findViewById(R.id.linearLayout);
 		View child = getLayoutInflater().inflate(R.layout.timer, null);
 		child.setId(timerId);
 		child.setOnLongClickListener(new View.OnLongClickListener() {
@@ -352,13 +353,13 @@ public class ProjectTimerActivity extends Activity {
 			startStopBtn.performClick();
 		}
 
-		mainTl.addView(child,0); // add to top of table
+		container.addView(child,0); // add to top of table
 		
-		// add horizontal line
-		View lineView = new View(this);
-		lineView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
-		lineView.setBackgroundColor(Color.rgb(51,51,51));
-		mainTl.addView(lineView,1);
+//		// add horizontal line
+//		View lineView = new View(this);
+//		lineView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+//		lineView.setBackgroundColor(Color.rgb(51,51,51));
+//		mainTl.addView(lineView,0);
 
 	}
 	
@@ -441,7 +442,7 @@ public class ProjectTimerActivity extends Activity {
 		View parent = (View) v.getParent().getParent().getParent().getParent();
 				
 		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
-		final int id = ((View) parent.getParent()).getId();
+		final int id = ((View) parent.getParent().getParent()).getId();
 
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 		alert.setTitle("Note for " + textView.getText().toString());
@@ -1044,7 +1045,7 @@ public class ProjectTimerActivity extends Activity {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							// get the innerTl view
 							TableLayout tv = (TableLayout) findViewById(item.getItemId());
-							ll.removeView(tv);
+							container.removeView(tv);
 							timerId = (int) item.getItemId();
 
 							db.deleteTimer(timerId);
@@ -1472,15 +1473,15 @@ public class ProjectTimerActivity extends Activity {
 						for (int i = 0; i < len; i++) {
 							// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 							int id = (Integer) timerIds.get(i);
-							tr = (TableRow) findViewById(id);
+							tl = (TableLayout) findViewById(id);
 
-							if (tr == null)
+							if (tl == null)
 								continue; // none found; continue to next
 											// iteration
 
 							// table layout found, which means a timer also
 							// exists; save the time value
-							timeValue = (TextView) tr.findViewById(R.id.timeText);
+							timeValue = (TextView) tl.findViewById(R.id.timeText);
 							seconds += convertToSeconds(timeValue.getText().toString());
 						}
 
