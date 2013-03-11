@@ -30,7 +30,8 @@
                 android:layout_height="45dp"
                 android:text="Reset"
                 android:textColor="@color/button_text_color"
-                android:textSize="12dp" />
+                android:textSize="12dp"
+                android:onClick="resetTimer" />
             <Button
                 android:id="@+id/editLabelButton"
                 android:layout_width="55dp"
