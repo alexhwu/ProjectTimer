@@ -308,6 +308,7 @@ public class ProjectTimerActivity extends Activity {
 				timerOption.startAnimation(slideUpAnimation);
 			}
 		}
+		
 	}
 
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
@@ -513,6 +514,47 @@ public class ProjectTimerActivity extends Activity {
 							Toast.makeText(ProjectTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
 
 						return;
+					}
+				});
+
+		alert.setNegativeButton(CANCEL_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+		alert.show();
+	}
+	
+	public void deleteTime(View v) {
+		// TODO: find a better way to find outer table layout
+		final View parent = (View) v.getParent().getParent().getParent().getParent();
+				
+		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
+		final int id = ((View) parent.getParent().getParent()).getId();
+		
+		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+		alert.setTitle("Delete " + textView.getText().toString() + "?");
+
+		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+			public void onCancel(DialogInterface arg0) {
+				return;
+			}
+		});
+		alert.setPositiveButton(OK_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// get the innerTl view
+						TableLayout tv = (TableLayout) findViewById(id);
+						container.removeView(tv);
+						
+
+						db.deleteTimer(timerId);
+
+						timerIds.remove(timerIds.indexOf(Integer.valueOf(id)));
+						timerCount--;
 					}
 				});
 

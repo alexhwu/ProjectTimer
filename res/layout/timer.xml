@@ -8,8 +8,8 @@
     <TableRow android:onClick="handleTimerClick" >
         <ToggleButton
             android:id="@+id/button1"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
+            android:layout_width="45dp"
+            android:layout_height="55dp"
             android:text="Start"
             android:textColor="#ffffff"
             android:textSize="12dp" />

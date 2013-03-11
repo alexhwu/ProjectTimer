@@ -4,18 +4,16 @@
         android:id="@+id/timerOptions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:stretchColumns="0" >
+        android:orientation="horizontal" >
         <TableRow>
             <Button
-                android:id="@+id/undoButton"
+                android:id="@+id/deleteButton"
                 android:layout_width="55dp"
                 android:layout_height="45dp"
-                android:text="Undo"
+                android:text="Delete"
                 android:textColor="@color/button_text_color"
                 android:textSize="12dp"
-                android:visibility="gone" />
+                android:onClick="deleteTime"/>
             <Button
                 android:id="@+id/editTimeButton"
                 android:layout_width="55dp"
