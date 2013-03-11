@@ -83,7 +83,7 @@ public class ProjectTimerActivity extends Activity {
 	static final String nl = "\n";
 	static final String DATA_FILE_NAME = "timers.csv";
 	static final String EMAIL_TYPE = "text/csv";
-	static final String EMAIL_SUBJECT = "Trial Version: Project Time Data";
+	static final String EMAIL_SUBJECT = "Project Timer Data";
 	static final String EMAIL_BODY = "Data from the Project Timer app by CoolTofu.com.";
 	static final String INTENT_CHOOSER_TITLE = "Send Mail";
 	final int repeatSpeed = 120; // how fast to repeat the action for
@@ -301,9 +301,8 @@ public class ProjectTimerActivity extends Activity {
 		startStopBtn.setTextSize(12);
 		startStopBtn.setHeight(pixels);
 		startStopBtn.setWidth(pixels);
-		startStopBtn.setId(START_STOP_ID_PREFIX + timerId);
-		startStopBtn.setBackgroundColor(Color.BLACK);
-		startStopBtn.setTextColor(getResources().getColor(R.color.text_color));
+		startStopBtn.setBackgroundColor(Color.WHITE);
+		startStopBtn.setTextColor(Color.BLACK);
 		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
 		startStopBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -839,9 +838,9 @@ public class ProjectTimerActivity extends Activity {
 
 				id = (Integer) timerIds.get(i);
 
-				tr = (TableRow) findViewById(id);
+				tl = (TableLayout) findViewById(id);
 
-				if (tr == null)
+				if (tl == null)
 					continue; // none found; continue to next iteration
 
 				cursor = db.getNote(id);
@@ -852,10 +851,10 @@ public class ProjectTimerActivity extends Activity {
 
 				// table layout found, which means a timer also exists; save the
 				// time value
-				timeValue = (TextView) tr.findViewById(R.id.timeText);
+				timeValue = (TextView) tl.findViewById(R.id.timeText);
 
 				// save the timer label
-				labelValue = (TextView) tr.findViewById(R.id.taskLabel);
+				labelValue = (TextView) tl.findViewById(R.id.taskLabel);
 				label = labelValue.getText().toString();
 
 				rowBuf.append("\"" + escapeQuote(now) + "\",");

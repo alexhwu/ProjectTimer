@@ -11,7 +11,7 @@
             android:layout_width="65dp"
             android:layout_height="65dp"
             android:text="Start"
-            android:textColor="@color/text_color"
+            android:textColor="#ffffff"
             android:textSize="12dp" />
         <TableLayout
             android:id="@+id/tableLayout2"
@@ -44,5 +44,5 @@
     <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:background="#696758" />
+                android:background="#302f2f" />
 </TableLayout>
