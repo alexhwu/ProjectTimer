@@ -16,8 +16,6 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -226,15 +224,15 @@ public class ProjectTimerActivity extends Activity {
 
 		// -------------------------------
 		// More button actions
-		moreBtn = (Button) findViewById(R.id.moreBtn);
-
-		moreBtn.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent i = new Intent();
-				i.setClass(ProjectTimerActivity.this, MoreScreen.class);
-				startActivity(i);
-			}
-		});
+//		moreBtn = (Button) findViewById(R.id.moreBtn);
+//
+//		moreBtn.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				Intent i = new Intent();
+//				i.setClass(ProjectTimerActivity.this, MoreScreen.class);
+//				startActivity(i);
+//			}
+//		});
 
 		// -------------------------------
 		// Options button actions
@@ -268,14 +266,10 @@ public class ProjectTimerActivity extends Activity {
 
 	}// onCreate
 
-	public boolean handleTimerClick(View v) {
+	public boolean handleTimerClick(final View v) {
 		final View timerOption = v.findViewById(R.id.timerOptions);
-
-		TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, 0, 4);
-		slideDownAnimation.setDuration(100);
-		slideDownAnimation.setFillAfter(true);
-
-		TranslateAnimation slideUpAnimation = new TranslateAnimation(0, 0, 5, -65);
+		
+		final TranslateAnimation slideUpAnimation = new TranslateAnimation(0, 0, 5, -65);
 		slideUpAnimation.setAnimationListener(new AnimationListener() {
 
 			public void onAnimationEnd(Animation animation) {
@@ -289,11 +283,54 @@ public class ProjectTimerActivity extends Activity {
 
 			public void onAnimationStart(Animation animation) {
 				// TODO Auto-generated method stub
+				
 			}
 		});
-		slideUpAnimation.setDuration(100);
+		slideUpAnimation.setDuration(200);
 		slideUpAnimation.setFillAfter(true);
+		
+		final TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, 0, 4);
+		slideDownAnimation.setAnimationListener(new AnimationListener() {
 
+			public void onAnimationEnd(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				// slide up other timer options
+				int len = timerIds.size();
+				int id = 0;
+				
+				for (int i = 0; i < len; i++) {
+					// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+					id = (Integer) timerIds.get(i);
+
+					tl = (TableLayout) findViewById(id);
+
+					if (tl == null || tl.findViewById(R.id.timerOptions) == null || tl.getId() == v.getId())
+						continue; // none found; continue to next iteration
+					
+					tl.findViewById(R.id.timerOptions).setVisibility(View.GONE);
+					//tl.findViewById(R.id.timerOptions).startAnimation(slideUpAnimation);
+				}
+			}
+			
+		});
+		slideDownAnimation.setDuration(200);
+		slideDownAnimation.setFillAfter(true);
+
+		
+
+		
+		
+		
 		if (timerOption == null) {
 			View child = getLayoutInflater().inflate(R.layout.timer_options, null);
 			child.setVisibility(View.VISIBLE);
@@ -310,31 +347,39 @@ public class ProjectTimerActivity extends Activity {
 				timerOption.startAnimation(slideUpAnimation);
 			}
 		}
-		
+
 		return true;
-		
+
 	}
 
-	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
+
+	
+	private void createTaskTimer(final int timerId, String label, final int seconds, boolean isOn) {
 		container = (LinearLayout) findViewById(R.id.linearLayout);
 		View child = getLayoutInflater().inflate(R.layout.timer, null);
 		child.setId(timerId);
 		child.setOnClickListener(new View.OnClickListener() {
-			
+
 			public void onClick(View v) {
 				handleTimerClick(v);
 			}
+			
 		});
-		child.setOnLongClickListener(new View.OnLongClickListener() {
-			public boolean onLongClick(View v) {
-				ClipData.Item item = new ClipData.Item("timer xyz");
-				ClipData dragData = new ClipData("timer xyz", new String[] {ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
-				View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
-				v.startDrag(dragData, myShadow, null, 0);
-				Toast.makeText(v.getContext(), "Long press", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-		});
+		
+//		child.setOnLongClickListener(new View.OnLongClickListener() {
+//			public boolean onLongClick(View v) {
+//				ClipData.Item item = new ClipData.Item(String.valueOf(v.getId()));
+//				ClipData dragData = new ClipData(String.valueOf(timerId), new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+//				View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
+//				v.startDrag(dragData, myShadow, null, 0);
+//				v.setTag("IsDragging");
+//				//v.setVisibility(View.INVISIBLE);
+//				
+//				return true;
+//			}
+//		});
+//		child.setOnDragListener(new MyDragEventListener()); // each table has
+//															// own listener
 
 		final TextView timeText = (TextView) child.findViewById(R.id.timeText);
 		final ToggleButton startStopBtn = (ToggleButton) child.findViewById(R.id.button1);
@@ -342,7 +387,7 @@ public class ProjectTimerActivity extends Activity {
 		startStopBtn.setTextSize(10);
 		startStopBtn.setHeight(55);
 		startStopBtn.setPadding(0, 0, 0, 25);
-		//startStopBtn.setWidth(45dp);
+		// startStopBtn.setWidth(45dp);
 		startStopBtn.setBackgroundColor(Color.WHITE);
 		startStopBtn.setTextColor(Color.BLACK);
 		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
@@ -394,8 +439,14 @@ public class ProjectTimerActivity extends Activity {
 			startStopBtn.performClick();
 		}
 
+		TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, -55, 0);
+		slideDownAnimation.setDuration(200);
+		slideDownAnimation.setFillAfter(true);
+		
+		
 		container.addView(child, 0); // add to top of table
-
+		child.startAnimation(slideDownAnimation);
+		
 		// // add horizontal line
 		// View lineView = new View(this);
 		// lineView.setLayoutParams(new
@@ -454,8 +505,7 @@ public class ProjectTimerActivity extends Activity {
 		input.setSingleLine(); // one line tall
 		input.setText(textView.getText().toString());
 		input.setSelection(input.getText().length());
-		
-		
+
 		alert.setView(input);
 
 		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -480,7 +530,7 @@ public class ProjectTimerActivity extends Activity {
 					}
 				});
 		alert.show();
-		
+
 	}
 
 	public void editNote(View v) {
@@ -542,14 +592,14 @@ public class ProjectTimerActivity extends Activity {
 				});
 		alert.show();
 	}
-	
+
 	public void deleteTime(View v) {
 		// TODO: find a better way to find outer table layout
 		final View parent = (View) v.getParent().getParent().getParent().getParent();
-				
+
 		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
 		final int id = ((View) parent.getParent().getParent()).getId();
-		
+
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 		alert.setTitle("Delete " + textView.getText().toString() + "?");
 
@@ -565,7 +615,6 @@ public class ProjectTimerActivity extends Activity {
 						// get the innerTl view
 						TableLayout tv = (TableLayout) findViewById(id);
 						container.removeView(tv);
-						
 
 						db.deleteTimer(timerId);
 
@@ -1773,5 +1822,83 @@ public class ProjectTimerActivity extends Activity {
 		timerIds.clear();
 		timerCount = 0;
 	}
+	
+//	protected class MyDragEventListener implements View.OnDragListener {
+//		float threshold = 5f;
+//		float previousY = 0;
+//		
+//		public boolean onDrag(View v, DragEvent event) {
+//			// View v is the view that received the drag event
+//			
+//			final int action = event.getAction();
+//			
+//			switch (action) {
+//				case DragEvent.ACTION_DRAG_STARTED:
+//					if (v.getTag() != null && v.getTag() == "IsDragging")
+//						return false;
+//					
+//					return true;
+//				
+//				case DragEvent.ACTION_DRAG_ENTERED:
+//					
+//					v.setAlpha(0.5f);
+//					v.setBackgroundColor(Color.GRAY);
+//					v.invalidate();
+//					
+//					
+//					
+//					return true;
+//					
+//				case DragEvent.ACTION_DRAG_LOCATION:
+//					// move timer down or up
+//					// getY() is relative to the View v parameter
+//					if (previousY == 0)
+//						previousY = event.getY();
+//					
+//					if (Math.abs(event.getY() - previousY) > threshold) { 
+//						if (event.getY() < previousY) {
+//							// timer is being dragged up
+//							Log.w("Drag Direction", "UP");
+//						} else {
+//							// timer is being dragged down
+//							Log.w("Drag Direction", "DOWN");
+//						}
+//						
+//						previousY = event.getY();
+//					}
+//					
+//					
+//					//Log.w("Location", event.getX() + "::" + event.getY());
+//					int h = v.getHeight();
+//					//v.setY(v.getY() + h);
+//					//v.invalidate();
+//					
+//					return true;
+//					
+//				case DragEvent.ACTION_DRAG_EXITED:
+//					v.setAlpha(1.0f);
+//					v.setBackgroundColor(Color.BLACK);
+//					v.invalidate();
+//					return true;
+//					
+//				case DragEvent.ACTION_DROP:
+//					v.setTag(null);
+//					v.setAlpha(1.0f);
+//					v.setBackgroundColor(Color.BLACK);
+//					v.invalidate();
+//					return true;
+//					
+//				case DragEvent.ACTION_DRAG_ENDED:
+//					v.setTag(null);
+//					v.setAlpha(1.0f);
+//					v.setBackgroundColor(Color.BLACK);
+//					v.invalidate();
+//					return true;
+//			}
+//			
+//			return false;
+//		}
+//	}
+	
 
 }

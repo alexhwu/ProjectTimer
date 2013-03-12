@@ -28,22 +28,22 @@
             android:layout_toRightOf="@+id/newTimerBtn"
             android:background="@color/btn_end" />
         <Button
-            android:id="@+id/moreBtn"
+            android:id="@+id/optionBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/verticalLine"
             android:background="@drawable/custom_button"
             android:height="55dp"
-            android:text="More Info"
+            android:text="..."
             android:textColor="@color/text_color" />
+        
     </RelativeLayout>
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:background="#696758" />
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/relativeLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -79,20 +79,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="horizontal" >
-                <Button
-                    android:id="@+id/optionBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:background="@drawable/custom_button"
-                    android:gravity="center"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:text="Options"
-                    android:textColor="@color/text_color" />
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="55dp"
-                    android:background="#696758" />
+                
                 <TableLayout
                     android:id="@+id/sumTableLayout"
                     android:layout_width="wrap_content"
@@ -101,19 +88,21 @@
                     android:orientation="vertical" >
                     <TableRow>
                         <TextView
+                            android:id="@+id/sumLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="15dp"
+                            android:text="Total"
+                            android:textSize="14dp" />
+                        <TextView
                             android:id="@+id/sumText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="15dp"
                             android:text="00:00:00"
+                            android:textStyle="bold"
                             android:textSize="28dp" />
-                        <TextView
-                            android:id="@+id/sumLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="15dp"
-                            android:text="Total Time"
-                            android:textSize="15dp" />
+                        
                     </TableRow>
                 </TableLayout>
             </LinearLayout>

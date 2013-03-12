@@ -4,7 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:visibility="visible" >
+    android:visibility="visible"
+    android:background="@drawable/timer_click_state" >
     <TableRow>
         <ToggleButton
             android:id="@+id/button1"
