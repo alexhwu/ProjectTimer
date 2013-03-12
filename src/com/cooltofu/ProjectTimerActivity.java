@@ -16,6 +16,8 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -266,7 +268,7 @@ public class ProjectTimerActivity extends Activity {
 
 	}// onCreate
 
-	public void handleTimerClick(View v) {
+	public boolean handleTimerClick(View v) {
 		final View timerOption = v.findViewById(R.id.timerOptions);
 
 		TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, 0, 4);
@@ -309,16 +311,26 @@ public class ProjectTimerActivity extends Activity {
 			}
 		}
 		
+		return true;
+		
 	}
 
 	private void createTaskTimer(int timerId, String label, final int seconds, boolean isOn) {
 		container = (LinearLayout) findViewById(R.id.linearLayout);
 		View child = getLayoutInflater().inflate(R.layout.timer, null);
 		child.setId(timerId);
+		child.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				handleTimerClick(v);
+			}
+		});
 		child.setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
-				// openContextMenu(v);
-				// TODO: long click enables drap and drop reordering
+				ClipData.Item item = new ClipData.Item("timer xyz");
+				ClipData dragData = new ClipData("timer xyz", new String[] {ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+				View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
+				v.startDrag(dragData, myShadow, null, 0);
 				Toast.makeText(v.getContext(), "Long press", Toast.LENGTH_SHORT).show();
 				return true;
 			}
@@ -327,9 +339,10 @@ public class ProjectTimerActivity extends Activity {
 		final TextView timeText = (TextView) child.findViewById(R.id.timeText);
 		final ToggleButton startStopBtn = (ToggleButton) child.findViewById(R.id.button1);
 		startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
-		startStopBtn.setTextSize(12);
-		startStopBtn.setHeight(pixels);
-		startStopBtn.setWidth(pixels);
+		startStopBtn.setTextSize(10);
+		startStopBtn.setHeight(55);
+		startStopBtn.setPadding(0, 0, 0, 25);
+		//startStopBtn.setWidth(45dp);
 		startStopBtn.setBackgroundColor(Color.WHITE);
 		startStopBtn.setTextColor(Color.BLACK);
 		startStopBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_toggle_off));
@@ -1728,14 +1741,14 @@ public class ProjectTimerActivity extends Activity {
 			for (int i = 0; i < len; i++) {
 
 				id = (Integer) timerIds.get(i);
-				tr = (TableRow) findViewById(id);
+				tl = (TableLayout) findViewById(id);
 
-				if (tr == null)
+				if (tl == null)
 					continue; // none found; continue to next iteration
 
 				// table layout found, which means a timer also exists; reset
 				// the time value
-				timeValue = (TextView) tr.findViewById(R.id.timeText);
+				timeValue = (TextView) tl.findViewById(R.id.timeText);
 				timeValue.setText(formatTimeTextDisplay(0));
 			}
 
@@ -1752,8 +1765,8 @@ public class ProjectTimerActivity extends Activity {
 		for (int i = 0; i < len; i++) {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 			id = (Integer) timerIds.get(i);
-			tr = (TableRow) findViewById(id);
-			mainTl.removeView(tr);
+			tl = (TableLayout) findViewById(id);
+			container.removeView(tl);
 
 			db.deleteTimer(id);
 		}
