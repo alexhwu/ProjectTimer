@@ -78,6 +78,7 @@ public class ProjectTimerActivity extends Activity {
 	static final String CONTEXT_MENU_DELETE_TIMER = "Delete Timer";
 	static final String CONTEXT_MENU_RESET_TIMER = "Reset Timer";
 	static final String CONTEXT_MENU_RESET_ALL_TIMERS = "Reset All Timers";
+	static final String CONTEXT_MENU_CLEAR_ALL_NOTES = "Clear All Notes";
 	static final String CONTEXT_MENU_DELETE_ALL_TIMERS = "Delete All Timers";
 	static final String CONTEXT_MENU_EMAIL_TIMERS = "Email Timers";
 
@@ -156,10 +157,9 @@ public class ProjectTimerActivity extends Activity {
 
 		setContentView(R.layout.main);
 
-		// get timers from db
 		db = new TimerDbAdapter(this);
 		db.open();
-
+		
 		cursor = db.fetchAllTimers();
 		startManagingCursor(cursor);
 
@@ -188,7 +188,7 @@ public class ProjectTimerActivity extends Activity {
 																			// .5
 																			// to
 																			// lessen
-																			// the
+																			// the 
 																			// lost
 																			// milliseconds
 				}
@@ -200,6 +200,7 @@ public class ProjectTimerActivity extends Activity {
 				timerCount++;
 			}// while cursor
 		}// if cursor != null
+		
 
 		newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
 
@@ -207,17 +208,19 @@ public class ProjectTimerActivity extends Activity {
 			public void onClick(View v) {
 				timerCount++;
 
-				final String label = "Timer Label";
+				
 
 				// create db entry for new timer
-				timerId = (int) db.createTimer(label, 0, 0, false);
+				timerId = (int) db.createTimer("", 0, 0, false);
 
 				if (timerId == -1) {
 					// db error
 					// TODO: handle error
 				}
+				final String label = "Timer " + timerId;
 
 				createTaskTimer(timerId, label, 0, false);
+				saveTimers();
 				timerIds.add(Integer.valueOf(timerId));
 			}
 		});
@@ -246,23 +249,23 @@ public class ProjectTimerActivity extends Activity {
 		registerForContextMenu(optionBtn);
 
 		// if on first access, add a sample timer to the window
-		SharedPreferences settings = getSharedPreferences(PREF_NAME, 0);
-		boolean isAccessed = settings.getBoolean("isAccessed", false);
-		if (isAccessed == false) {
-			timerId = (int) db.createTimer(SAMPLE_PROJECT_LABEL, 0, 0, false);
-
-			if (timerId == -1) {
-				// db error
-				// TODO: handle error
-			}
-
-			createTaskTimer(timerId, SAMPLE_PROJECT_LABEL, 5025, false);
-			timerIds.add(timerId);
-
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putBoolean("isAccessed", true);
-			editor.commit();
-		}
+//		SharedPreferences settings = getSharedPreferences(PREF_NAME, 0);
+//		boolean isAccessed = settings.getBoolean("isAccessed", false);
+//		if (isAccessed == false) {
+//			timerId = (int) db.createTimer(SAMPLE_PROJECT_LABEL, 0, 0, false);
+//
+//			if (timerId == -1) {
+//				// db error
+//				// TODO: handle error
+//			}
+//
+//			createTaskTimer(timerId, SAMPLE_PROJECT_LABEL, 5025, false);
+//			timerIds.add(timerId);
+//
+//			SharedPreferences.Editor editor = settings.edit();
+//			editor.putBoolean("isAccessed", true);
+//			editor.commit();
+//		}
 
 	}// onCreate
 
@@ -382,6 +385,10 @@ public class ProjectTimerActivity extends Activity {
 //															// own listener
 
 		final TextView timeText = (TextView) child.findViewById(R.id.timeText);
+		final TextView labelText = (TextView) child.findViewById(R.id.taskLabel);
+		timeText.setText(formatTimeTextDisplay(seconds));
+		labelText.setText(label);
+
 		final ToggleButton startStopBtn = (ToggleButton) child.findViewById(R.id.button1);
 		startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
 		startStopBtn.setTextSize(10);
@@ -459,7 +466,6 @@ public class ProjectTimerActivity extends Activity {
 	public void resetTimer(View v) {
 		// TODO: find a better way to find outer table layout
 		final View parent = (View) v.getParent().getParent().getParent().getParent();
-
 		final TextView textView = (TextView) parent.findViewById(R.id.taskLabel);
 
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
@@ -552,7 +558,7 @@ public class ProjectTimerActivity extends Activity {
 		startManagingCursor(cursor);
 		String note = "";
 
-		if (cursor != null) {
+		if (cursor != null && cursor.getCount() > 0) {
 			note = cursor.getString(0);
 			input.setText(note);
 		}
@@ -927,7 +933,8 @@ public class ProjectTimerActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(1, EMAIL_TIMERS_MENU_ID, 0, "Email Timers");
 		menu.add(1, RESET_ALL_TIMERS_MENU_ID, 1, "Reset All Timers");
-		menu.add(1, DELETE_ALL_TIMERS_MENU_ID, 2, "Delete All Timers");
+		menu.add(1, RESET_ALL_TIMERS_MENU_ID, 2, "Clear All Notes");
+		menu.add(1, DELETE_ALL_TIMERS_MENU_ID, 3, "Delete All Timers");
 		return true;
 	}
 
@@ -946,7 +953,8 @@ public class ProjectTimerActivity extends Activity {
 			menu.setHeaderTitle(CONTEXT_MENU_HEADER_TITLE);
 			menu.add(1, 1, 0, CONTEXT_MENU_EMAIL_TIMERS);
 			menu.add(1, 2, 1, CONTEXT_MENU_RESET_ALL_TIMERS);
-			menu.add(1, 3, 2, CONTEXT_MENU_DELETE_ALL_TIMERS);
+			menu.add(1, 3, 2, CONTEXT_MENU_CLEAR_ALL_NOTES);
+			menu.add(1, 4, 3, CONTEXT_MENU_DELETE_ALL_TIMERS);
 		}
 	}
 
@@ -1077,6 +1085,35 @@ public class ProjectTimerActivity extends Activity {
 		alert.show();
 	}
 
+	private void confirmClearAllNotes() {
+		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
+		alert.setTitle("Clear all notes?");
+
+		alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+
+			public void onCancel(DialogInterface arg0) {
+
+				return;
+			}
+		});
+		alert.setPositiveButton(OK_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						clearAllNotes();
+
+					}
+				});
+
+		alert.setNegativeButton(CANCEL_BTN_STRING,
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+		alert.show();
+	}
+	
 	private void confirmDeleteAllTimers() {
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 		alert.setTitle("Delete all Timers?");
@@ -1131,6 +1168,8 @@ public class ProjectTimerActivity extends Activity {
 			emailTimers();
 		} else if (menuItemTitle == CONTEXT_MENU_RESET_ALL_TIMERS) {
 			confirmResetAllTimers();
+		} else if (menuItemTitle == CONTEXT_MENU_CLEAR_ALL_NOTES) {
+			confirmClearAllNotes();
 
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_ALL_TIMERS) {
 			confirmDeleteAllTimers();
@@ -1590,9 +1629,15 @@ public class ProjectTimerActivity extends Activity {
 
 		super.onResume();
 
-		if (!db.isOpen())
+		if (!db.isOpen()) {
+			
 			db.open();
+		}
+		// get timers from db
+				
 
+				
+				
 		// calculate total if there are timers
 
 		final TextView totalTextView = (TextView) findViewById(R.id.sumText);
@@ -1625,8 +1670,10 @@ public class ProjectTimerActivity extends Activity {
 
 						if (seconds == 0)
 							totalTextView.setText("00:00:00");
-						else
+						else {
 							totalTextView.setText(formatTimeTextDisplay(seconds));
+							
+						}
 					}
 				});
 			}
@@ -1806,6 +1853,19 @@ public class ProjectTimerActivity extends Activity {
 
 	}
 
+	private void clearAllNotes() {
+
+		int len = timerIds.size();
+		int id = 0;
+
+		for (int i = 0; i < len; i++) {
+			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
+			id = (Integer) timerIds.get(i);
+			db.updateNote(id, ""); 
+		}
+		
+	}
+	
 	private void deleteAllTimers() {
 
 		int len = timerIds.size();
