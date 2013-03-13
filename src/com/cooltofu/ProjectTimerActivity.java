@@ -296,16 +296,27 @@ public class ProjectTimerActivity extends Activity {
 
 	private void createTaskTimer(final int timerId, String label, final int seconds, boolean isOn) {
 		container = (LinearLayout) findViewById(R.id.linearLayout);
-		View child = getLayoutInflater().inflate(R.layout.timer, null);
+		final View child = getLayoutInflater().inflate(R.layout.timer, null);
 		child.setId(timerId);
 		child.setOnClickListener(new View.OnClickListener() {
-
 			public void onClick(View v) {
 				handleTimerClick(v);
 			}
 
 		});
+		
 
+		child.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					((TextView) child.findViewById(R.id.timeText)).setTextColor(Color.GRAY);
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					((TextView) child.findViewById(R.id.timeText)).setTextColor(getResources().getColor(R.color.text_color));
+				}
+				return false;
+			}
+		});
 		// child.setOnLongClickListener(new View.OnLongClickListener() {
 		// public boolean onLongClick(View v) {
 		// ClipData.Item item = new ClipData.Item(String.valueOf(v.getId()));
