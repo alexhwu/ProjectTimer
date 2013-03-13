@@ -4,7 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class TimerTable {
 	
-	private static final String DATABASE_CREATE = "create table timer if not exist "
+	private static final String DATABASE_CREATE = "create table timer "
 								+ "(_id integer primary key autoincrement, "
 								+ "label text,"
 								+ "seconds integer not null,"
