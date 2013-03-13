@@ -55,9 +55,6 @@ import android.widget.ToggleButton;
 import com.cooltofu.db.TimerDbAdapter;
 
 public class ProjectTimerActivity extends Activity {
-	private final static int TIME_ID_PREFIX = 10000;
-	private final static int TASK_LABEL_ID_PREFIX = 20000;
-	private final static int START_STOP_ID_PREFIX = 30000;
 	private final static int EMAIL_TIMERS_MENU_ID = 40000;
 	private final static int DELETE_ALL_TIMERS_MENU_ID = 50000;
 	private final static int RESET_ALL_TIMERS_MENU_ID = 60000;
@@ -92,41 +89,18 @@ public class ProjectTimerActivity extends Activity {
 									// increment/decrement time
 	final int PRESS_DELAY = 200; // delay on press event for time editing
 	final static String PREF_NAME = "MY_PREF";
-	final static String SAMPLE_PROJECT_LABEL = "Sample Project";
 
 	static List<Integer> timerIds = new ArrayList<Integer>();
-
-	static String editedHour;
-	static String editedMinute;
-	static String editedSecond;
-
-	static LayoutParams startStopBtnLayoutParams;
-	static LayoutParams mtlParams;
-	static LayoutParams itlParams;
-	static LayoutParams timeTextParams;
-	static LayoutParams taskLabelParams;
-	static LayoutParams llParams;
-	static LayoutParams timerOptionsParams;
-	static TableLayout.LayoutParams tableRowParams;
-
-	static TableLayout mainTl;
-	static TableLayout innerTl;
-	static TableLayout timerOptionsLayout;
-	static TableLayout tl;
-	static TableRow tr;
 	static LinearLayout container;
-	static RelativeLayout sv;
 
 	Timer timer = new Timer();
 	static Handler handler = new Handler();
 
 	private static TimerDbAdapter db;
 	private static Cursor cursor;
-	private static int timerId;
 
 	private static Button newTimerBtn;
 	private static AlertDialog.Builder alert;
-	private static Button moreBtn;
 	private static Button optionBtn;
 	private static TimerTask totalTimerTask;
 
@@ -159,13 +133,14 @@ public class ProjectTimerActivity extends Activity {
 
 		db = new TimerDbAdapter(this);
 		db.open();
-		
+
 		cursor = db.fetchAllTimers();
 		startManagingCursor(cursor);
 
 		if (cursor != null) {
 
 			timerIds.clear();
+			int timerId = 0;
 			int seconds = 0;
 			long timestamp = 0;
 			long now = Calendar.getInstance().getTimeInMillis();
@@ -188,19 +163,18 @@ public class ProjectTimerActivity extends Activity {
 																			// .5
 																			// to
 																			// lessen
-																			// the 
+																			// the
 																			// lost
 																			// milliseconds
 				}
 
-				createTaskTimer(cursor.getInt(0), cursor.getString(1), seconds, isTimerOn);
+				createTaskTimer(timerId, cursor.getString(1), seconds, isTimerOn);
 				timerIds.add(timerId);
 				cursor.moveToNext();
 
 				timerCount++;
 			}// while cursor
 		}// if cursor != null
-		
 
 		newTimerBtn = (Button) findViewById(R.id.newTimerBtn);
 
@@ -208,10 +182,8 @@ public class ProjectTimerActivity extends Activity {
 			public void onClick(View v) {
 				timerCount++;
 
-				
-
 				// create db entry for new timer
-				timerId = (int) db.createTimer("", 0, 0, false);
+				int timerId = (int) db.createTimer("", 0, 0, false);
 
 				if (timerId == -1) {
 					// db error
@@ -220,23 +192,12 @@ public class ProjectTimerActivity extends Activity {
 				final String label = "Timer " + timerId;
 
 				createTaskTimer(timerId, label, 0, false);
-				saveTimers();
 				timerIds.add(Integer.valueOf(timerId));
+				saveTimers();
 			}
 		});
 
-		// -------------------------------
-		// More button actions
-//		moreBtn = (Button) findViewById(R.id.moreBtn);
-//
-//		moreBtn.setOnClickListener(new View.OnClickListener() {
-//			public void onClick(View v) {
-//				Intent i = new Intent();
-//				i.setClass(ProjectTimerActivity.this, MoreScreen.class);
-//				startActivity(i);
-//			}
-//		});
-
+	
 		// -------------------------------
 		// Options button actions
 		optionBtn = (Button) findViewById(R.id.optionBtn);
@@ -248,30 +209,12 @@ public class ProjectTimerActivity extends Activity {
 		});
 		registerForContextMenu(optionBtn);
 
-		// if on first access, add a sample timer to the window
-//		SharedPreferences settings = getSharedPreferences(PREF_NAME, 0);
-//		boolean isAccessed = settings.getBoolean("isAccessed", false);
-//		if (isAccessed == false) {
-//			timerId = (int) db.createTimer(SAMPLE_PROJECT_LABEL, 0, 0, false);
-//
-//			if (timerId == -1) {
-//				// db error
-//				// TODO: handle error
-//			}
-//
-//			createTaskTimer(timerId, SAMPLE_PROJECT_LABEL, 5025, false);
-//			timerIds.add(timerId);
-//
-//			SharedPreferences.Editor editor = settings.edit();
-//			editor.putBoolean("isAccessed", true);
-//			editor.commit();
-//		}
-
+		
 	}// onCreate
 
 	public boolean handleTimerClick(final View v) {
 		final View timerOption = v.findViewById(R.id.timerOptions);
-		
+
 		final TranslateAnimation slideUpAnimation = new TranslateAnimation(0, 0, 5, -65);
 		slideUpAnimation.setAnimationListener(new AnimationListener() {
 
@@ -286,23 +229,23 @@ public class ProjectTimerActivity extends Activity {
 
 			public void onAnimationStart(Animation animation) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 		slideUpAnimation.setDuration(200);
 		slideUpAnimation.setFillAfter(true);
-		
+
 		final TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, 0, 4);
 		slideDownAnimation.setAnimationListener(new AnimationListener() {
 
 			public void onAnimationEnd(Animation animation) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			public void onAnimationRepeat(Animation animation) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			public void onAnimationStart(Animation animation) {
@@ -310,7 +253,8 @@ public class ProjectTimerActivity extends Activity {
 				// slide up other timer options
 				int len = timerIds.size();
 				int id = 0;
-				
+				TableLayout tl = null;
+
 				for (int i = 0; i < len; i++) {
 					// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 					id = (Integer) timerIds.get(i);
@@ -319,21 +263,16 @@ public class ProjectTimerActivity extends Activity {
 
 					if (tl == null || tl.findViewById(R.id.timerOptions) == null || tl.getId() == v.getId())
 						continue; // none found; continue to next iteration
-					
+
 					tl.findViewById(R.id.timerOptions).setVisibility(View.GONE);
-					//tl.findViewById(R.id.timerOptions).startAnimation(slideUpAnimation);
+					// tl.findViewById(R.id.timerOptions).startAnimation(slideUpAnimation);
 				}
 			}
-			
+
 		});
 		slideDownAnimation.setDuration(200);
 		slideDownAnimation.setFillAfter(true);
 
-		
-
-		
-		
-		
 		if (timerOption == null) {
 			View child = getLayoutInflater().inflate(R.layout.timer_options, null);
 			child.setVisibility(View.VISIBLE);
@@ -355,8 +294,6 @@ public class ProjectTimerActivity extends Activity {
 
 	}
 
-
-	
 	private void createTaskTimer(final int timerId, String label, final int seconds, boolean isOn) {
 		container = (LinearLayout) findViewById(R.id.linearLayout);
 		View child = getLayoutInflater().inflate(R.layout.timer, null);
@@ -366,23 +303,24 @@ public class ProjectTimerActivity extends Activity {
 			public void onClick(View v) {
 				handleTimerClick(v);
 			}
-			
+
 		});
-		
-//		child.setOnLongClickListener(new View.OnLongClickListener() {
-//			public boolean onLongClick(View v) {
-//				ClipData.Item item = new ClipData.Item(String.valueOf(v.getId()));
-//				ClipData dragData = new ClipData(String.valueOf(timerId), new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
-//				View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
-//				v.startDrag(dragData, myShadow, null, 0);
-//				v.setTag("IsDragging");
-//				//v.setVisibility(View.INVISIBLE);
-//				
-//				return true;
-//			}
-//		});
-//		child.setOnDragListener(new MyDragEventListener()); // each table has
-//															// own listener
+
+		// child.setOnLongClickListener(new View.OnLongClickListener() {
+		// public boolean onLongClick(View v) {
+		// ClipData.Item item = new ClipData.Item(String.valueOf(v.getId()));
+		// ClipData dragData = new ClipData(String.valueOf(timerId), new
+		// String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+		// View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
+		// v.startDrag(dragData, myShadow, null, 0);
+		// v.setTag("IsDragging");
+		// //v.setVisibility(View.INVISIBLE);
+		//
+		// return true;
+		// }
+		// });
+		// child.setOnDragListener(new MyDragEventListener()); // each table has
+		// // own listener
 
 		final TextView timeText = (TextView) child.findViewById(R.id.timeText);
 		final TextView labelText = (TextView) child.findViewById(R.id.taskLabel);
@@ -449,17 +387,9 @@ public class ProjectTimerActivity extends Activity {
 		TranslateAnimation slideDownAnimation = new TranslateAnimation(0, 0, -55, 0);
 		slideDownAnimation.setDuration(200);
 		slideDownAnimation.setFillAfter(true);
-		
-		
+
 		container.addView(child, 0); // add to top of table
 		child.startAnimation(slideDownAnimation);
-		
-		// // add horizontal line
-		// View lineView = new View(this);
-		// lineView.setLayoutParams(new
-		// TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
-		// lineView.setBackgroundColor(Color.rgb(51,51,51));
-		// mainTl.addView(lineView,0);
 
 	}
 
@@ -622,7 +552,7 @@ public class ProjectTimerActivity extends Activity {
 						TableLayout tv = (TableLayout) findViewById(id);
 						container.removeView(tv);
 
-						db.deleteTimer(timerId);
+						db.deleteTimer(id);
 
 						timerIds.remove(timerIds.indexOf(Integer.valueOf(id)));
 						timerCount--;
@@ -980,6 +910,7 @@ public class ProjectTimerActivity extends Activity {
 			TextView labelValue;
 			String label;
 			String note = "";
+			TableLayout tl;
 
 			for (int i = 0; i < len; i++) {
 
@@ -1113,7 +1044,7 @@ public class ProjectTimerActivity extends Activity {
 				});
 		alert.show();
 	}
-	
+
 	private void confirmDeleteAllTimers() {
 		alert = new AlertDialog.Builder(ProjectTimerActivity.this);
 		alert.setTitle("Delete all Timers?");
@@ -1170,446 +1101,8 @@ public class ProjectTimerActivity extends Activity {
 			confirmResetAllTimers();
 		} else if (menuItemTitle == CONTEXT_MENU_CLEAR_ALL_NOTES) {
 			confirmClearAllNotes();
-
 		} else if (menuItemTitle == CONTEXT_MENU_DELETE_ALL_TIMERS) {
 			confirmDeleteAllTimers();
-		} else if (menuItemTitle == CONTEXT_MENU_RESET_TIMER) {
-			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
-
-			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
-			alert.setTitle("Reset " + textView.getText().toString() + "?");
-
-			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-				public void onCancel(DialogInterface arg0) {
-					return;
-				}
-			});
-			alert.setPositiveButton(OK_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							// get the innerTl view
-							// table layout found, which means a timer also
-							// exists; reset the time value
-							TextView timeValue = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
-							timeValue.setText(formatTimeTextDisplay(0));
-						}
-					});
-
-			alert.setNegativeButton(CANCEL_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog, int which) {
-							return;
-						}
-					});
-			alert.show();
-
-		} else if (menuItemTitle == CONTEXT_MENU_DELETE_TIMER) {
-			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
-
-			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
-			alert.setTitle("Delete " + textView.getText().toString() + "?");
-
-			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-				public void onCancel(DialogInterface arg0) {
-					return;
-				}
-			});
-			alert.setPositiveButton(OK_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							// get the innerTl view
-							TableLayout tv = (TableLayout) findViewById(item.getItemId());
-							container.removeView(tv);
-							timerId = (int) item.getItemId();
-
-							db.deleteTimer(timerId);
-
-							timerIds.remove(timerIds.indexOf(Integer.valueOf(timerId)));
-							timerCount--;
-						}
-					});
-
-			alert.setNegativeButton(CANCEL_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog, int which) {
-							return;
-						}
-					});
-			alert.show();
-
-		} else if (menuItemTitle == CONTEXT_MENU_EDIT_LABEL) {
-			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
-
-			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
-			alert.setTitle(CONTEXT_MENU_EDIT_LABEL);
-
-			final EditText input = new EditText(ProjectTimerActivity.this);
-			input.setSingleLine(); // one line tall
-			input.setText(textView.getText().toString());
-			input.setSelection(input.getText().length());
-			alert.setView(input);
-
-			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-				public void onCancel(DialogInterface arg0) {
-					return;
-				}
-			});
-
-			alert.setPositiveButton(OK_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							textView.setText(input.getText().toString().trim());
-						}
-					});
-
-			alert.setNegativeButton(CANCEL_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog, int which) {
-							return;
-						}
-					});
-			alert.show();
-		} else if (menuItemTitle == CONTEXT_MENU_EDIT_NOTE) {
-			final TextView textView = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
-			final int id = item.getItemId();
-
-			alert = new AlertDialog.Builder(ProjectTimerActivity.this);
-			alert.setTitle("Note for " + textView.getText().toString());
-
-			final EditText input = new EditText(ProjectTimerActivity.this);
-			input.setGravity(Gravity.TOP);
-			input.setLines(5); // one line tall
-
-			// get the note from the DB if available
-			cursor = db.getNote(id);
-			startManagingCursor(cursor);
-			String note = "";
-
-			if (cursor != null) {
-				note = cursor.getString(0);
-				input.setText(note);
-			}
-
-			input.setSelection(input.getText().length());
-			alert.setView(input);
-
-			alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-
-				public void onCancel(DialogInterface arg0) {
-					return;
-				}
-
-			});
-
-			alert.setPositiveButton(SAVE_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							if (db.updateNote(id, input.getText().toString().trim()))
-								Toast.makeText(ProjectTimerActivity.this, "Your note is saved.", Toast.LENGTH_SHORT).show();
-							else
-								Toast.makeText(ProjectTimerActivity.this, "Could not save your note.", Toast.LENGTH_LONG).show();
-
-							return;
-						}
-					});
-
-			alert.setNegativeButton(CANCEL_BTN_STRING,
-					new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog, int which) {
-							return;
-						}
-					});
-			alert.show();
-		} else if (menuItemTitle == CONTEXT_MENU_EDIT_TIME) {
-			final TextView timeText = (TextView) findViewById(TIME_ID_PREFIX + item.getItemId());
-			final TextView taskLabel = (TextView) findViewById(TASK_LABEL_ID_PREFIX + item.getItemId());
-			final ToggleButton startStopBtn = (ToggleButton) findViewById(START_STOP_ID_PREFIX + item.getItemId());
-			final boolean isOn = startStopBtn.isChecked();
-
-			// if timer is running, stop until finished editing time
-			if (isOn)
-				startStopBtn.performClick();
-
-			String[] timeArray = timeText.getText().toString().split(":");
-
-			final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			final View editTimeView = inflater.inflate(R.layout.edit_time, null);
-
-			final TextView hourText = (TextView) editTimeView.findViewById(R.id.editHourText);
-			final String hour = timeArray[0];
-			hourText.setText(hour);
-
-			TextView minuteText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-			String minute = timeArray[1];
-			minuteText.setText(minute);
-
-			TextView secondText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-			String second = timeArray[2];
-			secondText.setText(second);
-
-			final Dialog dialog = new Dialog(this);
-			dialog.setTitle("Edit Time for " + taskLabel.getText().toString());
-			dialog.setContentView(editTimeView);
-			dialog.show();
-
-			final Runnable onPressedIncrementHour = new Runnable() {
-				public void run() {
-
-					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
-					int h = Integer.parseInt(hText.getText().toString());
-					hText.setText(formatDoubleDigit(incrementHour(h)));
-					handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
-				}
-			};
-			final Runnable onPressedDecrementHour = new Runnable() {
-				public void run() {
-
-					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
-					int h = Integer.parseInt(hText.getText().toString());
-					hText.setText(formatDoubleDigit(decrementHour(h)));
-					handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
-				}
-			};
-
-			final Runnable onPressedIncrementMinute = new Runnable() {
-				public void run() {
-
-					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-					int m = Integer.parseInt(mText.getText().toString());
-					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
-					handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
-				}
-			};
-			final Runnable onPressedDecrementMinute = new Runnable() {
-				public void run() {
-
-					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-					int m = Integer.parseInt(mText.getText().toString());
-					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
-					handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
-				}
-			};
-
-			final Runnable onPressedIncrementSecond = new Runnable() {
-				public void run() {
-					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-					int s = Integer.parseInt(sText.getText().toString());
-					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
-					handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
-				}
-			};
-			final Runnable onPressedDecrementSecond = new Runnable() {
-				public void run() {
-					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-					int s = Integer.parseInt(sText.getText().toString());
-					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
-					handler.postAtTime(this, SystemClock.uptimeMillis() + repeatSpeed);
-				}
-			};
-			// ------------------------------------------------------------------------
-			// set the click function for the increment buttons
-			Button hourUpBtn = (Button) editTimeView.findViewById(R.id.editHourUpBtn);
-			hourUpBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-
-					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
-					int h = Integer.parseInt(hText.getText().toString());
-					hText.setText(formatDoubleDigit(incrementHour(h)));
-				}
-			});
-
-			hourUpBtn.setOnTouchListener(new View.OnTouchListener() {
-
-				public final boolean onTouch(View v, MotionEvent event) {
-
-					switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						handler.removeCallbacks(onPressedIncrementHour);
-						handler.postAtTime(onPressedIncrementHour, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						handler.removeCallbacks(onPressedIncrementHour);
-						break;
-					}
-					return false;
-				}
-
-			});
-
-			Button minuteUpBtn = (Button) editTimeView.findViewById(R.id.editMinuteUpBtn);
-			minuteUpBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-					int m = Integer.parseInt(mText.getText().toString());
-					mText.setText(formatDoubleDigit(incrementMinuteSecond(m)));
-				}
-			});
-			minuteUpBtn.setOnTouchListener(new View.OnTouchListener() {
-
-				public final boolean onTouch(View v, MotionEvent event) {
-
-					switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						handler.removeCallbacks(onPressedIncrementMinute);
-						handler.postAtTime(onPressedIncrementMinute, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						handler.removeCallbacks(onPressedIncrementMinute);
-						break;
-					}
-					return false;
-				}
-
-			});
-
-			Button secondUpBtn = (Button) editTimeView.findViewById(R.id.editSecondUpBtn);
-			secondUpBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-					int s = Integer.parseInt(sText.getText().toString());
-					sText.setText(formatDoubleDigit(incrementMinuteSecond(s)));
-				}
-			});
-			secondUpBtn.setOnTouchListener(new View.OnTouchListener() {
-
-				public final boolean onTouch(View v, MotionEvent event) {
-
-					switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						handler.removeCallbacks(onPressedIncrementSecond);
-						handler.postAtTime(onPressedIncrementSecond, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						handler.removeCallbacks(onPressedIncrementSecond);
-						break;
-					}
-					return false;
-				}
-
-			});
-
-			// ------------------------------------------------------------------------
-			// set the click function for the decrement buttons
-			Button hourDownBtn = (Button) editTimeView.findViewById(R.id.editHourDownBtn);
-			hourDownBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
-					int h = Integer.parseInt(hText.getText().toString());
-					hText.setText(formatDoubleDigit(decrementHour(h)));
-				}
-			});
-			hourDownBtn.setOnTouchListener(new View.OnTouchListener() {
-
-				public final boolean onTouch(View v, MotionEvent event) {
-
-					switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						handler.removeCallbacks(onPressedDecrementHour);
-						handler.postAtTime(onPressedDecrementHour, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						handler.removeCallbacks(onPressedDecrementHour);
-						break;
-					}
-					return false;
-				}
-
-			});
-
-			Button minuteDownBtn = (Button) editTimeView.findViewById(R.id.editMinuteDownBtn);
-			minuteDownBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-					int m = Integer.parseInt(mText.getText().toString());
-					mText.setText(formatDoubleDigit(decrementMinuteSecond(m)));
-				}
-			});
-			minuteDownBtn.setOnTouchListener(new View.OnTouchListener() {
-
-				public final boolean onTouch(View v, MotionEvent event) {
-
-					switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						handler.removeCallbacks(onPressedDecrementMinute);
-						handler.postAtTime(onPressedDecrementMinute, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						handler.removeCallbacks(onPressedDecrementMinute);
-						break;
-					}
-					return false;
-				}
-			});
-
-			Button secondDownBtn = (Button) editTimeView.findViewById(R.id.editSecondDownBtn);
-			secondDownBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-					int s = Integer.parseInt(sText.getText().toString());
-					sText.setText(formatDoubleDigit(decrementMinuteSecond(s)));
-				}
-			});
-			secondDownBtn.setOnTouchListener(new View.OnTouchListener() {
-
-				public final boolean onTouch(View v, MotionEvent event) {
-
-					switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-						handler.removeCallbacks(onPressedDecrementSecond);
-						handler.postAtTime(onPressedDecrementSecond, SystemClock.uptimeMillis() + repeatSpeed + PRESS_DELAY);
-						break;
-					case MotionEvent.ACTION_UP:
-						handler.removeCallbacks(onPressedDecrementSecond);
-						break;
-					}
-					return false;
-				}
-
-			});
-
-			Button editTimeOkBtn = (Button) editTimeView.findViewById(R.id.editTimeOkBtn);
-			editTimeOkBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-
-					final TextView hText = (TextView) editTimeView.findViewById(R.id.editHourText);
-					int h = Integer.parseInt(hText.getText().toString());
-
-					final TextView mText = (TextView) editTimeView.findViewById(R.id.editMinuteText);
-					int m = Integer.parseInt(mText.getText().toString());
-
-					final TextView sText = (TextView) editTimeView.findViewById(R.id.editSecondText);
-					int s = Integer.parseInt(sText.getText().toString());
-
-					timeText.setText(formatDoubleDigit(h) + ":" + formatDoubleDigit(m) + ":" + formatDoubleDigit(s));
-
-					// restart the timer
-					if (isOn)
-						startStopBtn.performClick();
-
-					dialog.dismiss();
-
-				}
-			});
-
-			Button editTimeCancelBtn = (Button) editTimeView.findViewById(R.id.editTimeCancelBtn);
-			editTimeCancelBtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					// restart the timer
-					if (isOn)
-						startStopBtn.performClick();
-
-					dialog.dismiss();
-
-				}
-			});
-
 		}
 
 		return true;
@@ -1630,14 +1123,11 @@ public class ProjectTimerActivity extends Activity {
 		super.onResume();
 
 		if (!db.isOpen()) {
-			
+
 			db.open();
 		}
 		// get timers from db
-				
 
-				
-				
 		// calculate total if there are timers
 
 		final TextView totalTextView = (TextView) findViewById(R.id.sumText);
@@ -1646,6 +1136,7 @@ public class ProjectTimerActivity extends Activity {
 			int seconds = 0;
 			int len = 0;
 			TextView timeValue;
+			TableLayout tl;
 
 			public void run() {
 				handler.post(new Runnable() {
@@ -1672,7 +1163,7 @@ public class ProjectTimerActivity extends Activity {
 							totalTextView.setText("00:00:00");
 						else {
 							totalTextView.setText(formatTimeTextDisplay(seconds));
-							
+
 						}
 					}
 				});
@@ -1722,6 +1213,7 @@ public class ProjectTimerActivity extends Activity {
 		ToggleButton btn;
 		boolean isOn = false;
 		long timestamp = 0;
+		TableLayout tl;
 
 		Calendar cal = Calendar.getInstance();
 
@@ -1827,7 +1319,7 @@ public class ProjectTimerActivity extends Activity {
 	}
 
 	private void resetAllTimers() {
-
+		TableLayout tl;
 		int len = timerIds.size();
 
 		if (len > 0) {
@@ -1861,13 +1353,13 @@ public class ProjectTimerActivity extends Activity {
 		for (int i = 0; i < len; i++) {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 			id = (Integer) timerIds.get(i);
-			db.updateNote(id, ""); 
+			db.updateNote(id, "");
 		}
-		
-	}
-	
-	private void deleteAllTimers() {
 
+	}
+
+	private void deleteAllTimers() {
+		TableLayout tl;
 		int len = timerIds.size();
 		int id = 0;
 
@@ -1882,83 +1374,82 @@ public class ProjectTimerActivity extends Activity {
 		timerIds.clear();
 		timerCount = 0;
 	}
-	
-//	protected class MyDragEventListener implements View.OnDragListener {
-//		float threshold = 5f;
-//		float previousY = 0;
-//		
-//		public boolean onDrag(View v, DragEvent event) {
-//			// View v is the view that received the drag event
-//			
-//			final int action = event.getAction();
-//			
-//			switch (action) {
-//				case DragEvent.ACTION_DRAG_STARTED:
-//					if (v.getTag() != null && v.getTag() == "IsDragging")
-//						return false;
-//					
-//					return true;
-//				
-//				case DragEvent.ACTION_DRAG_ENTERED:
-//					
-//					v.setAlpha(0.5f);
-//					v.setBackgroundColor(Color.GRAY);
-//					v.invalidate();
-//					
-//					
-//					
-//					return true;
-//					
-//				case DragEvent.ACTION_DRAG_LOCATION:
-//					// move timer down or up
-//					// getY() is relative to the View v parameter
-//					if (previousY == 0)
-//						previousY = event.getY();
-//					
-//					if (Math.abs(event.getY() - previousY) > threshold) { 
-//						if (event.getY() < previousY) {
-//							// timer is being dragged up
-//							Log.w("Drag Direction", "UP");
-//						} else {
-//							// timer is being dragged down
-//							Log.w("Drag Direction", "DOWN");
-//						}
-//						
-//						previousY = event.getY();
-//					}
-//					
-//					
-//					//Log.w("Location", event.getX() + "::" + event.getY());
-//					int h = v.getHeight();
-//					//v.setY(v.getY() + h);
-//					//v.invalidate();
-//					
-//					return true;
-//					
-//				case DragEvent.ACTION_DRAG_EXITED:
-//					v.setAlpha(1.0f);
-//					v.setBackgroundColor(Color.BLACK);
-//					v.invalidate();
-//					return true;
-//					
-//				case DragEvent.ACTION_DROP:
-//					v.setTag(null);
-//					v.setAlpha(1.0f);
-//					v.setBackgroundColor(Color.BLACK);
-//					v.invalidate();
-//					return true;
-//					
-//				case DragEvent.ACTION_DRAG_ENDED:
-//					v.setTag(null);
-//					v.setAlpha(1.0f);
-//					v.setBackgroundColor(Color.BLACK);
-//					v.invalidate();
-//					return true;
-//			}
-//			
-//			return false;
-//		}
-//	}
-	
+
+	// protected class MyDragEventListener implements View.OnDragListener {
+	// float threshold = 5f;
+	// float previousY = 0;
+	//
+	// public boolean onDrag(View v, DragEvent event) {
+	// // View v is the view that received the drag event
+	//
+	// final int action = event.getAction();
+	//
+	// switch (action) {
+	// case DragEvent.ACTION_DRAG_STARTED:
+	// if (v.getTag() != null && v.getTag() == "IsDragging")
+	// return false;
+	//
+	// return true;
+	//
+	// case DragEvent.ACTION_DRAG_ENTERED:
+	//
+	// v.setAlpha(0.5f);
+	// v.setBackgroundColor(Color.GRAY);
+	// v.invalidate();
+	//
+	//
+	//
+	// return true;
+	//
+	// case DragEvent.ACTION_DRAG_LOCATION:
+	// // move timer down or up
+	// // getY() is relative to the View v parameter
+	// if (previousY == 0)
+	// previousY = event.getY();
+	//
+	// if (Math.abs(event.getY() - previousY) > threshold) {
+	// if (event.getY() < previousY) {
+	// // timer is being dragged up
+	// Log.w("Drag Direction", "UP");
+	// } else {
+	// // timer is being dragged down
+	// Log.w("Drag Direction", "DOWN");
+	// }
+	//
+	// previousY = event.getY();
+	// }
+	//
+	//
+	// //Log.w("Location", event.getX() + "::" + event.getY());
+	// int h = v.getHeight();
+	// //v.setY(v.getY() + h);
+	// //v.invalidate();
+	//
+	// return true;
+	//
+	// case DragEvent.ACTION_DRAG_EXITED:
+	// v.setAlpha(1.0f);
+	// v.setBackgroundColor(Color.BLACK);
+	// v.invalidate();
+	// return true;
+	//
+	// case DragEvent.ACTION_DROP:
+	// v.setTag(null);
+	// v.setAlpha(1.0f);
+	// v.setBackgroundColor(Color.BLACK);
+	// v.invalidate();
+	// return true;
+	//
+	// case DragEvent.ACTION_DRAG_ENDED:
+	// v.setTag(null);
+	// v.setAlpha(1.0f);
+	// v.setBackgroundColor(Color.BLACK);
+	// v.invalidate();
+	// return true;
+	// }
+	//
+	// return false;
+	// }
+	// }
 
 }
