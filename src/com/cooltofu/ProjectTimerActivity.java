@@ -66,6 +66,7 @@ public class ProjectTimerActivity extends Activity {
 	private final static int EMAIL_TIMERS_MENU_ID = 40000;
 	private final static int DELETE_ALL_TIMERS_MENU_ID = 50000;
 	private final static int RESET_ALL_TIMERS_MENU_ID = 60000;
+	private final static int CLEAR_ALL_NOTES_MENU_ID = 70000;
 
 	private static final String TIME_FORMAT = "%02d:%02d:%02d";
 	final static String ALERT_NEW_TIMER_TITLE = "Add New Timer";
@@ -880,7 +881,7 @@ public class ProjectTimerActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(1, EMAIL_TIMERS_MENU_ID, 0, "Email Timers");
 		menu.add(1, RESET_ALL_TIMERS_MENU_ID, 1, "Reset All Timers");
-		menu.add(1, RESET_ALL_TIMERS_MENU_ID, 2, "Clear All Notes");
+		menu.add(1, CLEAR_ALL_NOTES_MENU_ID, 2, "Clear All Notes");
 		menu.add(1, DELETE_ALL_TIMERS_MENU_ID, 3, "Delete All Timers");
 		return true;
 	}
@@ -1099,6 +1100,9 @@ public class ProjectTimerActivity extends Activity {
 			return true;
 		case RESET_ALL_TIMERS_MENU_ID:
 			confirmResetAllTimers();
+			return true;
+		case CLEAR_ALL_NOTES_MENU_ID:
+			confirmClearAllNotes();
 			return true;
 		case DELETE_ALL_TIMERS_MENU_ID:
 			confirmDeleteAllTimers();
