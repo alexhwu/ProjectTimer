@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/moreScreenLinearLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    
+    <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#696758" />
+        
+    <LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical" >
+	        
+	    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:orientation="horizontal">
+	        
+		    
+		    <LinearLayout
+	            android:id="@+id/bottomLayout"
+	            android:layout_alignParentBottom="true"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="vertical">
+	            
+	            
+	            <Button
+	                android:id="@+id/moreScreenOkBtn"
+	                android:layout_width="fill_parent"
+	                android:layout_height="50dp"
+	                android:background="@drawable/custom_button"
+	                android:textColor="@color/text_color"
+	                android:text="Back to Main Screen" />
+	      
+	        </LinearLayout>
+	        
+		    <ScrollView
+		        android:id="@+id/scrollView1"
+		        android:layout_above="@+id/bottomLayout"
+		        android:layout_alignParentTop="true"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content" >   
+		        	        <LinearLayout
+		            android:id="@+id/linearLayout"
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:paddingRight="15dp"
+		            android:orientation="vertical" >
+				    
+				    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="15dp"
+                        android:text="TIP #1: Click the OFF/ON button to start/stop the timer." />
+				    
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:paddingLeft="15dp"
+				        android:paddingTop="15dp"
+				        android:text="TIP #2: Press and hold the time/label for more options." />
+				    
+				    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="15dp"
+                        android:text="TIP #3: Use the Options button at the bottom left of the screen for more actions." />
+				    
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:paddingLeft="15dp"
+				        android:paddingTop="45dp"
+				        android:text="Created by CoolTofu" />
+				    <TextView
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:autoLink="web"
+				        android:paddingLeft="15dp"
+				        android:text="http://cooltofu.com" />
+				   
+				    </LinearLayout>
+			</ScrollView>
+			<View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#696758"
+                    android:layout_below="@+id/scrollView1" />
+	    </RelativeLayout>
+	    
+    </LinearLayout>
+</LinearLayout>

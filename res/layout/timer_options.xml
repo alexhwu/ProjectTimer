@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android" >
+    <TableLayout
+        android:id="@+id/timerOptions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <TableRow>
+            <ImageButton
+                android:id="@+id/deleteButton"
+                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:background="#000000"
+                android:src="@drawable/content_discard"
+                android:onClick="deleteTime"/>
+            <ImageButton
+                android:id="@+id/editTimeButton"
+                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:background="#000000"
+                android:src="@drawable/device_access_time"
+                android:onClick="editTime" />
+            <ImageButton
+                android:id="@+id/resetButton"
+                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:src="@drawable/images_rotate_left"
+                android:background="#000000"
+                android:onClick="resetTimer" />
+            <ImageButton
+                android:id="@+id/editLabelButton"
+                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:src="@drawable/collections_labels"
+                android:background="#000000"
+                android:onClick="editLabel" />
+            <ImageButton
+                android:id="@+id/editNoteButton"
+                android:layout_width="55dp"
+                android:layout_height="45dp"
+                android:src="@drawable/content_edit"
+                android:background="#000000"
+                android:onClick="editNote" />
+        </TableRow>
+    </TableLayout>
+</TableRow>

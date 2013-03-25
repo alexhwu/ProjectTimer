@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tableLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="visible"
+     >
+    <TableRow>
+        <ToggleButton
+            android:id="@+id/button1"
+            android:layout_width="45dp"
+            android:layout_height="55dp"
+            android:text="Start"
+            android:textColor="#ffffff"
+            android:textSize="12dp" />
+        <TableLayout
+            android:id="@+id/tableLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:stretchColumns="0" >
+            <TableRow>
+                <TextView
+                    android:id="@+id/timeText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:text="00:00:00"
+                    android:textSize="28dp" />
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:id="@+id/taskLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="8dp"
+                    android:text="Timer Label"
+                    android:textSize="18dp" />
+            </TableRow>
+        </TableLayout>
+    </TableRow>
+    <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#302f2f" />
+</TableLayout>
