@@ -16,10 +16,12 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -30,6 +32,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,7 +40,9 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.view.ViewGroup.LayoutParams;
+
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -45,9 +50,12 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+
+
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -197,7 +205,6 @@ public class ProjectTimerActivity extends Activity {
 			}
 		});
 
-	
 		// -------------------------------
 		// Options button actions
 		optionBtn = (Button) findViewById(R.id.optionBtn);
@@ -208,8 +215,6 @@ public class ProjectTimerActivity extends Activity {
 			}
 		});
 		registerForContextMenu(optionBtn);
-
-		
 	}// onCreate
 
 	public boolean handleTimerClick(final View v) {
@@ -304,7 +309,6 @@ public class ProjectTimerActivity extends Activity {
 			}
 
 		});
-		
 
 		child.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
@@ -317,6 +321,7 @@ public class ProjectTimerActivity extends Activity {
 				return false;
 			}
 		});
+
 		// child.setOnLongClickListener(new View.OnLongClickListener() {
 		// public boolean onLongClick(View v) {
 		// ClipData.Item item = new ClipData.Item(String.valueOf(v.getId()));
@@ -332,6 +337,7 @@ public class ProjectTimerActivity extends Activity {
 		// });
 		// child.setOnDragListener(new MyDragEventListener()); // each table has
 		// // own listener
+
 
 		final TextView timeText = (TextView) child.findViewById(R.id.timeText);
 		final TextView labelText = (TextView) child.findViewById(R.id.taskLabel);
@@ -1385,6 +1391,7 @@ public class ProjectTimerActivity extends Activity {
 		timerIds.clear();
 		timerCount = 0;
 	}
+
 
 	// protected class MyDragEventListener implements View.OnDragListener {
 	// float threshold = 5f;
