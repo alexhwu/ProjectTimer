@@ -6,10 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,12 +36,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -127,7 +125,7 @@ public class ProjectTimerActivity extends Activity {
 		Eula.show(this);
 
 		setContentView(R.layout.main);
-
+		container = (LinearLayout) findViewById(R.id.linearLayout);
 		db = new TimerDbAdapter(this);
 		db.open();
 
@@ -209,10 +207,11 @@ public class ProjectTimerActivity extends Activity {
 	}
 
 	private void createTaskTimer(final int timerId, String label, final int seconds, boolean isOn) {
-		container = (LinearLayout) findViewById(R.id.linearLayout);
+		
 		final View child = getLayoutInflater().inflate(R.layout.timer, null);
 		child.setId(timerId);
-
+		child.setTag(timerId);
+		
 		child.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				handleTimerClick(v);
@@ -223,11 +222,11 @@ public class ProjectTimerActivity extends Activity {
 		child.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					((TextView) child.findViewById(R.id.timeText)).setTextColor(Color.GRAY);
-				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					((TextView) child.findViewById(R.id.timeText)).setTextColor(getResources().getColor(R.color.text_color));
-				}
+//				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//					((TextView) child.findViewById(R.id.timeText)).setTextColor(Color.GRAY);
+//				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+//					((TextView) child.findViewById(R.id.timeText)).setTextColor(getResources().getColor(R.color.text_color));
+//				}
 				return false;
 			}
 		});
@@ -255,11 +254,12 @@ public class ProjectTimerActivity extends Activity {
 		final MyTimer myTimer = new MyTimer(timerId, labelText, timeText, label, seconds);
 		timerArray.append(timerId, myTimer);
 
-		final ToggleButton startStopBtn = (ToggleButton) child.findViewById(R.id.button1);
+		final ToggleButton startStopBtn = (ToggleButton) child.findViewById(R.id.startStopButton);
 		startStopBtn.setText(TOGGLE_BTN_OFF_LABEL);
-		startStopBtn.setTextSize(10);
-		startStopBtn.setHeight(55);
-		startStopBtn.setPadding(0, 0, 0, 25);
+//		startStopBtn.setTextSize(10);
+		//startStopBtn.setHeight(55);
+		//startStopBtn.setPadding(0, 0, 0, 25);
+		
 
 		startStopBtn.setBackgroundColor(Color.WHITE);
 		startStopBtn.setTextColor(Color.BLACK);
@@ -291,18 +291,25 @@ public class ProjectTimerActivity extends Activity {
 		slideDownAnimation.setDuration(200);
 		slideDownAnimation.setFillAfter(true);
 		
-		View timerOption = getLayoutInflater().inflate(R.layout.timer_options, null);
+		//View timerOption = getLayoutInflater().inflate(R.layout.timer_options, null);
 		//child.setVisibility(View.VISIBLE);
-		((ViewGroup) child.findViewById(R.id.tableLayout2)).addView(timerOption);
-
+		//((ViewGroup) child.findViewById(R.id.tableLayout2)).addView(timerOption);
+		
+		// add spacer
+		
+		
+		
+				
 		container.addView(child, 0); // add to top of table
 		child.startAnimation(slideDownAnimation);
-
+		
+		
+		
 	}
 
 	public void resetTimer(View v) {
 		// TODO: find a better way to find outer table layout
-		final View parent = (View) v.getParent().getParent().getParent().getParent().getParent().getParent();
+		final View parent = (View) v.getParent().getParent();
 		// Log.w("timer id", parent.getId() + "");
 
 		final MyTimer mt = timerArray.get(parent.getId());
@@ -342,7 +349,7 @@ public class ProjectTimerActivity extends Activity {
 	public void editLabel(View v) {
 		// TODO: find a better way to find outer table layout
 		// Maybe use Tag
-		View parent = (View) v.getParent().getParent().getParent().getParent().getParent().getParent();
+		View parent = (View) v.getParent().getParent();
 
 		final MyTimer mt = timerArray.get(parent.getId());
 
@@ -383,7 +390,7 @@ public class ProjectTimerActivity extends Activity {
 
 	public void editNote(View v) {
 		// TODO: find a better way to find outer table layout
-		View parent = (View) v.getParent().getParent().getParent().getParent().getParent().getParent();
+		View parent = (View) v.getParent().getParent();
 
 		// final TextView textView = (TextView)
 		// parent.findViewById(R.id.taskLabel);
@@ -445,7 +452,7 @@ public class ProjectTimerActivity extends Activity {
 
 	public void deleteTime(View v) {
 		// TODO: find a better way to find outer table layout
-		final View parent = (View) v.getParent().getParent().getParent().getParent().getParent().getParent();
+		final View parent = (View) v.getParent().getParent();
 
 		// final TextView textView = (TextView)
 		// parent.findViewById(R.id.taskLabel);
@@ -465,8 +472,8 @@ public class ProjectTimerActivity extends Activity {
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// get the innerTl view
-						TableLayout tv = (TableLayout) findViewById(id);
-						container.removeView(tv);
+						
+						container.removeView(parent);
 
 						db.deleteTimer(id);
 
@@ -488,12 +495,12 @@ public class ProjectTimerActivity extends Activity {
 
 	public void editTime(View v) {
 		// TODO: find a better way to find outer table layout
-		View parent = (View) v.getParent().getParent().getParent().getParent().getParent().getParent();
+		View parent = (View) v.getParent().getParent();
 
 		final TextView timeText = (TextView) parent.findViewById(R.id.timeText);
 		final TextView taskLabel = (TextView) parent.findViewById(R.id.taskLabel);
 
-		final ToggleButton startStopBtn = (ToggleButton) parent.findViewById(R.id.button1);
+		final ToggleButton startStopBtn = (ToggleButton) parent.findViewById(R.id.startStopButton);
 		final boolean isOn = (startStopBtn == null) ? false: startStopBtn.isChecked();
 		
 		final MyTimer mt = timerArray.get(parent.getId());
@@ -826,16 +833,10 @@ public class ProjectTimerActivity extends Activity {
 		if (len > 0) {
 			int id = 0;
 			String note = "";
-			TableLayout tl;
 
 			for (int i = 0; i < len; i++) {
 
 				id = timerArray.keyAt(i);
-
-				tl = (TableLayout) findViewById(id);
-
-				if (tl == null)
-					continue; // none found; continue to next iteration
 
 				cursor = db.getNote(id);
 				startManagingCursor(cursor);
@@ -1190,19 +1191,15 @@ public class ProjectTimerActivity extends Activity {
 	}
 
 	private void deleteAllTimers() {
-		TableLayout tl;
 		int len = timerArray.size();
 		int id = 0;
 
 		for (int i = 0; i < len; i++) {
 			// KEY_ROWID, KEY_LABEL, KEY_SECONDS, KEY_IS_ON
 			id = timerArray.keyAt(i);
-			tl = (TableLayout) findViewById(id);
-			container.removeView(tl);
-
 			db.deleteTimer(id);
-
 		}
+		container.removeAllViews();
 		timerArray.clear();
 		timerCount = 0;
 	}

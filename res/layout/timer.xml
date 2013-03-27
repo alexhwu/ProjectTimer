@@ -1,49 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tableLayout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/timer"
+    android:layout_height="wrap_content"
+    android:layout_width="fill_parent"
+    
+    android:orientation="vertical">
+    
+    
+    
+
+<RelativeLayout
+    
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:visibility="visible"
-     >
-    <TableRow>
-        <ToggleButton
-            android:id="@+id/button1"
-            android:layout_width="45dp"
-            android:layout_height="55dp"
-            android:text="Start"
-            android:textColor="#ffffff"
-            android:textSize="12dp" />
-        <TableLayout
-            android:id="@+id/tableLayout2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:stretchColumns="0" >
-            <TableRow>
-                <TextView
-                    android:id="@+id/timeText"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:text="00:00:00"
-                    android:textSize="28dp" />
-            </TableRow>
-            <TableRow>
-                <TextView
-                    android:id="@+id/taskLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="8dp"
-                    android:text="Timer Label"
-                    android:textSize="18dp" />
-            </TableRow>
-        </TableLayout>
-    </TableRow>
-    <View
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="#302f2f" />
-</TableLayout>
+    android:background="@drawable/timerbg" >
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minEms="4"
+        android:text="00:00:00"
+        android:textSize="28dp" />
+    <TextView
+        android:id="@+id/taskLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/timeText"
+        android:layout_alignBaseline="@id/timeText"
+        android:layout_marginRight="8dp"
+        android:text="Timer Label"
+        android:textSize="18dp" />
+    <View 
+    android:id="@+id/spacer"
+    android:layout_width="fill_parent"  
+    android:layout_height="10dp"
+    android:layout_below="@id/timeText"
+    android:background="#0000FF00"
+     />
+    <ToggleButton
+        android:id="@+id/startStopButton"
+        android:layout_width="45dp"
+        android:layout_height="55dp"
+        android:textSize="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/spacer"
+        
+        />
+    <ImageButton
+        android:id="@+id/editTimeButton"
+        android:layout_width="45dp"
+        android:layout_height="55dp"
+        android:layout_alignTop="@id/startStopButton"
+        android:layout_toRightOf="@id/startStopButton"
+        android:background="@android:color/transparent"
+        android:onClick="editTime"
+        android:alpha="0.7"
+        android:src="@drawable/device_access_time" />
+    <ImageButton
+        android:id="@+id/resetButton"
+        android:layout_width="45dp"
+        android:layout_height="55dp"
+        android:layout_alignTop="@id/startStopButton"
+        android:layout_toRightOf="@id/editTimeButton"
+        android:background="@android:color/transparent"
+        android:onClick="resetTimer"
+        android:alpha="0.7"
+        android:src="@drawable/images_rotate_left" />
+    <ImageButton
+        android:id="@+id/editLabelButton"
+        android:layout_width="45dp"
+        android:layout_height="55dp"
+        android:layout_alignTop="@id/startStopButton"
+        android:layout_toRightOf="@id/resetButton"
+        android:background="@android:color/transparent"
+        android:onClick="editLabel"
+        android:alpha="0.7"
+        android:src="@drawable/collections_labels" />
+    <ImageButton
+        android:id="@+id/editNoteButton"
+        android:layout_width="45dp"
+        android:layout_height="55dp"
+        android:layout_alignTop="@id/startStopButton"
+        android:layout_toRightOf="@id/editLabelButton"
+        android:background="@android:color/transparent"
+        android:onClick="editNote"
+        android:alpha="0.7"
+        android:src="@drawable/content_edit" />
+    <View 
+    android:id="@+id/spacer2"
+    android:layout_width="20dp"  
+    android:layout_height="wrap_content"
+    android:layout_toRightOf="@id/editNoteButton"
+    android:background="#0000FF00"
+     />
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="45dp"
+        android:layout_height="55dp"
+        android:layout_alignTop="@id/startStopButton"
+        android:layout_toRightOf="@id/spacer2"
+        android:background="@android:color/transparent"
+        android:onClick="deleteTime"
+        android:alpha="0.4"
+        android:src="@drawable/content_discard" />
+    
+</RelativeLayout>
+
+<View 
+    android:id="@+id/spacer"
+    android:layout_width="fill_parent"  
+    android:layout_height="15dp"
+    android:background="@android:color/transparent"
+     />
+</LinearLayout>
