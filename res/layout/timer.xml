@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:minEms="4"
         android:text="00:00:00"
-        android:textSize="28dp" />
+        android:textSize="28sp" />
     <TextView
         android:id="@+id/taskLabel"
         android:layout_width="wrap_content"
@@ -29,7 +29,7 @@
         android:layout_alignBaseline="@id/timeText"
         android:layout_marginRight="8dp"
         android:text="Timer Label"
-        android:textSize="18dp" />
+        android:textSize="18sp" />
     <View 
     android:id="@+id/spacer"
     android:layout_width="fill_parent"  
@@ -41,7 +41,7 @@
         android:id="@+id/startStopButton"
         android:layout_width="45dp"
         android:layout_height="55dp"
-        android:textSize="10dp"
+        android:textSize="10sp"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/spacer"
         
@@ -107,7 +107,7 @@
 </RelativeLayout>
 
 <View 
-    android:id="@+id/spacer"
+    
     android:layout_width="fill_parent"  
     android:layout_height="15dp"
     android:background="@android:color/transparent"

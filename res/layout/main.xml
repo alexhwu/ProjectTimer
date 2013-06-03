@@ -101,14 +101,14 @@
                             android:layout_marginLeft="17dp"
                             android:text="00:00:00"
                             android:textStyle="bold"
-                            android:textSize="28dp" />
+                            android:textSize="28sp" />
                         <TextView
                             android:id="@+id/sumLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="19dp"
                             android:text="Total"
-                            android:textSize="14dp" />
+                            android:textSize="14sp" />
                     </TableRow>
                 </TableLayout>
             </LinearLayout>

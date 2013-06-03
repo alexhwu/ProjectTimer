@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <TableLayout
         android:id="@+id/editTimeLayout"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
@@ -15,7 +15,7 @@
                 android:layout_height="wrap_content"
                 android:text="+" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="25sp"/>
             <TextView/>
             <Button
                 android:id="@+id/editMinuteUpBtn"
@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:text="+" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="25sp"/>
             <TextView/>
             <Button
                 android:id="@+id/editSecondUpBtn"
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:text="+" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="25sp"/>
 		        
         </TableRow>
         
@@ -41,14 +41,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="35dp"
+                android:textSize="35sp"
                 android:text="00" />
             
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="35dp"
+                android:textSize="35sp"
                 android:text=":" />
             
             <TextView
@@ -56,14 +56,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="35dp"
+                android:textSize="35sp"
                 android:text="00" />
             
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="35dp"
+                android:textSize="35sp"
                 android:text=":" />
             
             <TextView
@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="35dp"
+                android:textSize="35sp"
                 android:text="00" />
         </TableRow>
         
@@ -83,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:text="-"
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="25sp"/>
             <TextView/>
             <Button
                 android:id="@+id/editMinuteDownBtn"
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="-" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="25sp"/>
             <TextView/>
             <Button
                 android:id="@+id/editSecondDownBtn"
@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:text="-" 
                 android:textColor="#333333"
-                android:textSize="25dp"/>
+                android:textSize="25sp"/>
         
         </TableRow>
         
@@ -108,17 +108,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-                    <Button
-		                android:id="@+id/editTimeOkBtn"
-		                android:layout_width="110dp"
-		                android:layout_height="wrap_content"
-		                android:text="OK" />
+                    
                     
 	                <Button
 	                    android:id="@+id/editTimeCancelBtn"
 	                    android:layout_width="88dp"
 	                    android:layout_height="wrap_content"
-	                    android:text="Cancel" />    
+	                    android:text="Cancel" />
+	                <Button
+                        android:id="@+id/editTimeOkBtn"
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:text="OK" />    
           </LinearLayout>      
     </TableLayout>
 </LinearLayout>
